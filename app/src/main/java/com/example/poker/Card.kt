@@ -1,7 +1,8 @@
 package com.example.poker
 
-import android.content.Context
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -21,16 +22,16 @@ class Card(private var rank: Int, private var suit: Int) {
     /**
      * Get Card image path
      */
-    fun getCardImagePath(): String {
+    private fun getCardImagePath() = "card_${this.rankArray[this.rank]}_${this.suitArray[this.suit]}"
 
-        return "card_${this.rankArray[this.rank]}_${this.suitArray[this.suit]}";
-    }
-
+    @SuppressLint("DiscouragedApi")
     @Composable
-    fun CardImage(filePath: String) {
+    fun CardImage() {
         val context = LocalContext.current;
-        val imageId = context.resources.getIdentifier(filePath, "drawable", context.packageName);
+        val imageId = context.resources.getIdentifier(this.getCardImagePath(), "drawable", context.packageName);
 
-        Image(painter = painterResource(id = imageId), contentDescription = "card")
+        Column() {
+            Image(painter = painterResource(id = imageId), contentDescription = "card",)
+        }
     }
 }

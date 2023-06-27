@@ -4,6 +4,7 @@ import android.media.Image
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -25,10 +26,13 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val card = Card(8,0);
-                    val filePath = card.getCardImagePath();
+                    val deck = Deck();
 
-                    card.CardImage(filePath)
+                    val card1 = deck.dealCard();
+                    val card2 = deck.dealCard();
+
+                    HandImage(card1 = card1, card2 = card2, Modifier)
+
                 }
             }
         }
@@ -48,5 +52,13 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 fun GreetingPreview() {
     PokerTheme {
         Greeting("Android")
+    }
+}
+
+@Composable
+fun HandImage(card1: Card, card2: Card, modifier: Modifier) {
+    Column {
+        card1.CardImage()
+        card2.CardImage()
     }
 }
