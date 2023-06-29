@@ -34,4 +34,11 @@ class Card(private var rank: Int, private var suit: Int) {
             Image(painter = painterResource(id = imageId), contentDescription = "card",)
         }
     }
+
+    /**
+     * output card rank_suit
+     */
+    override fun toString(): String {
+        return "${this.rankArray[this.rank]}_${this.suitArray[this.suit]}"
+    }
 }

@@ -2,9 +2,11 @@ package com.example.poker
 
 import android.media.Image
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -27,12 +29,35 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val deck = Deck();
+                    val player1 = ArrayList<Card>();
+                    val player2 = ArrayList<Card>();
+                    val table = ArrayList<Card>();
+                    val dealer = Dealer();
 
-                    val card1 = deck.dealCard();
-                    val card2 = deck.dealCard();
+                    dealer.dealCards(deck = deck, player1 = player1, player2 = player2)
 
-                    HandImage(card1 = card1, card2 = card2, Modifier)
+                    for (card: Card in player1) {
+                        Log.d("Player1:", card.toString())
+                    }
 
+                    for (card: Card in player2) {
+                        Log.d("Player2:", card.toString())
+                    }
+
+                    dealer.flop(deck = deck, table = table)
+                    for (card: Card in table) {
+                        Log.d("table(flop)", card.toString())
+                    }
+
+                    dealer.turn(deck = deck, table = table)
+                    for (card: Card in table) {
+                        Log.d("table(turn)", card.toString())
+                    }
+
+                    dealer.river(deck = deck, table = table)
+                    for (card: Card in table) {
+                        Log.d("table(river)", card.toString())
+                    }
                 }
             }
         }
@@ -57,7 +82,7 @@ fun GreetingPreview() {
 
 @Composable
 fun HandImage(card1: Card, card2: Card, modifier: Modifier) {
-    Column {
+    Row {
         card1.CardImage()
         card2.CardImage()
     }
