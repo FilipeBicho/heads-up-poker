@@ -18,6 +18,7 @@ class Deck {
             }
         }
 
+        // shuffle
         for (i in deck.size -1 downTo 1) {
             // Get random number
             val index = Random.nextInt(i + 1)

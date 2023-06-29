@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 
-class Card(private var rank: Int, private var suit: Int) {
+class Card(var rank: Int, var suit: Int) {
 
     /**
      * Card rank

@@ -34,30 +34,16 @@ class MainActivity : ComponentActivity() {
                     val table = ArrayList<Card>();
                     val dealer = Dealer();
 
-                    dealer.dealCards(deck = deck, player1 = player1, player2 = player2)
+                    player1.add(Card(4,0))
+                    player1.add(Card(1,0))
+                    table.add(Card(3, 0))
+                    table.add(Card(0, 0))
+                    table.add(Card(2, 0))
 
-                    for (card: Card in player1) {
-                        Log.d("Player1:", card.toString())
-                    }
+                    val player1Hand = Hand(playerCards = player1, tableCards = table).getHand()
 
-                    for (card: Card in player2) {
-                        Log.d("Player2:", card.toString())
-                    }
+                    player1Hand.forEach{Log.d("hand111", it.toString())}
 
-                    dealer.flop(deck = deck, table = table)
-                    for (card: Card in table) {
-                        Log.d("table(flop)", card.toString())
-                    }
-
-                    dealer.turn(deck = deck, table = table)
-                    for (card: Card in table) {
-                        Log.d("table(turn)", card.toString())
-                    }
-
-                    dealer.river(deck = deck, table = table)
-                    for (card: Card in table) {
-                        Log.d("table(river)", card.toString())
-                    }
                 }
             }
         }
