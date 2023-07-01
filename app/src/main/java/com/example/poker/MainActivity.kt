@@ -34,12 +34,13 @@ class MainActivity : ComponentActivity() {
                     val table = ArrayList<Card>();
                     val dealer = Dealer();
 
-                    player1.add(Card(8,0))
+                    player1.add(Card(0,0))
                     player1.add(Card(10,0))
                     table.add(Card(11, 0))
-                    table.add(Card(0, 0))
-                    table.add(Card(9, 0))
-                    table.add(Card(12, 0))
+                    table.add(Card(12, 1))
+                    table.add(Card(9, 1))
+                    table.add(Card(5, 1))
+                    table.add(Card(6, 1))
 
                     val player1Hand = Hand(playerCards = player1, tableCards = table).getHand()
 

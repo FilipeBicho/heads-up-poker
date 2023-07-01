@@ -1,11 +1,14 @@
 package com.example.poker
 
+import java.util.Collections
+import java.util.TreeMap
+
 class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
 
     private var allCards = mutableListOf<Card>()
     private var hand = mutableListOf<Card>()
-    private var suitRepeatedCards = LinkedHashMap<Int, List<Card>>()
-    private var rankRepeatedCards = LinkedHashMap<Int, List<Card>>()
+    private lateinit var suitRepeatedCards: MutableList<Map.Entry<Int, List<Card>>>
+    private var rankRepeatedCards: MutableList<Map.Entry<Int, List<Card>>>
     private var hasAce: Boolean = false
     private var resultText: String = ""
 
@@ -16,14 +19,45 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
         allCards = allCards.sortedBy { it.rank }.toCollection(ArrayList())
 
         // group repeated cards
-        this.suitRepeatedCards = allCards.groupBy { it.suit } as LinkedHashMap<Int, List<Card>>
-        this.rankRepeatedCards = allCards.groupBy { it.rank } as LinkedHashMap<Int, List<Card>>
+        suitRepeatedCards = allCards.groupBy { it.suit }.entries.sortedByDescending { it.value.size }.toMutableList()
+        rankRepeatedCards = allCards.groupBy { it.rank }.entries.sortedByDescending { it.value.size }.toMutableList()
 
-        hasAce = this.rankRepeatedCards.containsKey(0)
+        hasAce = allCards.any { it.rank == 0}
 
-        isStraight()
+        isFlush()
     }
 
+    /**
+     * check if is has straight
+     */
+    private fun isFlush(): Boolean {
+
+        val flushCards = suitRepeatedCards.first().value.sortedBy { it.rank }
+
+        // more than 5 cards with the same suit
+        if (flushCards.size >= 5) {
+
+            // has Ace
+            if (flushCards.any { it.rank == 0 }) {
+                 hand.add(flushCards[0])
+                 for (index in flushCards.size - 1 downTo flushCards.size - 4) {
+                     hand.add(flushCards[index])
+                 }
+            } else {
+                 for (index in flushCards.size - 1 downTo flushCards.size - 5) {
+                     hand.add(flushCards[index])
+                 }
+            }
+            resultText = "Flush"
+            return true
+        }
+
+        return false
+    }
+
+    /**
+     * Function to check if is a straight
+     */
     private fun isStraight(): Boolean {
 
         var currentRank: Int?
