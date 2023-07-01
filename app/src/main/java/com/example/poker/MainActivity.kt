@@ -34,15 +34,16 @@ class MainActivity : ComponentActivity() {
                     val table = ArrayList<Card>();
                     val dealer = Dealer();
 
-                    player1.add(Card(4,0))
-                    player1.add(Card(1,0))
-                    table.add(Card(3, 0))
+                    player1.add(Card(8,0))
+                    player1.add(Card(10,0))
+                    table.add(Card(11, 0))
                     table.add(Card(0, 0))
-                    table.add(Card(2, 0))
+                    table.add(Card(9, 0))
+                    table.add(Card(12, 0))
 
                     val player1Hand = Hand(playerCards = player1, tableCards = table).getHand()
 
-                    player1Hand.forEach{Log.d("hand111", it.toString())}
+                    player1Hand.forEach{Log.d("player_hand", it.toString())}
 
                 }
             }
