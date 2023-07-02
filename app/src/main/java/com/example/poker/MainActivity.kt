@@ -36,13 +36,13 @@ class MainActivity : ComponentActivity() {
                     val table = ArrayList<Card>();
                     val dealer = Dealer();
 
-                    player1.add(Card(12,3))
-                    player1.add(Card(12,0))
-                    table.add(Card(12, 2))
-                    table.add(Card(1, 1))
-                    table.add(Card(0, 3))
+                    player1.add(Card(0,1))
+                    player1.add(Card(6,1))
+                    table.add(Card(5, 1))
+                    table.add(Card(2, 1))
+                    table.add(Card(12, 1))
                     table.add(Card(0, 2))
-                    table.add(Card(8, 1))
+                    table.add(Card(7, 2))
 
                     val player1Hand = Hand(playerCards = player1, tableCards = table)
                     ResultPreview(result =  player1Hand.resultText, player1Hand.getHand().onEach { it.toString()}.toString())

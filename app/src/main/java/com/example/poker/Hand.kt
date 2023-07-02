@@ -1,29 +1,17 @@
 package com.example.poker
 
-import java.util.Collections
-import java.util.TreeMap
-
 class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
 
     private var allCards = mutableListOf<Card>()
     private var hand = mutableListOf<Card>()
     private lateinit var suitRepeatedCards: MutableList<Map.Entry<Int, List<Card>>>
-    private var rankRepeatedCards: MutableList<Map.Entry<Int, List<Card>>>
+    private lateinit var rankRepeatedCards: MutableList<Map.Entry<Int, List<Card>>>
     private lateinit var flushCards: List<Card>
     var resultText: String = ""
-    var resultValue: Int = 0
+    private var resultValue: Int = 0
 
     init {
-        setHand()
-
-        // sort by rank
-        allCards = allCards.sortedBy { it.rank }.toCollection(ArrayList())
-
-        // group repeated cards
-        suitRepeatedCards = allCards.groupBy { it.suit }.entries.sortedByDescending { it.value.size }.toMutableList()
-        rankRepeatedCards = allCards.groupBy { it.rank }.entries.sortedByDescending { it.value.size }.toMutableList()
-        flushCards = suitRepeatedCards.first().value.sortedBy { it.rank }
-
+        initCards()
         evaluateHand()
     }
 
@@ -47,6 +35,12 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
             return
         }
 
+        if (isFullHouse()) {
+            resultValue = 7
+            resultText = "Full House"
+            return
+        }
+
         if (isFlush()) {
             resultValue = 6
             resultText = "Flush"
@@ -64,6 +58,22 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
             resultText = "Three of a Kind"
             return
         }
+
+        if (isTwoPair()) {
+            resultValue = 3
+            resultText = "Two Pair"
+            return
+        }
+
+        if (isPair()) {
+            resultValue = 2
+            resultText = "Pair"
+            return
+        }
+
+        highCards()
+        resultValue = 1
+        resultText = "High Card"
     }
 
     /**
@@ -81,7 +91,7 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
     }
 
     /**
-     * is Straight flush
+     * Is Straight flush
      */
     private fun isStraightFlush(): Boolean {
 
@@ -91,17 +101,18 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
             }
         }
 
+        hand.clear()
         return false
     }
 
     /**
-     * is Four of a Kind
+     * Is Four of a Kind
      */
     private fun isFourOfAKind(): Boolean {
 
         if (rankRepeatedCards.first().value.size == 4) {
             hand.addAll(rankRepeatedCards.first().value)
-            setKicker()
+            highCards()
             return true
         }
 
@@ -109,13 +120,55 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
     }
 
     /**
-     * check if is has straight
+     * Is Full House
+     */
+    private fun isFullHouse(): Boolean {
+
+        val threeOfAKindList = rankRepeatedCards.filter { it.value.size == 3 }.sortedByDescending { it.key }.toMutableList()
+        val pairList = rankRepeatedCards.filter { it.value.size == 2 }.sortedByDescending { it.key }.toMutableList()
+
+        // there is no three of a kind
+        if (threeOfAKindList.isEmpty()) {
+            return false
+        }
+
+        // add highest three of a kind
+        if (threeOfAKindList.any { it.key == 0 }) {
+            hand.addAll(threeOfAKindList.removeLast().value)
+
+        } else {
+            hand.addAll(threeOfAKindList.removeFirst().value)
+        }
+
+        // if there is a pair of Ace
+        if (pairList.isNotEmpty() && pairList.any { it.key == 0}) {
+            hand.addAll(pairList.removeLast().value)
+            return true
+        } else {
+            // if there is another three of a kind
+            if (threeOfAKindList.isNotEmpty()) {
+                hand.addAll(threeOfAKindList.first().value.take(2))
+                return true
+            }
+
+            // if there is 1 pair or more
+            if (pairList.isNotEmpty()) {
+                hand.addAll(pairList.first().value)
+                return true
+            }
+        }
+
+        hand.clear()
+        return false
+    }
+
+    /**
+     * Is Flush
      */
     private fun isFlush(): Boolean {
 
         // more than 5 cards with the same suit
         if (flushCards.size >= 5) {
-
             // has Ace
             if (flushCards.any { it.rank == 0 }) {
                  hand.add(flushCards[0])
@@ -134,7 +187,7 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
     }
 
     /**
-     * Function to check if is a straight
+     * Is Straight
      */
     private fun isStraight(cards: MutableList<Card> = allCards): Boolean {
 
@@ -196,7 +249,7 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
     }
 
     /**
-     * is Three of a Kind
+     * Is Three of a Kind
      */
     private fun isThreeOfAKind(): Boolean {
 
@@ -213,13 +266,51 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
             hand.addAll(threeOfAKindHashMap.first().value)
         }
 
-        setKicker()
-
+        highCards()
         return true
-
     }
 
-    private fun setKicker() {
+    /**
+     * Is Two Pair
+     */
+    private fun isTwoPair(): Boolean {
+        val pairList = rankRepeatedCards.filter { it.value.size == 2 }.sortedByDescending { it.key }.toMutableList()
+
+        if (pairList.size > 1) {
+            // has pair of Ace
+            if (pairList.any { it.key == 0 }) {
+                hand.addAll(pairList.last().value)
+                hand.addAll(pairList.first().value)
+            } else {
+                hand.addAll(pairList.removeFirst().value)
+                hand.addAll(pairList.removeFirst().value)
+            }
+            highCards()
+            return true
+        }
+
+        return false
+    }
+
+    /**
+     * Is Pair
+     */
+    private fun isPair(): Boolean {
+        val pairList = rankRepeatedCards.filter { it.value.size == 2 }.sortedByDescending { it.key }.toMutableList()
+
+        if (pairList.size == 1) {
+            hand.addAll(pairList.first().value)
+            highCards()
+            return true
+        }
+
+        return false
+    }
+
+    /**
+     * Set High cards
+     */
+    private fun highCards() {
 
         val otherCards: ArrayList<Card> = ArrayList()
 
@@ -239,11 +330,24 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
     }
 
     /**
-     * Set hand by merging player and table cards
+     * Init cards
      */
-    private fun setHand() {
+    private fun initCards() {
+
+        // join player and table cards
         allCards.addAll(0, this.playerCards)
         allCards.addAll(allCards.size, this.tableCards)
+
+        // sort by rank
+        allCards = allCards.sortedBy { it.rank }.toCollection(ArrayList())
+
+        // group repeated cards
+        suitRepeatedCards = allCards.groupBy { it.suit }.entries.sortedByDescending { it.value.size }.toMutableList()
+        rankRepeatedCards = allCards.groupBy { it.rank }.entries.sortedByDescending { it.value.size }.toMutableList()
+
+        // sort grouped suit cards by rank
+        flushCards = suitRepeatedCards.first().value.sortedBy { it.rank }
+
     }
 
     /**
