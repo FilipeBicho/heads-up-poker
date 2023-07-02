@@ -58,6 +58,12 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
             resultText = "Straight"
             return
         }
+
+        if (isThreeOfAKind()) {
+            resultValue = 4
+            resultText = "Three of a Kind"
+            return
+        }
     }
 
     /**
@@ -187,6 +193,30 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
         }
 
         return false
+    }
+
+    /**
+     * is Three of a Kind
+     */
+    private fun isThreeOfAKind(): Boolean {
+
+        val threeOfAKindHashMap = rankRepeatedCards.filter { it.value.size == 3 }.sortedByDescending { it.key }
+
+        // there is no set with three of a kind
+        if (threeOfAKindHashMap.isEmpty()) {
+            return false
+        }
+
+        if (threeOfAKindHashMap.any { it.key == 0 }) {
+            hand.addAll(threeOfAKindHashMap.last().value)
+        } else {
+            hand.addAll(threeOfAKindHashMap.first().value)
+        }
+
+        setKicker()
+
+        return true
+
     }
 
     private fun setKicker() {
