@@ -9,8 +9,9 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
     private var hand = mutableListOf<Card>()
     private lateinit var suitRepeatedCards: MutableList<Map.Entry<Int, List<Card>>>
     private var rankRepeatedCards: MutableList<Map.Entry<Int, List<Card>>>
-    private var hasAce: Boolean = false
-    private var resultText: String = ""
+    private lateinit var flushCards: List<Card>
+    var resultText: String = ""
+    var resultValue: Int = 0
 
     init {
         setHand()
@@ -21,18 +22,90 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
         // group repeated cards
         suitRepeatedCards = allCards.groupBy { it.suit }.entries.sortedByDescending { it.value.size }.toMutableList()
         rankRepeatedCards = allCards.groupBy { it.rank }.entries.sortedByDescending { it.value.size }.toMutableList()
+        flushCards = suitRepeatedCards.first().value.sortedBy { it.rank }
 
-        hasAce = allCards.any { it.rank == 0}
+        evaluateHand()
+    }
 
-        isFlush()
+    private fun evaluateHand() {
+
+        if (isRoyalStraightFlush()) {
+            resultValue = 10
+            resultText = "Royal Straight Flush"
+            return
+        }
+
+        if (isStraightFlush()) {
+            resultValue = 9
+            resultText = "Straight Flush"
+            return
+        }
+
+        if (isFourOfAKind()) {
+            resultValue = 8
+            resultText = "Four of a Kind"
+            return
+        }
+
+        if (isFlush()) {
+            resultValue = 6
+            resultText = "Flush"
+            return
+        }
+
+        if (isStraight()) {
+            resultValue = 5
+            resultText = "Straight"
+            return
+        }
+    }
+
+    /**
+     * Is Royal Straight Flush
+     */
+    private fun isRoyalStraightFlush(): Boolean {
+
+        // is straight flush hand first card is an Ace
+        if (isStraightFlush() && hand[0].rank == 0) {
+            return true
+        }
+
+        hand.clear()
+        return false
+    }
+
+    /**
+     * is Straight flush
+     */
+    private fun isStraightFlush(): Boolean {
+
+        if (flushCards.size >= 5) {
+            if (isStraight(flushCards.toMutableList())) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    /**
+     * is Four of a Kind
+     */
+    private fun isFourOfAKind(): Boolean {
+
+        if (rankRepeatedCards.first().value.size == 4) {
+            hand.addAll(rankRepeatedCards.first().value)
+            setKicker()
+            return true
+        }
+
+        return false
     }
 
     /**
      * check if is has straight
      */
     private fun isFlush(): Boolean {
-
-        val flushCards = suitRepeatedCards.first().value.sortedBy { it.rank }
 
         // more than 5 cards with the same suit
         if (flushCards.size >= 5) {
@@ -48,7 +121,6 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
                      hand.add(flushCards[index])
                  }
             }
-            resultText = "Flush"
             return true
         }
 
@@ -58,22 +130,23 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
     /**
      * Function to check if is a straight
      */
-    private fun isStraight(): Boolean {
+    private fun isStraight(cards: MutableList<Card> = allCards): Boolean {
 
         var currentRank: Int?
         var nextCardRank: Int?
+        var sequentialCardsCount: Int = 1
         var straight: Int = 1
         var lastSequentialCardRank: Int = -1
         var lastSequentialCardIndex: Int = -1
 
-        for ((index, card) in allCards.withIndex()) {
+        for ((index, card) in cards.withIndex()) {
             // already checked all cards
-            if (index + 1 == allCards.size) {
+            if (index + 1 == cards.size) {
                 break
             }
 
             currentRank = card.rank
-            nextCardRank = allCards[index + 1].rank
+            nextCardRank = cards[index + 1].rank
 
             // next card has the same rank
             if (currentRank == nextCardRank) {
@@ -82,38 +155,57 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
 
             // is a sequential card
             if (currentRank == nextCardRank - 1) {
-                straight++
-                lastSequentialCardRank = nextCardRank
-                lastSequentialCardIndex = index + 1
+                sequentialCardsCount++
+
+                if (straight < sequentialCardsCount) {
+                    straight = sequentialCardsCount
+                    lastSequentialCardRank = nextCardRank
+                    lastSequentialCardIndex = index + 1
+                }
+
+
             } else {
-                straight = 1
+                sequentialCardsCount = 1
             }
         }
 
         // has straight 10 to Ace
-        if (straight >= 4 && hasAce && lastSequentialCardRank == 12) {
-            hand.add(allCards[0])
+        if (straight >= 4 && cards.any {it.rank == 0} && lastSequentialCardRank == 12) {
+            hand.add(cards[0])
             for (index in lastSequentialCardIndex downTo (lastSequentialCardIndex - 3)) {
-                hand.add(allCards[index])
+                hand.add(cards[index])
             }
-
-            resultText = "Straight"
             return true
         }
 
         // assign the biggest straight
         if (straight >= 5) {
-
             for (index in lastSequentialCardIndex downTo (lastSequentialCardIndex - 4)) {
-               hand.add(allCards[index])
+               hand.add(cards[index])
             }
-
-            resultText = "Straight"
             return true
         }
 
         return false
+    }
 
+    private fun setKicker() {
+
+        val otherCards: ArrayList<Card> = ArrayList()
+
+        for (card: Card in allCards) {
+            if (!hand.contains(card)) {
+                otherCards.add(card)
+            }
+        }
+
+        for (index: Int in hand.size .. 4) {
+            if (otherCards.any { it.rank == 0 }) {
+                hand.add(otherCards.removeFirst())
+            } else {
+                hand.add(otherCards.removeLast())
+            }
+        }
     }
 
     /**
@@ -127,7 +219,7 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
     /**
      * Return player hand
      */
-    fun getHand() = allCards;
+    fun getHand() = hand;
 
 
 }

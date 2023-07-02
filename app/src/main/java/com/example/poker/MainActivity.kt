@@ -7,7 +7,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -34,18 +36,16 @@ class MainActivity : ComponentActivity() {
                     val table = ArrayList<Card>();
                     val dealer = Dealer();
 
-                    player1.add(Card(0,0))
-                    player1.add(Card(10,0))
-                    table.add(Card(11, 0))
+                    player1.add(Card(1,3))
+                    player1.add(Card(12,0))
+                    table.add(Card(12, 2))
                     table.add(Card(12, 1))
-                    table.add(Card(9, 1))
+                    table.add(Card(12, 3))
                     table.add(Card(5, 1))
-                    table.add(Card(6, 1))
+                    table.add(Card(8, 1))
 
-                    val player1Hand = Hand(playerCards = player1, tableCards = table).getHand()
-
-                    player1Hand.forEach{Log.d("player_hand", it.toString())}
-
+                    val player1Hand = Hand(playerCards = player1, tableCards = table)
+                    ResultPreview(result =  player1Hand.resultText, player1Hand.getHand().onEach { it.toString()}.toString())
                 }
             }
         }
@@ -54,17 +54,19 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+    Row {
+        Text(
+            text = "Hello $name!",
+            modifier = modifier
+        )
+    }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    PokerTheme {
-        Greeting("Android")
+fun ResultPreview(result: String, cards: String) {
+    Column {
+        Text(text = result)
+        Text(text = cards)
     }
 }
 
