@@ -95,10 +95,8 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
      */
     private fun isStraightFlush(): Boolean {
 
-        if (flushCards.size >= 5) {
-            if (isStraight(flushCards.toMutableList())) {
-                return true
-            }
+        if (flushCards.size >= 5 && isStraight(flushCards.toMutableList())) {
+            return true
         }
 
         hand.clear()
@@ -124,8 +122,13 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
      */
     private fun isFullHouse(): Boolean {
 
-        val threeOfAKindList = rankRepeatedCards.filter { it.value.size == 3 }.sortedByDescending { it.key }.toMutableList()
-        val pairList = rankRepeatedCards.filter { it.value.size == 2 }.sortedByDescending { it.key }.toMutableList()
+        val threeOfAKindList = rankRepeatedCards
+            .filter { it.value.size == 3 }
+            .sortedByDescending { it.key }
+            .toMutableList()
+
+        val pairList = rankRepeatedCards.filter { it.value.size == 2 }.sortedByDescending { it.key }
+            .toMutableList()
 
         // there is no three of a kind
         if (threeOfAKindList.isEmpty()) {
@@ -141,7 +144,7 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
         }
 
         // if there is a pair of Ace
-        if (pairList.isNotEmpty() && pairList.any { it.key == 0}) {
+        if (pairList.isNotEmpty() && pairList.any { it.key == 0 }) {
             hand.addAll(pairList.removeLast().value)
             return true
         } else {
@@ -171,14 +174,14 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
         if (flushCards.size >= 5) {
             // has Ace
             if (flushCards.any { it.rank == 0 }) {
-                 hand.add(flushCards[0])
-                 for (index in flushCards.size - 1 downTo flushCards.size - 4) {
-                     hand.add(flushCards[index])
-                 }
+                hand.add(flushCards[0])
+                for (index in flushCards.size - 1 downTo flushCards.size - 4) {
+                    hand.add(flushCards[index])
+                }
             } else {
-                 for (index in flushCards.size - 1 downTo flushCards.size - 5) {
-                     hand.add(flushCards[index])
-                 }
+                for (index in flushCards.size - 1 downTo flushCards.size - 5) {
+                    hand.add(flushCards[index])
+                }
             }
             return true
         }
@@ -229,7 +232,7 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
         }
 
         // has straight 10 to Ace
-        if (straight >= 4 && cards.any {it.rank == 0} && lastSequentialCardRank == 12) {
+        if (straight >= 4 && cards.any { it.rank == 0 } && lastSequentialCardRank == 12) {
             hand.add(cards[0])
             for (index in lastSequentialCardIndex downTo (lastSequentialCardIndex - 3)) {
                 hand.add(cards[index])
@@ -240,7 +243,7 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
         // assign the biggest straight
         if (straight >= 5) {
             for (index in lastSequentialCardIndex downTo (lastSequentialCardIndex - 4)) {
-               hand.add(cards[index])
+                hand.add(cards[index])
             }
             return true
         }
@@ -253,7 +256,9 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
      */
     private fun isThreeOfAKind(): Boolean {
 
-        val threeOfAKindHashMap = rankRepeatedCards.filter { it.value.size == 3 }.sortedByDescending { it.key }
+        val threeOfAKindHashMap = rankRepeatedCards
+            .filter { it.value.size == 3 }
+            .sortedByDescending { it.key }
 
         // there is no set with three of a kind
         if (threeOfAKindHashMap.isEmpty()) {
@@ -274,7 +279,10 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
      * Is Two Pair
      */
     private fun isTwoPair(): Boolean {
-        val pairList = rankRepeatedCards.filter { it.value.size == 2 }.sortedByDescending { it.key }.toMutableList()
+        val pairList = rankRepeatedCards
+            .filter { it.value.size == 2 }
+            .sortedByDescending { it.key }
+            .toMutableList()
 
         if (pairList.size > 1) {
             // has pair of Ace
@@ -296,7 +304,10 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
      * Is Pair
      */
     private fun isPair(): Boolean {
-        val pairList = rankRepeatedCards.filter { it.value.size == 2 }.sortedByDescending { it.key }.toMutableList()
+        val pairList = rankRepeatedCards
+            .filter { it.value.size == 2 }
+            .sortedByDescending { it.key }
+            .toMutableList()
 
         if (pairList.size == 1) {
             hand.addAll(pairList.first().value)
@@ -320,7 +331,7 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
             }
         }
 
-        for (index: Int in hand.size .. 4) {
+        for (index: Int in hand.size..4) {
             if (otherCards.any { it.rank == 0 }) {
                 hand.add(otherCards.removeFirst())
             } else {
@@ -342,8 +353,17 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
         allCards = allCards.sortedBy { it.rank }.toCollection(ArrayList())
 
         // group repeated cards
-        suitRepeatedCards = allCards.groupBy { it.suit }.entries.sortedByDescending { it.value.size }.toMutableList()
-        rankRepeatedCards = allCards.groupBy { it.rank }.entries.sortedByDescending { it.value.size }.toMutableList()
+        suitRepeatedCards = allCards
+            .groupBy { it.suit }
+            .entries
+            .sortedByDescending { it.value.size }
+            .toMutableList()
+
+        rankRepeatedCards = allCards
+            .groupBy { it.rank }
+            .entries
+            .sortedByDescending { it.value.size }
+            .toMutableList()
 
         // sort grouped suit cards by rank
         flushCards = suitRepeatedCards.first().value.sortedBy { it.rank }
