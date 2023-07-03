@@ -1,6 +1,6 @@
 package com.example.poker
 
-class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
+class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
 
     private var allCards = mutableListOf<Card>()
     private var hand = mutableListOf<Card>()
@@ -8,7 +8,7 @@ class Hand(private var playerCards: ArrayList<Card>, var tableCards: ArrayList<C
     private lateinit var rankRepeatedCards: MutableList<Map.Entry<Int, List<Card>>>
     private lateinit var flushCards: List<Card>
     var resultText: String = ""
-    private var resultValue: Int = 0
+    var resultValue: Int = 0
 
     init {
         initCards()

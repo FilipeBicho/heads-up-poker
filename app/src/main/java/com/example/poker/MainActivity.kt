@@ -38,14 +38,16 @@ class MainActivity : ComponentActivity() {
 
                     player1.add(Card(0,1))
                     player1.add(Card(6,1))
-                    table.add(Card(5, 1))
-                    table.add(Card(2, 1))
-                    table.add(Card(12, 1))
-                    table.add(Card(0, 2))
-                    table.add(Card(7, 2))
+
+                    player2.add(Card(12, 1))
+                    player2.add(Card(11, 1))
+
+                    table.add(Card(5, 0))
+                    table.add(Card(2, 2))
+                    table.add(Card(12, 3))
 
                     val player1Hand = Hand(playerCards = player1, tableCards = table)
-                    ResultPreview(result =  player1Hand.resultText, player1Hand.getHand().onEach { it.toString()}.toString())
+                    val player2Hand = Hand(playerCards = player2, tableCards = table)
                 }
             }
         }
