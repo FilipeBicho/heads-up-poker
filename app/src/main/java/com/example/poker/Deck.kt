@@ -10,7 +10,6 @@ class Deck {
     private var deck = arrayListOf<Card>();
 
     init {
-
         // init cards
         for (rank in 0 until 12) {
             for (suit in 0 until 4) {
@@ -22,13 +21,10 @@ class Deck {
         for (i in deck.size -1 downTo 1) {
             // Get random number
             val index = Random.nextInt(i + 1)
-
             // get card at random index
             val tempCard = deck[index]
-
             // set current card in a random index
             deck[index] = deck[i]
-
             // set random card in the current index
             deck[i] = tempCard;
         }

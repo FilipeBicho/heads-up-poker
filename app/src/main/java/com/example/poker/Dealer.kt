@@ -18,7 +18,6 @@ class Dealer {
      * Deal flop
      */
     fun flop(deck: Deck, table: ArrayList<Card>) {
-
         // Burn card
         deck.dealCard();
 
@@ -32,7 +31,6 @@ class Dealer {
      * Deal turn
      */
     fun turn(deck: Deck, table: ArrayList<Card>) {
-
         // Burn card
         deck.dealCard();
 
@@ -44,7 +42,6 @@ class Dealer {
      * Deal river
      */
     fun river(deck: Deck, table: ArrayList<Card>) {
-
         // Burn card
         deck.dealCard();
 

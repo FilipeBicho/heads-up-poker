@@ -18,6 +18,9 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
         }
     }
 
+    /**
+     * Calculate winner when both players have the same hand rank
+     */
     private fun calculateWinner(): Int {
 
         return when(player1Result) {
@@ -187,7 +190,6 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
      * Get result
      */
     fun getResult(): String {
-
         return when (winner) {
             1 -> "player 1 wins"
             2 -> "player 2 wins"

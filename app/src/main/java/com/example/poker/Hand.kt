@@ -104,8 +104,8 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
      * Is Four of a Kind
      */
     private fun isFourOfAKind(): Boolean {
-        if (rankRepeatedCards.first().value.size == 4) {
-            hand.addAll(rankRepeatedCards.first().value)
+        if (rankRepeatedCards[0].value.size == 4) {
+            hand.addAll(rankRepeatedCards[0].value)
             highCards()
             return true
         }
@@ -145,13 +145,13 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
         } else {
             // if there is another three of a kind
             if (threeOfAKindList.isNotEmpty()) {
-                hand.addAll(threeOfAKindList.first().value.take(2))
+                hand.addAll(threeOfAKindList[0].value.take(2))
                 return true
             }
 
             // if there is 1 pair or more
             if (pairList.isNotEmpty()) {
-                hand.addAll(pairList.first().value)
+                hand.addAll(pairList[0].value)
                 return true
             }
         }
@@ -260,7 +260,7 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
         if (threeOfAKindHashMap.any { it.key == 0 }) {
             hand.addAll(threeOfAKindHashMap.last().value)
         } else {
-            hand.addAll(threeOfAKindHashMap.first().value)
+            hand.addAll(threeOfAKindHashMap[0].value)
         }
 
         highCards()
@@ -280,7 +280,7 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
             // has pair of Ace
             if (pairList.any { it.key == 0 }) {
                 hand.addAll(pairList.last().value)
-                hand.addAll(pairList.first().value)
+                hand.addAll(pairList[0].value)
             } else {
                 hand.addAll(pairList.removeFirst().value)
                 hand.addAll(pairList.removeFirst().value)
@@ -302,7 +302,7 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
             .toMutableList()
 
         if (pairList.size == 1) {
-            hand.addAll(pairList.first().value)
+            hand.addAll(pairList[0].value)
             highCards()
             return true
         }
@@ -356,7 +356,7 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
             .toMutableList()
 
         // sort grouped suit cards by rank
-        flushCards = suitRepeatedCards.first().value.sortedBy { it.rank }
+        flushCards = suitRepeatedCards[0].value.sortedBy { it.rank }
     }
 
     /**
