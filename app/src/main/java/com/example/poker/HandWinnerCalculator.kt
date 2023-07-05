@@ -27,6 +27,9 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
             6 -> compareFlush()
             5 -> compareStraight()
             4 -> compareThreeOfAKind()
+            3 -> compareTwoPair()
+            2 -> compareOnePair()
+            1 -> compareHigherKicker(startIndex = 0, endIndex = 4)
             else -> {winner}
         }
     }
@@ -35,9 +38,9 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
      * Calculate flush winner
      */
     private fun compareFlush(): Int {
-        return if (player1Cards.first().rank == 0 && player2Cards.first().rank != 0) {
+        return if (player1Cards[0].rank == 0 && player2Cards[0].rank != 0) {
             1
-        } else if (player1Cards.first().rank != 0 && player2Cards.first().rank == 0) {
+        } else if (player1Cards[0].rank != 0 && player2Cards[0].rank == 0) {
             2
         } else {
             compareHigherKicker(startIndex = 3, endIndex = 4)
@@ -63,15 +66,15 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
     private fun compareThreeOfAKind(): Int {
 
         // check first if there is a three of a kind of Aces
-        return if (player1Cards.first().rank == 0 && player2Cards.first().rank != 0) {
+        return if (player1Cards[0].rank == 0 && player2Cards[0].rank != 0) {
             1
-        } else if (player1Cards.first().rank != 0 && player2Cards.first().rank == 0) {
+        } else if (player1Cards[0].rank != 0 && player2Cards[0].rank == 0) {
             2
         } else {
             // check if highest three of a kind
-            if (player1Cards.first().rank > player2Cards.first().rank) {
+            if (player1Cards[0].rank > player2Cards[0].rank) {
                 1
-            } else if (player1Cards.first().rank < player2Cards.first().rank) {
+            } else if (player1Cards[0].rank < player2Cards[0].rank) {
                 2
             } else {
                 compareHigherKicker(startIndex = 3, endIndex = 4)
@@ -80,11 +83,46 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
     }
 
     /**
+     * Calculate 2 pair winner
+     */
+    private fun compareTwoPair(): Int {
+        return if (player1Cards[0].rank == 0 && player2Cards[0].rank != 0) {
+            1
+        } else if (player1Cards[0].rank != 0 && player2Cards[0].rank == 0) {
+            2
+        } else {
+            if (player1Cards[0].rank > player2Cards[0].rank) {
+                1
+            } else if (player1Cards[0].rank < player2Cards[0].rank) {
+                2
+            } else {
+                if (player1Cards[3].rank > player2Cards[3].rank) {
+                    1
+                } else if (player1Cards[3].rank < player2Cards[3].rank) {
+                    2
+                } else {
+                    compareHigherKicker(startIndex = 4, endIndex = 4)
+                }
+            }
+        }
+    }
+
+    private fun compareOnePair(): Int {
+        return if (player1Cards[0].rank == 0 && player2Cards[0].rank != 0) {
+            1
+        } else if (player1Cards[0].rank != 0 && player2Cards[0].rank == 0) {
+            2
+        } else {
+            compareHigherKicker(startIndex = 2, endIndex = 4)
+        }
+    }
+
+    /**
      * Calculate four of a kind or full house winner
      */
     private fun compareFirstAndLastCard(): Int {
         // players have the same four of a kind
-        if (player1Cards.first().rank == player2Cards.first().rank) {
+        if (player1Cards[0].rank == player2Cards[0].rank) {
             // players have the same kicker
             if (player1Cards.last().rank == player2Cards.last().rank ) {
                 return 3
@@ -107,14 +145,14 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
         }
 
         // calculate winner via higher four of a kind
-        return if (player1Cards.first().rank == 0 && player2Cards.first().rank != 0) {
+        return if (player1Cards[0].rank == 0 && player2Cards[0].rank != 0) {
             1
-        } else if (player1Cards.first().rank != 0 && player2Cards.first().rank == 0) {
+        } else if (player1Cards[0].rank != 0 && player2Cards[0].rank == 0) {
             2
         } else {
-            if (player1Cards.first().rank > player2Cards.first().rank) {
+            if (player1Cards[0].rank > player2Cards[0].rank) {
                 1
-            } else if (player1Cards.first().rank < player2Cards.first().rank) {
+            } else if (player1Cards[0].rank < player2Cards[0].rank) {
                 2
             } else {
                 3

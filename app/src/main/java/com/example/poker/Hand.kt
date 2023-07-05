@@ -16,7 +16,6 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
     }
 
     private fun evaluateHand() {
-
         if (isRoyalStraightFlush()) {
             resultValue = 10
             resultText = "Royal Straight Flush"
@@ -80,7 +79,6 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
      * Is Royal Straight Flush
      */
     private fun isRoyalStraightFlush(): Boolean {
-
         // is straight flush hand first card is an Ace
         if (isStraightFlush() && hand[0].rank == 0) {
             return true
@@ -94,7 +92,6 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
      * Is Straight flush
      */
     private fun isStraightFlush(): Boolean {
-
         if (flushCards.size >= 5 && isStraight(flushCards.toMutableList())) {
             return true
         }
@@ -107,7 +104,6 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
      * Is Four of a Kind
      */
     private fun isFourOfAKind(): Boolean {
-
         if (rankRepeatedCards.first().value.size == 4) {
             hand.addAll(rankRepeatedCards.first().value)
             highCards()
@@ -121,7 +117,6 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
      * Is Full House
      */
     private fun isFullHouse(): Boolean {
-
         val threeOfAKindList = rankRepeatedCards
             .filter { it.value.size == 3 }
             .sortedByDescending { it.key }
@@ -169,7 +164,6 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
      * Is Flush
      */
     private fun isFlush(): Boolean {
-
         // more than 5 cards with the same suit
         if (flushCards.size >= 5) {
             // has Ace
@@ -193,7 +187,6 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
      * Is Straight
      */
     private fun isStraight(cards: MutableList<Card> = allCards): Boolean {
-
         var currentRank: Int?
         var nextCardRank: Int?
         var sequentialCardsCount: Int = 1
@@ -255,7 +248,6 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
      * Is Three of a Kind
      */
     private fun isThreeOfAKind(): Boolean {
-
         val threeOfAKindHashMap = rankRepeatedCards
             .filter { it.value.size == 3 }
             .sortedByDescending { it.key }
@@ -322,7 +314,6 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
      * Set High cards
      */
     private fun highCards() {
-
         val otherCards: ArrayList<Card> = ArrayList()
 
         for (card: Card in allCards) {
@@ -344,7 +335,6 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
      * Init cards
      */
     private fun initCards() {
-
         // join player and table cards
         allCards.addAll(0, this.playerCards)
         allCards.addAll(allCards.size, this.tableCards)
@@ -367,7 +357,6 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
 
         // sort grouped suit cards by rank
         flushCards = suitRepeatedCards.first().value.sortedBy { it.rank }
-
     }
 
     /**
