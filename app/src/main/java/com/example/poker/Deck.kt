@@ -11,7 +11,7 @@ class Deck {
 
     init {
         // init cards
-        for (rank in 0 until 12) {
+        for (rank in 0 until 13) {
             for (suit in 0 until 4) {
                 deck.add(Card(rank, suit))
             }
@@ -38,5 +38,12 @@ class Deck {
     /**
      * Remove card from the top of the deck
      */
-    fun dealCard() = deck.removeAt(deck.size - 1);
+    fun dealCard() = deck.removeLast()
+
+    /**
+     * Get card from the top of the deck
+     */
+    fun getCard() = deck.last()
+
+    fun getCardAtIndex(index: Int) = deck[index]
 }

@@ -31,31 +31,27 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val deck = Deck();
-                    val player1 = ArrayList<Card>();
-                    val player2 = ArrayList<Card>();
+                    val player1Cards = ArrayList<Card>();
+                    val player2Cards = ArrayList<Card>();
                     val table = ArrayList<Card>();
                     val dealer = Dealer();
 
-                    player1.add(Card(11,1))
-                    player1.add(Card(7,2))
+                    deck.dealCard()
+                    player1Cards.add(deck.dealCard())
+                    player1Cards.add(deck.dealCard())
+                    dealer.flop(deck, table)
 
-                    player2.add(Card(6, 0))
-                    player2.add(Card(12, 1))
+                    val player1Hand = Hand(playerCards = player1Cards, tableCards = table)
+                   // val player2Hand = Hand(playerCards = player2, tableCards = table)
 
-                    table.add(Card(9, 2))
-                    table.add(Card(3, 3))
-                    table.add(Card(2, 1))
-                    table.add(Card(10, 0))
-                    table.add(Card(1, 0))
+                    val odds = Odds(player1Cards, table, deck.getDeck())
 
-                    val player1Hand = Hand(playerCards = player1, tableCards = table)
-                    val player2Hand = Hand(playerCards = player2, tableCards = table)
-                    val winnerCalculator = HandWinnerCalculator(player1Hand, player2Hand)
 
-                    val player1HandText = "${player1Hand.getHand().onEach { it.toString() }} - ${player1Hand.resultText}"
-                    val player2HandText = "${player2Hand.getHand().onEach { it.toString() }} - ${player2Hand.resultText}"
 
-                    ResultPreview(player1HandText, player2HandText, winnerCalculator.getResult())
+//                    val winnerCalculator = HandWinnerCalculator(player1Hand, player2Hand)
+//                    val player1HandText = "${player1Hand.getHand().onEach { it.toString() }} - ${player1Hand.resultText}"
+//                    val player2HandText = "${player2Hand.getHand().onEach { it.toString() }} - ${player2Hand.resultText}"
+//                    ResultPreview(player1HandText, player2HandText, winnerCalculator.getResult())
                 }
             }
         }

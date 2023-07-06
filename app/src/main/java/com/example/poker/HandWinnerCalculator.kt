@@ -3,15 +3,15 @@ package com.example.poker
 class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
 
     private var winner: Int = 3
-    val player1Cards = player1Hand.getHand()
-    val player2Cards = player2Hand.getHand()
+    private val player1Cards = player1Hand.getHand()
+    private val player2Cards = player2Hand.getHand()
     private val player1Result = player1Hand.resultValue
-    val player2Result = player2Hand.resultValue
+    private val player2Result = player2Hand.resultValue
 
     init {
         winner = if (player1Result > player2Result) {
             1
-        } else if (player1Result< player2Result) {
+        } else if (player1Result < player2Result) {
             2
         } else {
             calculateWinner()
@@ -197,5 +197,10 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
             else -> {"draw"}
         }
     }
+
+    /**
+     * Get winner
+     */
+    fun getWinner() = winner
 
 }
