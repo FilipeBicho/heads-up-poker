@@ -36,10 +36,11 @@ class MainActivity : ComponentActivity() {
                     val table = ArrayList<Card>();
                     val dealer = Dealer();
 
-                    deck.dealCard()
                     player1Cards.add(deck.dealCard())
                     player1Cards.add(deck.dealCard())
-                    dealer.flop(deck, table)
+                    table.add(deck.dealCard())
+                    table.add(deck.dealCard())
+                    table.add(deck.dealCard())
 
                     val player1Hand = Hand(playerCards = player1Cards, tableCards = table)
                    // val player2Hand = Hand(playerCards = player2, tableCards = table)

@@ -14,8 +14,6 @@ class Odds (var playerCards: ArrayList<Card>, val tableCards: ArrayList<Card>, p
     init {
         setCardCombinations()
         flopOdds()
-
-        println()
     }
 
     /**
@@ -42,45 +40,34 @@ class Odds (var playerCards: ArrayList<Card>, val tableCards: ArrayList<Card>, p
     }
 
     /**
-     * Calculate inner
+     * Calculate flop odds
      */
     private fun flopOdds() {
-
-        val tempDeck: ArrayList<Card> = ArrayList()
         val tempTableCards: ArrayList<Card> = ArrayList()
-
         tempTableCards.addAll(tableCards.toList())
+
         for (opponentCards: ArrayList<Card> in cardCombinations) {
-            tempDeck.addAll(deck.toList())
-            tempDeck.remove(opponentCards.component1())
-            tempDeck.remove(opponentCards.component2())
-            for (card1Index in 0 until tempDeck.size) {
+           for (missingTableCards: ArrayList<Card> in cardCombinations) {
 
-                tempTableCards.add(tempDeck[card1Index])
-                for (card2Index: Int in 0 until tempDeck.size) {
+               if (missingTableCards.contains(opponentCards.component1())
+                   || missingTableCards.contains(opponentCards.component2())) {
+                   continue
+               }
 
-                    if (deck[card1Index] === deck[card2Index]) {
-                        continue
-                    }
+               tempTableCards.addAll(missingTableCards.toList())
+               val playerHand = Hand(playerCards, tempTableCards)
+               val opponentHand = Hand(opponentCards, tempTableCards)
+               when (HandWinnerCalculator(player1Hand = playerHand, player2Hand = opponentHand).getWinner()) {
+                   1 -> player1++
+                   2 -> player2++
+                   3 -> draw++
+                   else -> {}
+               }
 
-                    tempTableCards.add(tempDeck[card2Index])
-
-                    val playerHand = Hand(playerCards, tempTableCards)
-                    val opponentHand = Hand(opponentCards, tempTableCards)
-                    when (HandWinnerCalculator(player1Hand = playerHand, player2Hand = opponentHand).getWinner()) {
-                        1 -> player1++
-                        2 -> player2++
-                        3 -> draw++
-                        else -> {}
-                    }
-
-
-                    tempTableCards.removeLast()
-                    combinations++
-                }
-                tempTableCards.removeLast()
-            }
-            tempDeck.clear()
+               tempTableCards.removeLast()
+               tempTableCards.removeLast()
+               combinations++
+           }
         }
     }
 
