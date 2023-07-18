@@ -42,17 +42,33 @@ class MainActivity : ComponentActivity() {
                     table.add(deck.dealCard())
                     table.add(deck.dealCard())
 
-                    val player1Hand = Hand(playerCards = player1Cards, tableCards = table)
+                    // player hand
+                    var player1Hand = Hand(playerCards = player1Cards, tableCards = table)
                    // val player2Hand = Hand(playerCards = player2, tableCards = table)
 
-                    val odds = Odds(player1Cards, table, deck.getDeck())
+                    // flop
+                    var player1winningOdds = Odds(player1Cards, table, deck.getDeck())
+                    player1winningOdds.flopOdds()
+                    var flopText = "${player1Cards.onEach { it.toString() }} - ${player1Hand.resultText} : ${player1winningOdds.winningOdds}%"
 
+                    table.add(deck.dealCard())
+                    player1Hand = Hand(playerCards = player1Cards, tableCards = table)
 
+                    // turn odds
+                    player1winningOdds = Odds(player1Cards, table, deck.getDeck())
+                    player1winningOdds.turnOdds()
 
-//                    val winnerCalculator = HandWinnerCalculator(player1Hand, player2Hand)
-//                    val player1HandText = "${player1Hand.getHand().onEach { it.toString() }} - ${player1Hand.resultText}"
-//                    val player2HandText = "${player2Hand.getHand().onEach { it.toString() }} - ${player2Hand.resultText}"
-//                    ResultPreview(player1HandText, player2HandText, winnerCalculator.getResult())
+                    val turnText = "${player1Cards.onEach { it.toString() }} - ${player1Hand.resultText} : ${player1winningOdds.winningOdds}%"
+
+                    table.add(deck.dealCard())
+                    player1Hand = Hand(playerCards = player1Cards, tableCards = table)
+                    // river odds
+                    player1winningOdds = Odds(player1Cards, table, deck.getDeck())
+                    player1winningOdds.riverOdds()
+
+                    val riverText = "${player1Cards.onEach { it.toString() }} - ${player1Hand.resultText} : ${player1winningOdds.winningOdds}%"
+
+                    ResultPreview(flopText, turnText, riverText, "${table.onEach { it.toString() }}")
                 }
             }
         }
@@ -61,10 +77,11 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun ResultPreview(player1: String, player2: String, result: String) {
+fun ResultPreview(flop: String, turn: String, river: String, result: String) {
     Column {
-        Text(text = player1)
-        Text(text = player2)
+        Text(text = flop)
+        Text(text = turn)
+        Text(text = river)
         Text(text = result)
     }
 }
