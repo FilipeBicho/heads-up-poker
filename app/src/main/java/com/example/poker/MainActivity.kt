@@ -1,5 +1,6 @@
 package com.example.poker
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Window
 import androidx.activity.ComponentActivity
@@ -30,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -60,13 +62,14 @@ class MainActivity : ComponentActivity() {
 fun HomePage(modifier: Modifier = Modifier) {
     
     var shouldShowOnBoarding by rememberSaveable { mutableStateOf(true) }
-    
+    val game = Game()
+
     Surface(modifier) {
         Background()
         if (shouldShowOnBoarding) {
             OnboardingScreen(onContinueClick = { shouldShowOnBoarding = false })
         } else {
-            Greetings()
+           game.StartGame()
         }
     }
 }
@@ -90,51 +93,16 @@ fun OnboardingScreen(
         }
     }
 }
-@Composable
-fun Greetings(
-    modifier: Modifier = Modifier,
-    names: List<String> = List(1000) { "$it"}
-) {
-    LazyColumn(modifier = modifier.padding(vertical = 4.dp)) {
-        items(items = names) { name ->
-            Greeting(name = name)
-        }
-    }
-}
 
-@Composable
-private fun Greeting(name: String) {
-    var expanded by remember { mutableStateOf(false) }
-    val extraPadding = if (expanded) 48.dp else 0.dp
 
-    Surface(
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
-    ) {
-        Row(modifier = Modifier.padding(24.dp)) {
-            Column(modifier = Modifier
-                .weight(1f)
-                .padding(bottom = extraPadding.coerceAtLeast(0.dp))) {
-                Text(text = "Hello, ")
-                Text(
-                    text = name,
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                )
-            }
-            ElevatedButton(onClick = { expanded = !expanded }) {
-                Text(text = if (expanded) "Show less" else "Show more")
-            }
-        }
-    }
-}
+
+
 
 @Preview(showBackground = true, widthDp = 320)
 @Composable
 fun HomePagePreview(modifier: Modifier = Modifier) {
     PokerTheme {
-        Greetings()
+        HomePage()
     }
 }
 
@@ -149,23 +117,7 @@ fun Background() {
     }
 }
 
-@Composable
-fun ResultPreview(flop: String, turn: String, river: String, result: String) {
-    Column {
-        Text(text = flop)
-        Text(text = turn)
-        Text(text = river)
-        Text(text = result)
-    }
-}
 
-@Composable
-fun HandImage(card1: Card, card2: Card, modifier: Modifier) {
-    Row {
-        card1.CardImage()
-        card2.CardImage()
-    }
-}
 
 private fun hideStatusBar(window: Window) {
 
