@@ -49,8 +49,8 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background,
                 ) {
                     hideStatusBar(window)
-
-                    HomePage(modifier = Modifier.fillMaxSize())
+                    val game = Game()
+                    game.StartGame()
 
                 }
             }

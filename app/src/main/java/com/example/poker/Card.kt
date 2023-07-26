@@ -12,7 +12,7 @@ class Card(var rank: Int, var suit: Int) {
     /**
      * Card rank
      */
-    private val rankArray = arrayOf("A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K")
+    private val rankArray = arrayOf("ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king")
 
     /**
      * Card suit
