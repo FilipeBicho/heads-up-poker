@@ -6,26 +6,20 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.DarkGray
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 class Game : ComponentActivity() {
 
@@ -46,10 +40,22 @@ class Game : ComponentActivity() {
     }
 
 
+    @Preview
     @Composable
     fun Layout() {
         Background()
         Column(modifier =Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.2f)
+                    .background(Color.Green),
+                contentAlignment = Alignment.BottomCenter
+            ){
+                Column {
+
+                }
+            }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -63,12 +69,33 @@ class Game : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(3f)
-                    .padding(8.dp),
+                    .weight(0.5f)
+                    .background(Color.Red),
+                contentAlignment = Alignment.Center
+            ) {
+                Column {
+
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 contentAlignment = Alignment.Center
             ) {
                 Column {
                     TableCards()
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.5f)
+                    .background(Color.Green),
+                contentAlignment = Alignment.Center
+            ) {
+                Column {
+
                 }
             }
             Box(
@@ -81,19 +108,30 @@ class Game : ComponentActivity() {
                     Player2Cards()
                 }
             }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.2f)
+                    .background(Color.Yellow),
+                contentAlignment = Alignment.BottomCenter
+            ){
+                Column {
+
+                }
+            }
         }
     }
 
     @Composable    
     fun Player1Cards() {
-
-        val modifier = Modifier.size(150.dp)
+        val modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp)
+        val contentScale = ContentScale.Fit
         Row (
             horizontalArrangement = Arrangement.Center,
         )
         {
             for (card in player1Cards) {
-                CardImage(card = card, modifier)
+                CardImage(card = card, modifier, contentScale)
             }
         }
     }
@@ -101,51 +139,43 @@ class Game : ComponentActivity() {
     @Composable
     fun Player2Cards() {
 
-        val modifier = Modifier.size(150.dp)
+        val modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp)
+        val contentScale = ContentScale.Fit
         Row (
             horizontalArrangement = Arrangement.Center,
         )
         {
             for (card in player2Cards) {
-                CardImage(card = card, modifier)
+                CardImage(card = card, modifier, contentScale)
             }
         }
     }
 
     @Composable
     fun TableCards() {
+        val modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp)
+        val contentScale = ContentScale.Fit
 
-        val modifier = Modifier.size(80.dp)
         Row (
             horizontalArrangement = Arrangement.Center,
         )
         {
             for (card in tableCards) {
-                CardImage(card = card, modifier)
+                CardImage(card = card, modifier, contentScale)
             }
-        }
-    }
-
-
-    @Composable
-    fun ResultPreview(flop: String, turn: String, river: String, result: String) {
-        Column {
-            Text(text = flop)
-            Text(text = turn)
-            Text(text = river)
-            Text(text = result)
         }
     }
     
     @SuppressLint("DiscouragedApi")
     @Composable
-    fun CardImage(card: Card, modifier: Modifier) {
+    fun CardImage(card: Card, modifier: Modifier, contentScale: ContentScale) {
         val context = LocalContext.current;
         val imageId = context.resources.getIdentifier(card.getCardImagePath(), "drawable", context.packageName);
 
         Image(
             modifier = modifier,
             painter = painterResource(id = imageId),
+            contentScale = contentScale,
             contentDescription = "card"
         )
 
