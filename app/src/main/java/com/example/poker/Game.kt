@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 
 class Game : ComponentActivity() {
 
@@ -46,7 +47,7 @@ class Game : ComponentActivity() {
     @Composable
     fun Layout() {
         Background()
-        Column(modifier =Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -92,7 +93,7 @@ class Game : ComponentActivity() {
                     .fillMaxWidth()
                     .weight(1f),
                 contentAlignment = Alignment.BottomCenter
-            ){
+            ) {
                 Column {
                     PlayerCards(player2Cards)
                 }
@@ -100,48 +101,50 @@ class Game : ComponentActivity() {
         }
     }
 
-    @Composable    
+    @Composable
     fun PlayerCards(cards: ArrayList<Card>) {
-        val modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp)
-        val contentScale = ContentScale.Fit
-        Row (
-            horizontalArrangement = Arrangement.Center,
-        )
-        {
-            for (card in cards) {
-                CardImage(card = card, modifier, contentScale)
-            }
+
+        Box {
+            CardImage(card = cards.first(), Modifier.padding(bottom = 5.dp))
+            CardImage(
+                card = cards.last(),
+                Modifier
+                    .zIndex(2f)
+                    .padding(start = 20.dp, top = 5.dp)
+            )
         }
     }
 
     @Composable
     fun TableCards() {
         val modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp)
-        val contentScale = ContentScale.Fit
 
-        Row (
+        Row(
             horizontalArrangement = Arrangement.Center,
         )
         {
             for (card in tableCards) {
-                CardImage(card = card, modifier, contentScale)
+                CardImage(card = card, modifier)
             }
         }
     }
-    
+
     @SuppressLint("DiscouragedApi")
     @Composable
-    fun CardImage(card: Card, modifier: Modifier, contentScale: ContentScale) {
+    fun CardImage(card: Card, modifier: Modifier) {
         val context = LocalContext.current;
-        val imageId = context.resources.getIdentifier(card.getCardImagePath(), "drawable", context.packageName);
+        val imageId = context.resources.getIdentifier(
+            card.getCardImagePath(),
+            "drawable",
+            context.packageName
+        )
 
         Image(
             modifier = modifier,
             painter = painterResource(id = imageId),
-            contentScale = contentScale,
+            contentScale = ContentScale.Fit,
             contentDescription = "card"
         )
     }
-
 }
 
