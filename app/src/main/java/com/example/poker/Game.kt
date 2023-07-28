@@ -3,7 +3,6 @@ package com.example.poker
 import android.annotation.SuppressLint
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,27 +10,30 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 class Game : ComponentActivity() {
 
-    val deck = Deck();
-    val player1Cards = ArrayList<Card>();
-    val player2Cards = ArrayList<Card>();
-    val tableCards = ArrayList<Card>();
-    val dealer = Dealer();
+    private val deck = Deck()
+    private val player1Cards = ArrayList<Card>()
+    private val player2Cards = ArrayList<Card>()
+    private val tableCards = ArrayList<Card>()
+    private val dealer = Dealer()
+    private val pot: Int = 700
+    private val bet: Int = 300
 
     @Composable
     fun StartGame() {
-
         dealer.dealCards(deck, player1Cards, player2Cards)
         dealer.flop(deck, tableCards)
         dealer.turn(deck, tableCards)
@@ -48,33 +50,21 @@ class Game : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.2f)
-                    .background(Color.Green),
-                contentAlignment = Alignment.BottomCenter
-            ){
-                Column {
-
-                }
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
                     .weight(1f),
                 contentAlignment = Alignment.TopCenter
             ) {
                 Column() {
-                    Player1Cards()
+                    PlayerCards(player1Cards)
                 }
             }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.5f)
-                    .background(Color.Red),
-                contentAlignment = Alignment.Center
+                    .weight(0.5f),
+                contentAlignment = Alignment.BottomCenter
             ) {
                 Column {
-
+                    Text(text = "Pot: $pot €", fontWeight = FontWeight.Bold)
                 }
             }
             Box(
@@ -90,12 +80,11 @@ class Game : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.5f)
-                    .background(Color.Green),
-                contentAlignment = Alignment.Center
+                    .weight(0.5f),
+                contentAlignment = Alignment.TopCenter
             ) {
                 Column {
-
+                    Text(text = "$bet €", fontSize = 15.sp)
                 }
             }
             Box(
@@ -105,47 +94,21 @@ class Game : ComponentActivity() {
                 contentAlignment = Alignment.BottomCenter
             ){
                 Column {
-                    Player2Cards()
-                }
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.2f)
-                    .background(Color.Yellow),
-                contentAlignment = Alignment.BottomCenter
-            ){
-                Column {
-
+                    PlayerCards(player2Cards)
                 }
             }
         }
     }
 
     @Composable    
-    fun Player1Cards() {
+    fun PlayerCards(cards: ArrayList<Card>) {
         val modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp)
         val contentScale = ContentScale.Fit
         Row (
             horizontalArrangement = Arrangement.Center,
         )
         {
-            for (card in player1Cards) {
-                CardImage(card = card, modifier, contentScale)
-            }
-        }
-    }
-
-    @Composable
-    fun Player2Cards() {
-
-        val modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp)
-        val contentScale = ContentScale.Fit
-        Row (
-            horizontalArrangement = Arrangement.Center,
-        )
-        {
-            for (card in player2Cards) {
+            for (card in cards) {
                 CardImage(card = card, modifier, contentScale)
             }
         }
@@ -178,7 +141,6 @@ class Game : ComponentActivity() {
             contentScale = contentScale,
             contentDescription = "card"
         )
-
     }
 
 }
