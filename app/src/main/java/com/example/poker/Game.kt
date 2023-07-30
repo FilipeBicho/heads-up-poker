@@ -4,20 +4,19 @@ import android.annotation.SuppressLint
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,41 +61,36 @@ class Game : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1.3f)
             ) {
                 Row(Modifier.align(Alignment.TopCenter)) {
-                    Text(text = "Player",
-                        Modifier
-                            .fillMaxHeight()
-                            .wrapContentHeight(Alignment.CenterVertically))
                     PlayerCards(player1Cards)
-                    Text(text = "Money")
                 }
             }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(2f)
+                    .weight(1.5f)
             ) {
                 Row(Modifier.align(Alignment.TopCenter)) {
                     Column() {
                         Text(
                             text = "Pot: $pot €",
                             modifier = Modifier
-                                .weight(0.5f)
+                                .weight(0.3f)
                                 .align(Alignment.CenterHorizontally)
                                 .wrapContentHeight(Alignment.Bottom),
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.End
                         )
 
-                        Row(modifier = Modifier.weight(1f)) {
+                        Row(modifier = Modifier.weight(1.1f)) {
                             TableCards(Modifier.padding(horizontal = 5.dp))
                         }
 
                         Text(
                             text = "$bet €", modifier = Modifier
-                                .weight(0.5f)
+                                .weight(0.3f)
                                 .align(Alignment.CenterHorizontally), fontSize = 15.sp
                         )
                     }
@@ -104,28 +99,10 @@ class Game : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1.3f)
             ) {
-                Row(Modifier.align(Alignment.TopCenter).background(Color.Gray.copy(alpha = 0.5f), shape = RoundedCornerShape(10.dp))) {
-                    Box(modifier = Modifier
-                        .fillMaxHeight()
-                        .width(60.dp)
-                        ) {
-                        Text(text = "Filipe Bicho",
-                            Modifier.align(Alignment.Center),
-                            textAlign = TextAlign.Center,
-                            fontSize = 12.sp)
-                    }
+                Row(Modifier.align(Alignment.TopCenter)) {
                     PlayerCards(player2Cards)
-                    Box(modifier = Modifier
-                        .fillMaxHeight()
-                        .width(60.dp)
-                    ) {
-                        Text(text = "1500€",
-                            Modifier.align(Alignment.Center),
-                            textAlign = TextAlign.Center,
-                            fontSize = 12.sp)
-                    }
                 }
             }
         }
@@ -133,7 +110,11 @@ class Game : ComponentActivity() {
 
     @Composable
     fun PlayerCards(cards: ArrayList<Card>) {
-        Box() {
+        Box(
+            modifier = Modifier
+                .width(IntrinsicSize.Max)
+                .fillMaxHeight()
+        ) {
             CardImage(
                 card = cards.first(),
                 Modifier.padding(bottom = 5.dp)
@@ -144,6 +125,32 @@ class Game : ComponentActivity() {
                     .zIndex(2f)
                     .padding(start = 20.dp, top = 5.dp)
             )
+
+            Box(
+                modifier = Modifier
+                    .zIndex(3f)
+                    .fillMaxHeight(0.6f)
+                    .align(Alignment.BottomCenter)
+                    .background(Color.Black.copy(alpha = 0.8f), shape = RoundedCornerShape(5.dp))
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(text = "Filipe Bicho",
+                        modifier = Modifier.width(60.dp),
+                        fontSize = 14.sp,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
+                    )
+
+                    Divider(color = Color.White, thickness = 2.dp, modifier = Modifier.padding(vertical = 5.dp))
+
+                    Text(text = "1500 €",
+                        fontSize = 14.sp)
+                }
+
+            }
         }
     }
 
