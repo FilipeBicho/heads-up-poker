@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -61,7 +62,7 @@ class Game : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1.3f)
+                    .weight(0.4f)
             ) {
                 Row(Modifier.align(Alignment.TopCenter)) {
                     PlayerCards(player1Cards)
@@ -70,7 +71,7 @@ class Game : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1.5f)
+                    .weight(0.4f)
             ) {
                 Row(Modifier.align(Alignment.TopCenter)) {
                     Column() {
@@ -99,7 +100,7 @@ class Game : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1.3f)
+                    .weight(0.4f)
             ) {
                 Row(Modifier.align(Alignment.TopCenter)) {
                     PlayerCards(player2Cards)
@@ -111,45 +112,49 @@ class Game : ComponentActivity() {
     @Composable
     fun PlayerCards(cards: ArrayList<Card>) {
         Box(
-            modifier = Modifier
-                .width(IntrinsicSize.Max)
-                .fillMaxHeight()
         ) {
             CardImage(
                 card = cards.first(),
-                Modifier.padding(bottom = 5.dp)
+                Modifier
+                    .rotate(-5f)
+                    .padding(vertical = 5.dp)
+                    .align(Alignment.TopCenter)
             )
             CardImage(
                 card = cards.last(),
                 Modifier
                     .zIndex(2f)
-                    .padding(start = 20.dp, top = 5.dp)
+                    .padding(start = 30.dp, top = 10.dp, bottom = 10.dp)
+                    .rotate(5f)
+                    .align(Alignment.TopCenter)
             )
 
-            Box(
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .zIndex(3f)
                     .fillMaxHeight(0.6f)
                     .align(Alignment.BottomCenter)
-                    .background(Color.Black.copy(alpha = 0.8f), shape = RoundedCornerShape(5.dp))
+                    .width(150.dp)
+                    .background(Color.Black.copy(alpha = 0.9f), shape = RoundedCornerShape(5.dp))
             ) {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(text = "Filipe Bicho",
-                        modifier = Modifier.width(60.dp),
-                        fontSize = 14.sp,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1
-                    )
+                Text(text = "Filipe Bicho",
+                    fontSize = 14.sp,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    textAlign = TextAlign.Center
+                )
 
-                    Divider(color = Color.White, thickness = 2.dp, modifier = Modifier.padding(vertical = 5.dp))
+                Divider(
+                    color = Color.White,
+                    thickness = 2.dp,
+                    modifier = Modifier.padding(vertical = 5.dp)
+                )
 
-                    Text(text = "1500 €",
-                        fontSize = 14.sp)
-                }
-
+                Text(text = "1500 €",
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center)
             }
         }
     }
