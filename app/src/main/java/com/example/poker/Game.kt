@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -62,7 +61,7 @@ class Game : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.4f)
+                    .weight(0.3f)
             ) {
                 Row(Modifier.align(Alignment.TopCenter)) {
                     PlayerCards(player1Cards)
@@ -78,21 +77,23 @@ class Game : ComponentActivity() {
                         Text(
                             text = "Pot: $pot €",
                             modifier = Modifier
-                                .weight(0.3f)
+                                .weight(0.2f)
                                 .align(Alignment.CenterHorizontally)
                                 .wrapContentHeight(Alignment.Bottom),
                             fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
                             textAlign = TextAlign.End
                         )
 
-                        Row(modifier = Modifier.weight(1.1f)) {
-                            TableCards(Modifier.padding(horizontal = 5.dp))
+                        Row(modifier = Modifier.weight(0.6f)) {
+                            TableCards(Modifier.padding(all = 5.dp))
                         }
 
                         Text(
                             text = "$bet €", modifier = Modifier
-                                .weight(0.3f)
-                                .align(Alignment.CenterHorizontally), fontSize = 15.sp
+                                .weight(0.2f)
+                                .align(Alignment.CenterHorizontally),
+                            fontSize = 15.sp
                         )
                     }
                 }
@@ -100,7 +101,7 @@ class Game : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.4f)
+                    .weight(0.3f)
             ) {
                 Row(Modifier.align(Alignment.TopCenter)) {
                     PlayerCards(player2Cards)
@@ -117,14 +118,14 @@ class Game : ComponentActivity() {
                 card = cards.first(),
                 Modifier
                     .rotate(-5f)
-                    .padding(vertical = 5.dp)
+                    .padding(top = 5.dp, bottom = 5.dp, end = 15.dp)
                     .align(Alignment.TopCenter)
             )
             CardImage(
                 card = cards.last(),
                 Modifier
                     .zIndex(2f)
-                    .padding(start = 30.dp, top = 10.dp, bottom = 10.dp)
+                    .padding(start = 15.dp, top = 5.dp, bottom = 5.dp)
                     .rotate(5f)
                     .align(Alignment.TopCenter)
             )
