@@ -3,6 +3,7 @@ package com.example.poker
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
@@ -40,8 +42,32 @@ fun Layout(game: Game) {
                 .fillMaxWidth()
                 .weight(0.3f)
         ) {
-            Row(Modifier.align(Alignment.TopCenter)) {
-                PlayerCards(game.player1Cards)
+            Row {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(0.4f)
+                        .border(1.dp, Color.White)
+                ) {
+
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(0.3f)
+                        .border(1.dp, Color.White)
+                        .wrapContentWidth(Alignment.CenterHorizontally)
+                ) {
+                    PlayerCards(game.player1Cards)
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(0.4f)
+                        .border(1.dp, Color.White)
+                ) {
+
+                }
             }
         }
         Box(
@@ -49,30 +75,54 @@ fun Layout(game: Game) {
                 .fillMaxWidth()
                 .weight(0.4f)
         ) {
-            Row(Modifier.align(Alignment.TopCenter)) {
-                Column() {
-                    Text(
-                        text = "Pot: ${game.pot} €",
-                        modifier = Modifier
-                            .weight(0.2f)
-                            .align(Alignment.CenterHorizontally)
-                            .wrapContentHeight(Alignment.Bottom),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp,
-                        textAlign = TextAlign.End
-                    )
+            Row {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(0.2f)
+                        .border(1.dp, Color.White)
+                ) {
 
-                    Row(modifier = Modifier.weight(0.6f)) {
-                        TableCards(Modifier.padding(all = 5.dp), game.tableCards)
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(0.5f)
+                        .border(1.dp, Color.White)
+                        .wrapContentWidth(Alignment.CenterHorizontally)
+                ) {
+                    Column {
+                        Text(
+                            text = "Pot: ${game.pot} €",
+                            modifier = Modifier
+                                .weight(0.2f)
+                                .align(Alignment.CenterHorizontally)
+                                .wrapContentHeight(Alignment.Bottom),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            textAlign = TextAlign.End
+                        )
+
+                        Row(modifier = Modifier.weight(0.6f)) {
+                            TableCards(Modifier.padding(all = 5.dp), game.tableCards)
+                        }
+
+                        Text(
+                            text = "${game.bet} €",
+                            modifier = Modifier
+                                .weight(0.2f)
+                                .align(Alignment.CenterHorizontally),
+                            fontSize = 15.sp
+                        )
                     }
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(0.2f)
+                        .border(1.dp, Color.White)
+                ) {
 
-                    Text(
-                        text = "${game.bet} €",
-                        modifier = Modifier
-                            .weight(0.2f)
-                            .align(Alignment.CenterHorizontally),
-                        fontSize = 15.sp
-                    )
                 }
             }
         }
@@ -81,8 +131,32 @@ fun Layout(game: Game) {
                 .fillMaxWidth()
                 .weight(0.3f)
         ) {
-            Row(Modifier.align(Alignment.TopCenter)) {
-                PlayerCards(game.player2Cards)
+            Row {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(0.4f)
+                        .border(1.dp, Color.White)
+                ) {
+
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(0.3f)
+                        .border(1.dp, Color.White)
+                        .wrapContentWidth(Alignment.CenterHorizontally)
+                ) {
+                    PlayerCards(game.player2Cards)
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(0.4f)
+                        .border(1.dp, Color.White)
+                ) {
+
+                }
             }
         }
     }
@@ -90,8 +164,7 @@ fun Layout(game: Game) {
 
 @Composable
 fun PlayerCards(cards: ArrayList<Card>) {
-    Box(
-    ) {
+    Box {
         CardImage(
             card = cards.first(),
             Modifier
@@ -118,7 +191,8 @@ fun PlayerCards(cards: ArrayList<Card>) {
                 .width(150.dp)
                 .background(Color.Black.copy(alpha = 0.9f), shape = RoundedCornerShape(5.dp))
         ) {
-            Text(text = "Filipe Bicho",
+            Text(
+                text = "Filipe Bicho",
                 fontSize = 14.sp,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
@@ -131,9 +205,11 @@ fun PlayerCards(cards: ArrayList<Card>) {
                 modifier = Modifier.padding(vertical = 5.dp)
             )
 
-            Text(text = "1500 €",
+            Text(
+                text = "1500 €",
                 fontSize = 14.sp,
-                textAlign = TextAlign.Center)
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
@@ -148,7 +224,7 @@ fun TableCards(modifier: Modifier, tableCards: ArrayList<Card>) {
 @SuppressLint("DiscouragedApi")
 @Composable
 fun CardImage(card: Card, modifier: Modifier) {
-    val context = LocalContext.current;
+    val context = LocalContext.current
     val imageId = context.resources.getIdentifier(
         card.getCardImagePath(),
         "drawable",
