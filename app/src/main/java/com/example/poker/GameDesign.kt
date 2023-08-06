@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -49,7 +50,9 @@ fun Layout(game: Game) {
                         .weight(0.4f)
                         .border(1.dp, Color.White)
                 ) {
-
+                    Box(modifier = Modifier.align(Alignment.BottomEnd)) {
+                        DealerChipImage()
+                    }
                 }
                 Box(
                     modifier = Modifier
@@ -138,7 +141,9 @@ fun Layout(game: Game) {
                         .weight(0.4f)
                         .border(1.dp, Color.White)
                 ) {
-
+                    Box(modifier = Modifier.align(Alignment.TopEnd)) {
+                        DealerChipImage()
+                    }
                 }
                 Box(
                     modifier = Modifier
@@ -236,5 +241,14 @@ fun CardImage(card: Card, modifier: Modifier) {
         painter = painterResource(id = imageId),
         contentScale = ContentScale.Fit,
         contentDescription = "card"
+    )
+}
+
+@Composable
+private fun DealerChipImage() {
+    Image(
+        painter = painterResource(id = R.drawable.dealer),
+        contentDescription = "Dealer chip image",
+        modifier = Modifier.size(20.dp)
     )
 }
