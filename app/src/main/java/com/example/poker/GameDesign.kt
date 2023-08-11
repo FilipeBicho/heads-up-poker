@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -22,7 +23,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,11 +31,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,7 +46,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.core.graphics.toColorInt
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -171,22 +173,38 @@ fun Layout(game: Game) {
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(0.4f)
-                        .border(1.dp, Color.White),
+                        .border(1.dp, Color.White)
                 ) {
-                    Column {
-                        var sliderPosition by remember { mutableStateOf(0f) }
-                        Text(
-                            text = sliderPosition.roundToInt().toString()
-                        )
-                        Slider(
-                            value = sliderPosition,
-                            valueRange = 0f..1500f,
-                            onValueChange = { sliderPosition = it },
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
 
-                        )
-                        Row (
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ){
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(0.5f)
+                        ) {
+                            Column {
+                                var sliderPosition by remember { mutableStateOf(0f) }
+                                Text(
+                                    text = sliderPosition.roundToInt().toString()
+                                )
+                                Slider(
+                                    value = sliderPosition,
+                                    valueRange = 0f..1500f,
+                                    onValueChange = { sliderPosition = it },
+
+                                    )
+                            }
+
+                        }
+
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .weight(0.5f),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        ) {
                             Button("Fold")
                             Button("Call")
                             Button("Bet")
@@ -287,22 +305,39 @@ private fun DealerChipImage() {
 
 @Composable
 private fun Button(text: String) {
-    val contextForToast = LocalContext.current.applicationContext
 
-    Button(
+    val brush = Brush.linearGradient(
+        listOf(colorResource(id = R.color.dark_red), Color.Black),
+        start = Offset(0.0f, 50.0f),
+        end = Offset(0.0f, 100.0f)
+    )
+
+    val context = LocalContext.current.applicationContext
+
+    Box(
         modifier = Modifier
+            .clip(shape = RoundedCornerShape(10.dp))
+            .border(
+                2.dp,
+                colorResource(id = R.color.custom_gray),
+                shape = RoundedCornerShape(10.dp)
+            )
+            .height(40.dp)
             .width(80.dp)
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color("#a82020".toColorInt()),
-                        Color.Black
-                    ),
-                ), shape = ButtonDefaults.elevatedShape
+            .background(brush)
+    )
+    {
+        Button(
+            onClick = { /*TODO*/ },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.White
             ),
-        onClick = {},
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
-    ) {
-        Text(text, color = Color.White)
+            modifier = Modifier.align(Alignment.Center)
+        )
+        {
+            Text(text = text, fontSize = 15.sp)
+        }
     }
+
 }
