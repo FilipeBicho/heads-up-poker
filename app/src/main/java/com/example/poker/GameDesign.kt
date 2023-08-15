@@ -18,11 +18,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,6 +42,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -176,33 +179,21 @@ fun Layout(game: Game) {
                         .border(1.dp, Color.White)
                 ) {
                     Column(
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
 
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .weight(0.5f)
+                                .weight(0.4f)
                         ) {
-                            Column {
-                                var sliderPosition by remember { mutableStateOf(0f) }
-                                Text(
-                                    text = sliderPosition.roundToInt().toString()
-                                )
-                                Slider(
-                                    value = sliderPosition,
-                                    valueRange = 0f..1500f,
-                                    onValueChange = { sliderPosition = it },
-
-                                    )
-                            }
-
+                            BetSlider()
                         }
 
                         Row(
                             Modifier
                                 .fillMaxWidth()
-                                .weight(0.5f),
+                                .weight(0.6f),
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
                             Button("Fold")
@@ -303,23 +294,69 @@ private fun DealerChipImage() {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Button(text: String) {
+private fun BetSlider() {
 
     val brush = Brush.linearGradient(
-        listOf(colorResource(id = R.color.dark_red), Color.Black),
+        listOf(colorResource(id = R.color.button_red), Color.Black),
         start = Offset(0.0f, 50.0f),
         end = Offset(0.0f, 100.0f)
     )
 
-    val context = LocalContext.current.applicationContext
+
+    var betValue by remember { mutableStateOf(0) }
+
+    Row(
+        modifier = Modifier.background(brush = brush)
+    ) {
+        Box(modifier = Modifier.weight(0.2f)) {
+            BasicTextField(
+                value = betValue.toString(),
+                onValueChange = { betValue = it.toInt() },
+                maxLines = 1,
+                textStyle = TextStyle(color = Color.Black, textAlign = TextAlign.Center),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxHeight()
+                    .background(Color.White)
+            )
+        }
+
+        Box(modifier = Modifier.weight(0.8f)) {
+            Slider(
+                value = betValue.toFloat(),
+                onValueChange = { betValue = it.roundToInt() },
+                modifier = Modifier
+                    .padding(end = 20.dp),
+                valueRange = 0f..1500f,
+                colors = SliderDefaults.colors(
+                    thumbColor = Color.DarkGray,
+                    activeTrackColor = Color.White
+                ),
+
+
+                )
+        }
+    }
+}
+
+
+@Composable
+private fun Button(text: String) {
+
+    val brush = Brush.linearGradient(
+        listOf(colorResource(id = R.color.button_red), Color.Black),
+        start = Offset(0.0f, 50.0f),
+        end = Offset(0.0f, 100.0f)
+    )
 
     Box(
         modifier = Modifier
             .clip(shape = RoundedCornerShape(10.dp))
             .border(
                 2.dp,
-                colorResource(id = R.color.custom_gray),
+                colorResource(id = R.color.border_gray),
                 shape = RoundedCornerShape(10.dp)
             )
             .height(40.dp)
@@ -339,5 +376,4 @@ private fun Button(text: String) {
             Text(text = text, fontSize = 15.sp)
         }
     }
-
 }
