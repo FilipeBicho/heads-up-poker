@@ -1,13 +1,16 @@
 package com.example.poker
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +26,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -51,7 +55,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Layout(game: Game) {
     Background()
@@ -65,7 +68,7 @@ fun Layout(game: Game) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .weight(0.4f)
+                        .weight(0.3f)
                         .border(1.dp, Color.White)
                 ) {
                     Box(modifier = Modifier.align(Alignment.BottomEnd)) {
@@ -140,10 +143,20 @@ fun Layout(game: Game) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .weight(0.2f)
+                        .weight(0.30f)
                         .border(1.dp, Color.White)
                 ) {
-
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .height(25.dp),
+                        horizontalArrangement = Arrangement.spacedBy(3.dp)
+                    ) {
+                        BigBlindButton(text = "2 BB")
+                        BigBlindButton(text = "3 BB")
+                        BigBlindButton(text = "Pot")
+                        BigBlindButton(text = "Max")
+                    }
                 }
             }
         }
@@ -156,7 +169,7 @@ fun Layout(game: Game) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .weight(0.4f)
+                        .weight(0.3f)
                         .border(1.dp, Color.White)
                 ) {
                     Box(modifier = Modifier.align(Alignment.TopEnd)) {
@@ -194,11 +207,11 @@ fun Layout(game: Game) {
                             Modifier
                                 .fillMaxWidth()
                                 .weight(0.6f),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
                         ) {
-                            Button("Fold")
-                            Button("Call")
-                            Button("Bet")
+                            MainBetButton("Fold")
+                            MainBetButton("Call")
+                            MainBetButton("Bet")
                         }
                     }
 
@@ -343,7 +356,7 @@ private fun BetSlider() {
 
 
 @Composable
-private fun Button(text: String) {
+private fun MainBetButton(text: String) {
 
     val brush = Brush.linearGradient(
         listOf(colorResource(id = R.color.button_red), Color.Black),
@@ -376,4 +389,24 @@ private fun Button(text: String) {
             Text(text = text, fontSize = 15.sp)
         }
     }
+}
+
+@Composable
+private fun BigBlindButton(text: String) {
+
+
+    OutlinedButton(
+        onClick = {},
+        border = BorderStroke(1.dp, colorResource(id = R.color.border_gray)),
+        shape = RoundedCornerShape(5.dp),
+        contentPadding = PaddingValues(0.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.DarkGray,
+            contentColor = Color.White
+        ),
+        modifier = Modifier.defaultMinSize(minWidth = ButtonDefaults.MinWidth)
+    ) {
+        Text(text)
+    }
+
 }
