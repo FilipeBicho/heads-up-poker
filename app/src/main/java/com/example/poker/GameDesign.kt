@@ -106,7 +106,13 @@ fun Layout(game: Game) {
                         .weight(0.2f)
                         .border(1.dp, Color.White)
                 ) {
-
+                    Text(
+                        text = "Pot: ${game.pot} €",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                    )
                 }
                 Box(
                     modifier = Modifier
@@ -117,12 +123,11 @@ fun Layout(game: Game) {
                 ) {
                     Column {
                         Text(
-                            text = "Pot: ${game.pot} €",
+                            text = "75 €",
                             modifier = Modifier
                                 .weight(0.2f)
                                 .align(Alignment.CenterHorizontally)
-                                .wrapContentHeight(Alignment.Bottom),
-                            fontWeight = FontWeight.Bold,
+                                .wrapContentHeight(Alignment.Top),
                             fontSize = 15.sp,
                             textAlign = TextAlign.End
                         )
@@ -132,11 +137,13 @@ fun Layout(game: Game) {
                         }
 
                         Text(
-                            text = "${game.bet} €",
+                            text = "75 €",
                             modifier = Modifier
                                 .weight(0.2f)
-                                .align(Alignment.CenterHorizontally),
-                            fontSize = 15.sp
+                                .align(Alignment.CenterHorizontally)
+                                .wrapContentHeight(Alignment.Bottom),
+                            fontSize = 15.sp,
+                            textAlign = TextAlign.End
                         )
                     }
                 }
