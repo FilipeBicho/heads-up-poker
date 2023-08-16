@@ -69,7 +69,6 @@ fun Layout(game: Game) {
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(0.3f)
-                        .border(1.dp, Color.White)
                 ) {
                     Box(modifier = Modifier.align(Alignment.BottomEnd)) {
                         DealerChipImage()
@@ -79,7 +78,6 @@ fun Layout(game: Game) {
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(0.3f)
-                        .border(1.dp, Color.White)
                         .wrapContentWidth(Alignment.CenterHorizontally)
                 ) {
                     PlayerCards(game.player1Cards)
@@ -87,8 +85,7 @@ fun Layout(game: Game) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .weight(0.4f)
-                        .border(1.dp, Color.White)
+                        .weight(0.3f)
                 ) {
 
                 }
@@ -104,7 +101,6 @@ fun Layout(game: Game) {
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(0.2f)
-                        .border(1.dp, Color.White)
                 ) {
                     Text(
                         text = "Pot: ${game.pot} €",
@@ -117,7 +113,6 @@ fun Layout(game: Game) {
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(0.5f)
-                        .border(1.dp, Color.White)
                         .wrapContentWidth(Alignment.CenterHorizontally)
                 ) {
                     Column {
@@ -147,17 +142,15 @@ fun Layout(game: Game) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .weight(0.30f)
-                        .border(1.dp, Color.White)
+                        .weight(0.2f)
                 ) {
                     Row(
                         modifier = Modifier
                             .align(Alignment.BottomStart)
                             .height(25.dp),
-                        horizontalArrangement = Arrangement.spacedBy(3.dp)
+                        horizontalArrangement = Arrangement.spacedBy(1.dp)
                     ) {
                         BigBlindButton(text = "2 BB")
-                        BigBlindButton(text = "3 BB")
                         BigBlindButton(text = "Pot")
                         BigBlindButton(text = "Max")
                     }
@@ -174,7 +167,7 @@ fun Layout(game: Game) {
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(0.3f)
-                        .border(1.dp, Color.White)
+
                 ) {
                     Box(modifier = Modifier.align(Alignment.TopEnd)) {
                         DealerChipImage()
@@ -184,7 +177,6 @@ fun Layout(game: Game) {
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(0.3f)
-                        .border(1.dp, Color.White)
                         .wrapContentWidth(Alignment.CenterHorizontally)
                 ) {
                     PlayerCards(game.player2Cards)
@@ -192,8 +184,7 @@ fun Layout(game: Game) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .weight(0.4f)
-                        .border(1.dp, Color.White)
+                        .weight(0.3f)
                 ) {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -211,7 +202,7 @@ fun Layout(game: Game) {
                             Modifier
                                 .fillMaxWidth()
                                 .weight(0.6f),
-                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
                             MainBetButton("Fold")
                             MainBetButton("Call")
@@ -310,21 +301,16 @@ private fun DealerChipImage() {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BetSlider() {
-
-    val brush = Brush.linearGradient(
-        listOf(colorResource(id = R.color.button_red), Color.Black),
-        start = Offset(0.0f, 50.0f),
-        end = Offset(0.0f, 100.0f)
-    )
-
-
     var betValue by remember { mutableStateOf(0) }
 
     Row(
-        modifier = Modifier.background(brush = brush)
+        modifier = Modifier
+            .background(
+                Color.DarkGray.copy(alpha = 0.9f),
+                shape = RoundedCornerShape(5.dp)
+            )
     ) {
         Box(modifier = Modifier.weight(0.2f)) {
             BasicTextField(
@@ -343,26 +329,20 @@ private fun BetSlider() {
             Slider(
                 value = betValue.toFloat(),
                 onValueChange = { betValue = it.roundToInt() },
-                modifier = Modifier.padding(end = 20.dp),
+                modifier = Modifier.padding(end = 10.dp),
                 valueRange = 0f..1500f,
                 colors = SliderDefaults.colors(
-                    thumbColor = Color.DarkGray,
-                    activeTrackColor = Color.White
+                    thumbColor = Color.LightGray,
+                    activeTrackColor = colorResource(id = R.color.button_red),
+                    inactiveTrackColor = Color.Black
                 ),
             )
         }
     }
 }
 
-
 @Composable
 private fun MainBetButton(text: String) {
-
-    val brush = Brush.linearGradient(
-        listOf(colorResource(id = R.color.button_red), Color.Black),
-        start = Offset(0.0f, 50.0f),
-        end = Offset(0.0f, 100.0f)
-    )
 
     Box(
         modifier = Modifier
@@ -372,9 +352,9 @@ private fun MainBetButton(text: String) {
                 colorResource(id = R.color.border_gray),
                 shape = RoundedCornerShape(10.dp)
             )
-            .height(40.dp)
+            .height(35.dp)
             .width(80.dp)
-            .background(brush)
+            .background(colorResource(id = R.color.button_red))
     )
     {
         Button(
@@ -396,11 +376,10 @@ private fun BigBlindButton(text: String) {
 
     OutlinedButton(
         onClick = {},
-        border = BorderStroke(1.dp, colorResource(id = R.color.border_gray)),
         shape = RoundedCornerShape(5.dp),
         contentPadding = PaddingValues(0.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.DarkGray,
+            containerColor = Color.DarkGray.copy(alpha = 0.9f),
             contentColor = Color.White
         ),
         modifier = Modifier.defaultMinSize(minWidth = ButtonDefaults.MinWidth)
