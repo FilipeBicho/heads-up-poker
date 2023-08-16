@@ -110,7 +110,6 @@ fun Layout(game: Game) {
                         text = "Pot: ${game.pot} €",
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
-                        textAlign = TextAlign.End,
                         modifier = Modifier.align(Alignment.CenterEnd)
                     )
                 }
@@ -129,7 +128,6 @@ fun Layout(game: Game) {
                                 .align(Alignment.CenterHorizontally)
                                 .wrapContentHeight(Alignment.Top),
                             fontSize = 15.sp,
-                            textAlign = TextAlign.End
                         )
 
                         Row(modifier = Modifier.weight(0.6f)) {
@@ -143,7 +141,6 @@ fun Layout(game: Game) {
                                 .align(Alignment.CenterHorizontally)
                                 .wrapContentHeight(Alignment.Bottom),
                             fontSize = 15.sp,
-                            textAlign = TextAlign.End
                         )
                     }
                 }
@@ -221,7 +218,6 @@ fun Layout(game: Game) {
                             MainBetButton("Bet")
                         }
                     }
-
                 }
             }
         }
@@ -347,16 +343,13 @@ private fun BetSlider() {
             Slider(
                 value = betValue.toFloat(),
                 onValueChange = { betValue = it.roundToInt() },
-                modifier = Modifier
-                    .padding(end = 20.dp),
+                modifier = Modifier.padding(end = 20.dp),
                 valueRange = 0f..1500f,
                 colors = SliderDefaults.colors(
                     thumbColor = Color.DarkGray,
                     activeTrackColor = Color.White
                 ),
-
-
-                )
+            )
         }
     }
 }
@@ -401,7 +394,6 @@ private fun MainBetButton(text: String) {
 @Composable
 private fun BigBlindButton(text: String) {
 
-
     OutlinedButton(
         onClick = {},
         border = BorderStroke(1.dp, colorResource(id = R.color.border_gray)),
@@ -415,5 +407,4 @@ private fun BigBlindButton(text: String) {
     ) {
         Text(text)
     }
-
 }
