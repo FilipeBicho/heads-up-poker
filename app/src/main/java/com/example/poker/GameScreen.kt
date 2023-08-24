@@ -1,7 +1,6 @@
 package com.example.poker
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,12 +24,12 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,8 +38,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -54,9 +51,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import kotlin.math.roundToInt
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun Layout(game: Game) {
+fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
+
+    val gameUiState by gameViewModel.uiState.collectAsState()
     Background()
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -80,7 +80,9 @@ fun Layout(game: Game) {
                         .weight(0.3f)
                         .wrapContentWidth(Alignment.CenterHorizontally)
                 ) {
-                    PlayerCards(game.player1Cards)
+                    if (gameUiState.player1Cards.isNotEmpty()) {
+                        PlayerCards(gameUiState.player1Cards)
+                    }
                 }
                 Box(
                     modifier = Modifier
@@ -103,7 +105,7 @@ fun Layout(game: Game) {
                         .weight(0.2f)
                 ) {
                     Text(
-                        text = "Pot: ${game.pot} €",
+                        text = "Pot: ${gameUiState.pot} €",
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
                         modifier = Modifier.align(Alignment.CenterEnd)
@@ -117,7 +119,7 @@ fun Layout(game: Game) {
                 ) {
                     Column {
                         Text(
-                            text = "75 €",
+                            text = "${gameUiState.player1Bet} €",
                             modifier = Modifier
                                 .weight(0.2f)
                                 .align(Alignment.CenterHorizontally)
@@ -125,8 +127,10 @@ fun Layout(game: Game) {
                             fontSize = 15.sp,
                         )
 
-                        Row(modifier = Modifier.weight(0.6f)) {
-                            TableCards(Modifier.padding(all = 5.dp), game.tableCards)
+                        if (gameUiState.tableCards.isNotEmpty()) {
+                            Row(modifier = Modifier.weight(0.6f)) {
+                                TableCards(Modifier.padding(all = 5.dp), gameUiState.tableCards)
+                            }
                         }
 
                         Text(
@@ -179,7 +183,9 @@ fun Layout(game: Game) {
                         .weight(0.3f)
                         .wrapContentWidth(Alignment.CenterHorizontally)
                 ) {
-                    PlayerCards(game.player2Cards)
+                    if (gameUiState.player2Cards.isNotEmpty()) {
+                        PlayerCards(gameUiState.player2Cards)
+                    }
                 }
                 Box(
                     modifier = Modifier
@@ -204,9 +210,9 @@ fun Layout(game: Game) {
                                 .weight(0.6f),
                             horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
-                            MainBetButton("Fold")
-                            MainBetButton("Call")
-                            MainBetButton("Bet")
+                            MainBetButton("Fold") { gameViewModel.dealFlop() }
+                            MainBetButton("Call") { gameViewModel.dealTurn() }
+                            MainBetButton("Bet") { gameViewModel.dealRiver() }
                         }
                     }
                 }
@@ -216,7 +222,7 @@ fun Layout(game: Game) {
 }
 
 @Composable
-fun PlayerCards(cards: ArrayList<Card>) {
+private fun PlayerCards(cards: MutableList<Card>) {
     Box {
         CardImage(
             card = cards.first(),
@@ -268,7 +274,7 @@ fun PlayerCards(cards: ArrayList<Card>) {
 }
 
 @Composable
-fun TableCards(modifier: Modifier, tableCards: ArrayList<Card>) {
+private fun TableCards(modifier: Modifier, tableCards: MutableList<Card>) {
     for (card in tableCards) {
         CardImage(card = card, modifier)
     }
@@ -276,7 +282,7 @@ fun TableCards(modifier: Modifier, tableCards: ArrayList<Card>) {
 
 @SuppressLint("DiscouragedApi")
 @Composable
-fun CardImage(card: Card, modifier: Modifier) {
+private fun CardImage(card: Card, modifier: Modifier) {
     val context = LocalContext.current
     val imageId = context.resources.getIdentifier(
         card.getCardImagePath(),
@@ -342,7 +348,7 @@ private fun BetSlider() {
 }
 
 @Composable
-private fun MainBetButton(text: String) {
+private fun MainBetButton(text: String, onClick: () -> Unit) {
 
     Box(
         modifier = Modifier
@@ -358,7 +364,7 @@ private fun MainBetButton(text: String) {
     )
     {
         Button(
-            onClick = { /*TODO*/ },
+            onClick = onClick ,
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Transparent,
                 contentColor = Color.White

@@ -1,51 +1,71 @@
 package com.example.poker
 
-import java.util.ArrayList
+import android.annotation.SuppressLint
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import kotlin.collections.ArrayList
 
+@SuppressLint("MutableCollectionMutableState")
 class Dealer {
+
+    private var player1Cards: ArrayList<Card> = ArrayList()
+    private var player2Cards: ArrayList<Card> = ArrayList()
+    private var tableCards by mutableStateOf(ArrayList<Card>())
+    private var deck: Deck = Deck()
 
     /**
      * Deal cards to player1 and player 2
      */
-    fun dealCards(deck: Deck, player1: ArrayList<Card>, player2: ArrayList<Card>) {
-        player1.add(deck.dealCard())
-        player2.add(deck.dealCard())
-        player1.add(deck.dealCard())
-        player2.add(deck.dealCard())
+    init {
+        player1Cards.add(deck.dealCard())
+        player2Cards.add(deck.dealCard())
+        player1Cards.add(deck.dealCard())
+        player2Cards.add(deck.dealCard())
     }
+
+    fun getPlayer1Cards() = player1Cards
+
+    fun getPlayer2Cards() = player2Cards
 
     /**
      * Deal flop
      */
-    fun flop(deck: Deck, table: ArrayList<Card>) {
+    fun getFlop(): MutableList<Card> {
         // Burn card
         deck.dealCard();
 
         // deal flop
         for (i in 0 until 3) {
-            table.add(deck.dealCard())
+            tableCards.add(deck.dealCard())
         }
+
+        return tableCards
     }
 
     /**
      * Deal turn
      */
-    fun turn(deck: Deck, table: ArrayList<Card>) {
+    fun getTurn(): MutableList<Card> {
         // Burn card
         deck.dealCard();
 
         // deal turn
-        table.add(deck.dealCard())
+        tableCards.add(deck.dealCard())
+
+        return tableCards
     }
 
     /**
      * Deal river
      */
-    fun river(deck: Deck, table: ArrayList<Card>) {
+    fun getRiver(): MutableList<Card> {
         // Burn card
         deck.dealCard();
 
         // deal river
-        table.add(deck.dealCard())
+        tableCards.add(deck.dealCard())
+
+        return tableCards
     }
 }

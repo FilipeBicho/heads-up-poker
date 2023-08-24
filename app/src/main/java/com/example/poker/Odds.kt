@@ -13,7 +13,7 @@ class Odds (private var playerCards: ArrayList<Card>, private val tableCards: Ar
     var winningOdds: Float = 0.0F
 
     init {
-        setCardCombinations()
+
     }
 
     /**

@@ -49,9 +49,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background,
                 ) {
                     hideStatusBar(window)
-                    val game = Game()
-                    game.StartGame()
-
+                    GameScreen()
                 }
             }
         }
@@ -62,14 +60,13 @@ class MainActivity : ComponentActivity() {
 fun HomePage(modifier: Modifier = Modifier) {
     
     var shouldShowOnBoarding by rememberSaveable { mutableStateOf(true) }
-    val game = Game()
 
     Surface(modifier) {
         Background()
         if (shouldShowOnBoarding) {
             OnboardingScreen(onContinueClick = { shouldShowOnBoarding = false })
         } else {
-           game.StartGame()
+            GameScreen()
         }
     }
 }
