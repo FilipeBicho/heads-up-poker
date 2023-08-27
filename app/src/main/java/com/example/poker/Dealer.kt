@@ -1,71 +1,52 @@
 package com.example.poker
 
 import android.annotation.SuppressLint
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import kotlin.collections.ArrayList
+import androidx.compose.runtime.snapshots.SnapshotStateList
 
 @SuppressLint("MutableCollectionMutableState")
-class Dealer {
+class Dealer(player1Cards: SnapshotStateList<Card>, player2Cards: SnapshotStateList<Card>) {
 
-    private var player1Cards: ArrayList<Card> = ArrayList()
-    private var player2Cards: ArrayList<Card> = ArrayList()
-    private var tableCards by mutableStateOf(ArrayList<Card>())
     private var deck: Deck = Deck()
 
     /**
-     * Deal cards to player1 and player 2
+     * Set player cards
      */
-    init {
+    fun setPlayerCards(
+        player1Cards: SnapshotStateList<Card>,
+        player2Cards: SnapshotStateList<Card>
+    ) {
         player1Cards.add(deck.dealCard())
         player2Cards.add(deck.dealCard())
         player1Cards.add(deck.dealCard())
         player2Cards.add(deck.dealCard())
     }
 
-    fun getPlayer1Cards() = player1Cards
-
-    fun getPlayer2Cards() = player2Cards
-
     /**
-     * Deal flop
+     * Set flop
      */
-    fun getFlop(): MutableList<Card> {
-        // Burn card
-        deck.dealCard();
+    fun setFlopCards(tableCards: SnapshotStateList<Card>) {
 
-        // deal flop
+        deck.dealCard();
         for (i in 0 until 3) {
             tableCards.add(deck.dealCard())
         }
-
-        return tableCards
     }
 
     /**
-     * Deal turn
+     * Set turn
      */
-    fun getTurn(): MutableList<Card> {
-        // Burn card
+    fun setTurnCard(tableCards: SnapshotStateList<Card>) {
+
         deck.dealCard();
-
-        // deal turn
         tableCards.add(deck.dealCard())
-
-        return tableCards
     }
 
     /**
-     * Deal river
+     * Set river
      */
-    fun getRiver(): MutableList<Card> {
-        // Burn card
+    fun setRiverCard(tableCards: SnapshotStateList<Card>) {
+
         deck.dealCard();
-
-        // deal river
         tableCards.add(deck.dealCard())
-
-        return tableCards
     }
 }

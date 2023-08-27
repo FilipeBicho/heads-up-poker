@@ -56,7 +56,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
 
-    val gameUiState by gameViewModel.uiState.collectAsState()
     Background()
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -80,8 +79,8 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         .weight(0.3f)
                         .wrapContentWidth(Alignment.CenterHorizontally)
                 ) {
-                    if (gameUiState.player1Cards.isNotEmpty()) {
-                        PlayerCards(gameUiState.player1Cards)
+                    if (gameViewModel.player1Cards.isNotEmpty()) {
+                        PlayerCards(gameViewModel.player1Cards)
                     }
                 }
                 Box(
@@ -105,7 +104,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         .weight(0.2f)
                 ) {
                     Text(
-                        text = "Pot: ${gameUiState.pot} €",
+                        text = "Pot: ${gameViewModel.pot} €",
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
                         modifier = Modifier.align(Alignment.CenterEnd)
@@ -119,7 +118,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                 ) {
                     Column {
                         Text(
-                            text = "${gameUiState.player1Bet} €",
+                            text = "${gameViewModel.player1Bet} €",
                             modifier = Modifier
                                 .weight(0.2f)
                                 .align(Alignment.CenterHorizontally)
@@ -127,9 +126,9 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                             fontSize = 15.sp,
                         )
 
-                        if (gameUiState.tableCards.isNotEmpty()) {
+                        if (gameViewModel.tableCards.isNotEmpty()) {
                             Row(modifier = Modifier.weight(0.6f)) {
-                                TableCards(Modifier.padding(all = 5.dp), gameUiState.tableCards)
+                                TableCards(Modifier.padding(all = 5.dp), gameViewModel.tableCards)
                             }
                         }
 
@@ -183,8 +182,8 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         .weight(0.3f)
                         .wrapContentWidth(Alignment.CenterHorizontally)
                 ) {
-                    if (gameUiState.player2Cards.isNotEmpty()) {
-                        PlayerCards(gameUiState.player2Cards)
+                    if (gameViewModel.player2Cards.isNotEmpty()) {
+                        PlayerCards(gameViewModel.player2Cards)
                     }
                 }
                 Box(

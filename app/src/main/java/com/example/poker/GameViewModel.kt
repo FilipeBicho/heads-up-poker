@@ -1,45 +1,41 @@
 package com.example.poker
 
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 
 class GameViewModel : ViewModel() {
 
-    // Game UI state
-    private val _uiState = MutableStateFlow(GameUiState())
-    val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
+    var player1Cards = mutableStateListOf<Card>()
+
+    var player2Cards = mutableStateListOf<Card>()
+
+    var tableCards = mutableStateListOf<Card>()
+    var pot by mutableStateOf(0)
+        private set
+    var player1Bet by mutableStateOf(0)
+        private set
 
 
-    var dealer: Dealer = Dealer()
+    var dealer: Dealer = Dealer(player1Cards, player2Cards)
 
     init {
-        uiState.value.player1Cards = dealer.getPlayer1Cards()
-        uiState.value.player2Cards = dealer.getPlayer2Cards()
+        dealer.setPlayerCards(player1Cards = player1Cards, player2Cards = player2Cards)
     }
 
     fun dealFlop() {
-
-        _uiState.update { currentState ->
-            currentState.copy(
-                pot = 50
-            )
-        }
+        dealer.setFlopCards(tableCards = tableCards)
     }
 
     fun dealTurn() {
-        _uiState.update { currentState -> currentState.copy(pot = 60) }
+        dealer.setTurnCard(tableCards = tableCards)
     }
 
     fun dealRiver() {
-        _uiState.update { currentState ->
-            currentState.copy(
-                tableCards = dealer.getRiver()
-            )
-        }
+        dealer.setRiverCard(tableCards = tableCards)
     }
 
 }
