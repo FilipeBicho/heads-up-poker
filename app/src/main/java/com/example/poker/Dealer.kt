@@ -4,7 +4,11 @@ import android.annotation.SuppressLint
 import androidx.compose.runtime.snapshots.SnapshotStateList
 
 @SuppressLint("MutableCollectionMutableState")
-class Dealer(player1Cards: SnapshotStateList<Card>, player2Cards: SnapshotStateList<Card>) {
+class Dealer {
+
+    val playerTurn: Int = 0
+
+    val computerTurn: Int = 1
 
     private var deck: Deck = Deck()
 
@@ -12,13 +16,13 @@ class Dealer(player1Cards: SnapshotStateList<Card>, player2Cards: SnapshotStateL
      * Set player cards
      */
     fun setPlayerCards(
-        player1Cards: SnapshotStateList<Card>,
-        player2Cards: SnapshotStateList<Card>
+        playerCards: SnapshotStateList<Card>,
+        computerCards: SnapshotStateList<Card>
     ) {
-        player1Cards.add(deck.dealCard())
-        player2Cards.add(deck.dealCard())
-        player1Cards.add(deck.dealCard())
-        player2Cards.add(deck.dealCard())
+        playerCards.add(deck.dealCard())
+        computerCards.add(deck.dealCard())
+        playerCards.add(deck.dealCard())
+        computerCards.add(deck.dealCard())
     }
 
     /**
