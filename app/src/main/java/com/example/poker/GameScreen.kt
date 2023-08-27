@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -34,21 +36,26 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlin.math.roundToInt
 
@@ -359,9 +366,12 @@ private fun GameActionButton(text: String, onClick: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun BetSlider(gameViewModel: GameViewModel) {
     var betValue by remember { mutableStateOf(gameViewModel.playerBet) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
 
     Row(
         modifier = Modifier
@@ -373,7 +383,20 @@ private fun BetSlider(gameViewModel: GameViewModel) {
         Box(modifier = Modifier.weight(0.2f)) {
             BasicTextField(
                 value = betValue.toString(),
-                onValueChange = { betValue = it.toInt() },
+                onValueChange = {
+                    if (it.isNotEmpty() && it.isDigitsOnly() && it.toInt() <= gameViewModel.playerMoney) {
+                        betValue = it.toInt()
+                    }
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        gameViewModel.updatePlayerBet(betValue)
+                        keyboardController?.hide()
+                    }
+                ),
                 maxLines = 1,
                 textStyle = TextStyle(color = Color.Black, textAlign = TextAlign.Center),
                 modifier = Modifier
