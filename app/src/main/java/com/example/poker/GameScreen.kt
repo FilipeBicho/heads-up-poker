@@ -43,6 +43,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -167,9 +168,11 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         horizontalArrangement = Arrangement.spacedBy(1.dp)
                     ) {
                         if (gameViewModel.isPlayerTurn()) {
-                            BetButton(text = "2 BB")
-                            BetButton(text = "Pot")
-                            BetButton(text = "Max")
+                            if (gameViewModel.bigBlind * 2 > gameViewModel.pot) {
+                                BetButton(text = "2 BB") { gameViewModel.updatePlayerBet(gameViewModel.bigBlind * 2) }
+                            }
+                            BetButton(text = "Pot") { gameViewModel.updatePlayerBet(gameViewModel.pot) }
+                            BetButton(text = "Max") { gameViewModel.updatePlayerBet(gameViewModel.playerMoney) }
                         }
                     }
                 }
@@ -371,6 +374,7 @@ private fun GameActionButton(text: String, onClick: () -> Unit) {
 private fun BetSlider(gameViewModel: GameViewModel) {
     var betValue by remember { mutableStateOf(gameViewModel.playerBet) }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
 
     Row(
@@ -390,11 +394,13 @@ private fun BetSlider(gameViewModel: GameViewModel) {
                 },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done),
+                    imeAction = ImeAction.Done
+                ),
                 keyboardActions = KeyboardActions(
                     onDone = {
                         gameViewModel.updatePlayerBet(betValue)
                         keyboardController?.hide()
+                        focusManager.clearFocus()
                     }
                 ),
                 maxLines = 1,
@@ -410,7 +416,7 @@ private fun BetSlider(gameViewModel: GameViewModel) {
             Slider(
                 value = betValue.toFloat(),
                 onValueChange = { betValue = it.roundToInt() },
-                onValueChangeFinished = { gameViewModel.updatePlayerBet(betValue)},
+                onValueChangeFinished = { gameViewModel.updatePlayerBet(betValue) },
                 modifier = Modifier.padding(end = 10.dp),
                 valueRange = gameViewModel.bigBlind.toFloat()..1500f,
                 colors = SliderDefaults.colors(
@@ -424,10 +430,10 @@ private fun BetSlider(gameViewModel: GameViewModel) {
 }
 
 @Composable
-private fun BetButton(text: String) {
+private fun BetButton(text: String, onClick: () -> Unit) {
 
     OutlinedButton(
-        onClick = {},
+        onClick = onClick,
         shape = RoundedCornerShape(5.dp),
         contentPadding = PaddingValues(0.dp),
         colors = ButtonDefaults.buttonColors(
