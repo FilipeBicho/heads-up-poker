@@ -4,9 +4,6 @@ import kotlin.random.Random
 
 class Deck {
 
-    /**
-     * Holds deck
-     */
     private var deck = arrayListOf<Card>();
 
     init {

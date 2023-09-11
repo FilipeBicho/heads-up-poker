@@ -7,9 +7,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 class Dealer {
 
     val playerTurn: Int = 0
-
     val computerTurn: Int = 1
-
     private var deck: Deck = Deck()
 
     /**

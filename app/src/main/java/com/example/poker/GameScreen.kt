@@ -62,7 +62,6 @@ import kotlin.math.roundToInt
 
 @Composable
 fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
-
     Background()
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -311,7 +310,6 @@ private fun TableCards(modifier: Modifier, tableCards: MutableList<Card>) {
 @Composable
 private fun CardImage(card: Card, modifier: Modifier, displayCards: Boolean) {
     val context = LocalContext.current
-
     val imageId = if (displayCards) {
         context.resources.getIdentifier(
             card.getCardImagePath(),
@@ -341,7 +339,6 @@ private fun DealerChipImage() {
 
 @Composable
 private fun GameActionButton(text: String, onClick: () -> Unit) {
-
     Box(
         modifier = Modifier
             .clip(shape = RoundedCornerShape(10.dp))
@@ -375,7 +372,6 @@ private fun BetSlider(gameViewModel: GameViewModel) {
     var betValue by remember { mutableStateOf(gameViewModel.playerBet) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
-
 
     Row(
         modifier = Modifier
@@ -431,7 +427,6 @@ private fun BetSlider(gameViewModel: GameViewModel) {
 
 @Composable
 private fun BetButton(text: String, onClick: () -> Unit) {
-
     OutlinedButton(
         onClick = onClick,
         shape = RoundedCornerShape(5.dp),

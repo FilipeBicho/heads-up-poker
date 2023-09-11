@@ -22,7 +22,6 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
      * Calculate winner when both players have the same hand rank
      */
     private fun calculateWinner(): Int {
-
         return when(player1Result) {
             9 -> compareStraight()
             8 -> compareFirstAndLastCard()
@@ -67,7 +66,6 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
      * Calculate three of a kind winner
      */
     private fun compareThreeOfAKind(): Int {
-
         // check first if there is a three of a kind of Aces
         return if (player1Cards[0].rank == 0 && player2Cards[0].rank != 0) {
             1
@@ -110,6 +108,9 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
         }
     }
 
+    /**
+     * Compare 1 pair winner
+     */
     private fun compareOnePair(): Int {
         return if (player1Cards[0].rank == 0 && player2Cards[0].rank != 0) {
             1
@@ -167,7 +168,6 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
      * compare kickers
      */
     private fun compareHigherKicker (startIndex: Int, endIndex: Int): Int {
-
         // check for kicker Ace
         if (player1Cards[startIndex].rank == 0 && player2Cards[startIndex].rank != 0) {
             return 1

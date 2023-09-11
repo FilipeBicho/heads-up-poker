@@ -10,17 +10,12 @@ class Odds (private var playerCards: ArrayList<Card>, private val tableCards: Ar
     private var player2 = 0
     private var draw = 0
     private var combinations = 0
-    var winningOdds: Float = 0.0F
-
-    init {
-
-    }
+    private var winningOdds: Float = 0.0F
 
     /**
      * create function to set all possible hand combinations
      */
     private fun setCardCombinations() {
-
         val usedCombinations = mutableListOf<ArrayList<Card>>()
 
         for (card1: Card in deck) {
@@ -48,7 +43,6 @@ class Odds (private var playerCards: ArrayList<Card>, private val tableCards: Ar
      * Calculate flop odds
      */
     fun flopOdds() {
-
         val tempTableCards: ArrayList<Card> = ArrayList()
         tempTableCards.addAll(tableCards.toList())
 
@@ -96,7 +90,6 @@ class Odds (private var playerCards: ArrayList<Card>, private val tableCards: Ar
      * calculate turn odds
      */
     fun turnOdds() {
-
         val tempTableCards: ArrayList<Card> = ArrayList()
         tempTableCards.addAll(tableCards.toList())
 
@@ -138,7 +131,6 @@ class Odds (private var playerCards: ArrayList<Card>, private val tableCards: Ar
      * calculate river odds
      */
     fun riverOdds() {
-
         // use table cards to calculate player hand
         val playerHand = Hand(playerCards, tableCards)
 
@@ -161,5 +153,4 @@ class Odds (private var playerCards: ArrayList<Card>, private val tableCards: Ar
         // calculate winning odds
         winningOdds = ((player1.toFloat() / combinations) * 100)
     }
-
 }

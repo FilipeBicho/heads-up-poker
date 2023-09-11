@@ -9,14 +9,7 @@ import androidx.compose.ui.res.painterResource
 
 class Card(var rank: Int, var suit: Int) {
 
-    /**
-     * Card rank
-     */
     private val rankArray = arrayOf("ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king")
-
-    /**
-     * Card suit
-     */
     private val suitArray = arrayOf("hearts", "spades", "clubs", "diamonds")
 
     /**
@@ -30,7 +23,7 @@ class Card(var rank: Int, var suit: Int) {
         val context = LocalContext.current;
         val imageId = context.resources.getIdentifier(this.getCardImagePath(), "drawable", context.packageName);
 
-        Column() {
+        Column {
             Image(painter = painterResource(id = imageId), contentDescription = "card",)
         }
     }

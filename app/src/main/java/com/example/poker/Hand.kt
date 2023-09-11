@@ -1,13 +1,13 @@
 package com.example.poker
 
-class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
+class Hand(private var playerCards: ArrayList<Card>, private var tableCards: ArrayList<Card>) {
 
     private var allCards = mutableListOf<Card>()
     private var hand = mutableListOf<Card>()
     private lateinit var suitRepeatedCards: MutableList<Map.Entry<Int, List<Card>>>
     private lateinit var rankRepeatedCards: MutableList<Map.Entry<Int, List<Card>>>
     private lateinit var flushCards: List<Card>
-    var resultText: String = ""
+    private var resultText: String = ""
     var resultValue: Int = 0
 
     init {
@@ -363,6 +363,4 @@ class Hand(var playerCards: ArrayList<Card>, var tableCards: ArrayList<Card>) {
      * Return player hand
      */
     fun getHand() = hand;
-
-
 }
