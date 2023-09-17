@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import kotlin.random.Random
 
 class GameViewModel : ViewModel() {
 
@@ -29,6 +30,12 @@ class GameViewModel : ViewModel() {
     var computerMoney by mutableStateOf(startMoney)
         private set
 
+    var playerOddsValue by mutableStateOf(0)
+        private set
+
+    var computerOddsValue by mutableStateOf(0)
+        private set
+
     var playerBet by mutableStateOf(0)
         private set
     var computerBet by mutableStateOf(0)
@@ -42,10 +49,15 @@ class GameViewModel : ViewModel() {
         private set
 
     private var dealer: Dealer = Dealer()
+    private lateinit var playerOdds: Odds
+    private lateinit var computerOdds: Odds
 
     init {
         dealer.setPlayerCards(playerCards = playerCards, computerCards = computerCards)
         dealerTurn = 1//Random(System.nanoTime()).nextInt(0, 2)
+        dealer.setFlopCards(tableCards)
+
+        playerOddsValue = Odds(playerCards.toList(), tableCards.toList()).getFlopOdds()
 
         gameTurn = if (dealerTurn == dealer.playerTurn) {
             dealer.computerTurn
@@ -55,11 +67,14 @@ class GameViewModel : ViewModel() {
     }
 
     fun fold() {
-        playerName = "Fold"
+        dealer.setTurnCard(tableCards)
+        playerOddsValue = Odds(playerCards.toList(), tableCards.toList()).getTurnOdds()
+
     }
 
     fun call() {
-        playerName = "Call"
+        dealer.setRiverCard(tableCards)
+        playerOddsValue = Odds(playerCards.toList(), tableCards.toList()).getRiverOdds()
     }
 
     fun bet() {

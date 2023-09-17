@@ -80,6 +80,14 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                             DealerChipImage()
                         }
                     }
+                    Box(modifier = Modifier.align(Alignment.CenterEnd)) {
+                        if (!gameViewModel.computerOddsValue.equals(0.0F)) {
+                            Text(
+                                text = "${gameViewModel.computerOddsValue} %",
+                                fontSize = 15.sp,
+                            )
+                        }
+                    }
                 }
                 Box(
                     modifier = Modifier
@@ -192,6 +200,14 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                     Box(modifier = Modifier.align(Alignment.TopEnd)) {
                         if (gameViewModel.isPlayerDealer()) {
                             DealerChipImage()
+                        }
+                    }
+                    Box(modifier = Modifier.align(Alignment.CenterEnd)) {
+                        if (!gameViewModel.playerOddsValue.equals(0.0F)) {
+                            Text(
+                                text = "${gameViewModel.playerOddsValue} %",
+                                fontSize = 15.sp,
+                            )
                         }
                     }
                 }

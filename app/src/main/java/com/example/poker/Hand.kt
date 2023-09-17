@@ -1,6 +1,6 @@
 package com.example.poker
 
-class Hand(private var playerCards: ArrayList<Card>, private var tableCards: ArrayList<Card>) {
+class Hand(private var playerCards: List<Card>, private var tableCards: List<Card>) {
 
     private var allCards = mutableListOf<Card>()
     private var hand = mutableListOf<Card>()

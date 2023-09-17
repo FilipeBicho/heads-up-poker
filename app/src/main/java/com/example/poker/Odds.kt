@@ -2,30 +2,40 @@ package com.example.poker
 
 import kotlin.math.roundToInt
 
-class Odds (private var playerCards: ArrayList<Card>, private val tableCards: ArrayList<Card>, private var deck: ArrayList<Card>) {
+class Odds(private var playerCards: List<Card>, private val tableCards: List<Card>) {
 
     private var cardCombinations = mutableListOf<ArrayList<Card>>()
-
-    private var player1 = 0
-    private var player2 = 0
-    private var draw = 0
-    private var combinations = 0
-    private var winningOdds: Float = 0.0F
+    private var deck = Deck().getDeck()
 
     /**
-     * create function to set all possible hand combinations
+     * set all possible hand combinations
      */
-    private fun setCardCombinations() {
+    init{
         val usedCombinations = mutableListOf<ArrayList<Card>>()
 
+        // remove player cards
+        for (playerCard in playerCards) {
+            deck.removeIf { playerCard.getCardImagePath() == it.getCardImagePath() }
+        }
+
+        // remove table cards
+        for (tableCard in tableCards) {
+            deck.removeIf { tableCard.getCardImagePath() == it.getCardImagePath() }
+        }
+
         for (card1: Card in deck) {
+
+            if (playerCards.contains(card1) || tableCards.contains(card1)) {
+                continue
+            }
+
             for (card2: Card in deck) {
-                if (card1 == card2) {
+                if (card1 == card2 || playerCards.contains(card2) || tableCards.contains(card2)) {
                     continue
                 }
 
                 // prevent repetitions
-                if (usedCombinations.isNotEmpty() && usedCombinations.contains(listOf(card1, card2))) {
+                if (usedCombinations.isNotEmpty() && (usedCombinations.contains(listOf(card1, card2)) || usedCombinations.contains(listOf(card2, card1)))) {
                    continue
                 }
 
@@ -42,30 +52,32 @@ class Odds (private var playerCards: ArrayList<Card>, private val tableCards: Ar
     /**
      * Calculate flop odds
      */
-    fun flopOdds() {
+    fun getFlopOdds(): Int {
+
+        var player1 = 0
+        var player2 = 0
+        var draw = 0
+        var combinations = 0
+
         val tempTableCards: ArrayList<Card> = ArrayList()
         tempTableCards.addAll(tableCards.toList())
 
-        // only iterate half of the combinations
-        val size = (cardCombinations.size.toFloat()/2).roundToInt()
-
-        for (index1: Int in 0  until size step 10) {
-           for (index2: Int in size - 10 downTo 10 step 10) {
-
+        for (opponentCards: ArrayList<Card> in cardCombinations) {
+            for (tableCards: ArrayList<Card> in cardCombinations) {
                // continue if 2nd combination contains any card from the 1st combination
-               if (cardCombinations[index2].contains(cardCombinations[index1].component1())
-                   || cardCombinations[index2].contains(cardCombinations[index1].component2())) {
+               if (opponentCards.contains(tableCards.component1())
+                   || opponentCards.contains(tableCards.component2())) {
                    continue
                }
 
                // add 2nd combination cards to table cards
-               tempTableCards.addAll(cardCombinations[index2].toList())
+               tempTableCards.addAll(tableCards)
 
                // use table cards to calculate player hand
                val playerHand = Hand(playerCards, tempTableCards)
 
                // use 1st combination cards and table cards to calculate opponent hand
-               val opponentHand = Hand(cardCombinations[index1], tempTableCards)
+               val opponentHand = Hand(opponentCards, tempTableCards)
 
                // calculate winner
                when (HandWinnerCalculator(player1Hand = playerHand, player2Hand = opponentHand).getWinner()) {
@@ -83,13 +95,19 @@ class Odds (private var playerCards: ArrayList<Card>, private val tableCards: Ar
         }
 
         // calculate winning odds
-        winningOdds = ((player1.toFloat() / combinations) * 100)
+        return ((player1.toFloat() / combinations) * 100).roundToInt()
     }
 
     /**
      * calculate turn odds
      */
-    fun turnOdds() {
+    fun getTurnOdds(): Int {
+
+        var player1 = 0
+        var player2 = 0
+        var draw = 0
+        var combinations = 0
+
         val tempTableCards: ArrayList<Card> = ArrayList()
         tempTableCards.addAll(tableCards.toList())
 
@@ -124,13 +142,19 @@ class Odds (private var playerCards: ArrayList<Card>, private val tableCards: Ar
         }
 
         // calculate winning odds
-        winningOdds = ((player1.toFloat() / combinations) * 100)
+        return ((player1.toFloat() / combinations) * 100).roundToInt()
     }
 
     /**
      * calculate river odds
      */
-    fun riverOdds() {
+    fun getRiverOdds(): Int {
+
+        var player1 = 0
+        var player2 = 0
+        var draw = 0
+        var combinations = 0
+
         // use table cards to calculate player hand
         val playerHand = Hand(playerCards, tableCards)
 
@@ -151,6 +175,6 @@ class Odds (private var playerCards: ArrayList<Card>, private val tableCards: Ar
         }
 
         // calculate winning odds
-        winningOdds = ((player1.toFloat() / combinations) * 100)
+        return ((player1.toFloat() / combinations) * 100).roundToInt()
     }
 }
