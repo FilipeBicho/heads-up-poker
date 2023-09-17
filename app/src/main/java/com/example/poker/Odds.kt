@@ -2,7 +2,7 @@ package com.example.poker
 
 import kotlin.math.roundToInt
 
-class Odds(private var playerCards: List<Card>, private val tableCards: List<Card>) {
+class Odds(private var playerCards: List<Card>, private var tableCards: MutableList<Card>) {
 
     private var cardCombinations = mutableListOf<ArrayList<Card>>()
     private var deck = Deck().getDeck()
@@ -10,33 +10,31 @@ class Odds(private var playerCards: List<Card>, private val tableCards: List<Car
     /**
      * set all possible hand combinations
      */
-    init{
+    init {
         val usedCombinations = mutableListOf<ArrayList<Card>>()
 
         // remove player cards
         for (playerCard in playerCards) {
-            deck.removeIf { playerCard.getCardImagePath() == it.getCardImagePath() }
+            deck.removeIf { playerCard.toString() == it.toString() }
         }
 
         // remove table cards
         for (tableCard in tableCards) {
-            deck.removeIf { tableCard.getCardImagePath() == it.getCardImagePath() }
+            deck.removeIf { tableCard.toString() == it.toString() }
         }
 
         for (card1: Card in deck) {
-
-            if (playerCards.contains(card1) || tableCards.contains(card1)) {
-                continue
-            }
-
             for (card2: Card in deck) {
-                if (card1 == card2 || playerCards.contains(card2) || tableCards.contains(card2)) {
+                if (card1 == card2) {
                     continue
                 }
 
                 // prevent repetitions
-                if (usedCombinations.isNotEmpty() && (usedCombinations.contains(listOf(card1, card2)) || usedCombinations.contains(listOf(card2, card1)))) {
-                   continue
+                if (usedCombinations.isNotEmpty()
+                    && (usedCombinations.contains(listOf(card1, card2))
+                            || usedCombinations.contains(listOf(card2, card1)))
+                ) {
+                    continue
                 }
 
                 // add combination
@@ -64,34 +62,38 @@ class Odds(private var playerCards: List<Card>, private val tableCards: List<Car
 
         for (opponentCards: ArrayList<Card> in cardCombinations) {
             for (tableCards: ArrayList<Card> in cardCombinations) {
-               // continue if 2nd combination contains any card from the 1st combination
-               if (opponentCards.contains(tableCards.component1())
-                   || opponentCards.contains(tableCards.component2())) {
-                   continue
-               }
+                // continue if 2nd combination contains any card from the 1st combination
+                if (opponentCards.contains(tableCards.component1())
+                    || opponentCards.contains(tableCards.component2())
+                ) {
+                    continue
+                }
 
-               // add 2nd combination cards to table cards
-               tempTableCards.addAll(tableCards)
+                // add 2nd combination cards to table cards
+                tempTableCards.addAll(tableCards)
 
-               // use table cards to calculate player hand
-               val playerHand = Hand(playerCards, tempTableCards)
+                // use table cards to calculate player hand
+                val playerHand = Hand(playerCards, tempTableCards)
 
-               // use 1st combination cards and table cards to calculate opponent hand
-               val opponentHand = Hand(opponentCards, tempTableCards)
+                // use 1st combination cards and table cards to calculate opponent hand
+                val opponentHand = Hand(opponentCards, tempTableCards)
 
-               // calculate winner
-               when (HandWinnerCalculator(player1Hand = playerHand, player2Hand = opponentHand).getWinner()) {
-                   1 -> player1++
-                   2 -> player2++
-                   3 -> draw++
-                   else -> {}
-               }
+                // calculate winner
+                when (HandWinnerCalculator(
+                    player1Hand = playerHand,
+                    player2Hand = opponentHand
+                ).getWinner()) {
+                    1 -> player1++
+                    2 -> player2++
+                    3 -> draw++
+                    else -> {}
+                }
 
-               // remove temporarily table cards
-               tempTableCards.removeLast()
-               tempTableCards.removeLast()
-               combinations++
-           }
+                // remove temporarily table cards
+                tempTableCards.removeLast()
+                tempTableCards.removeLast()
+                combinations++
+            }
         }
 
         // calculate winning odds
@@ -129,7 +131,10 @@ class Odds(private var playerCards: List<Card>, private val tableCards: List<Car
                 val opponentHand = Hand(opponentCards, tempTableCards)
 
                 // calculate winner
-                when (HandWinnerCalculator(player1Hand = playerHand, player2Hand = opponentHand).getWinner()) {
+                when (HandWinnerCalculator(
+                    player1Hand = playerHand,
+                    player2Hand = opponentHand
+                ).getWinner()) {
                     1 -> player1++
                     2 -> player2++
                     3 -> draw++
@@ -164,7 +169,10 @@ class Odds(private var playerCards: List<Card>, private val tableCards: List<Car
             val opponentHand = Hand(opponentCards, tableCards)
 
             // calculate winner
-            when (HandWinnerCalculator(player1Hand = playerHand, player2Hand = opponentHand).getWinner()) {
+            when (HandWinnerCalculator(
+                player1Hand = playerHand,
+                player2Hand = opponentHand
+            ).getWinner()) {
                 1 -> player1++
                 2 -> player2++
                 3 -> draw++
@@ -176,5 +184,20 @@ class Odds(private var playerCards: List<Card>, private val tableCards: List<Car
 
         // calculate winning odds
         return ((player1.toFloat() / combinations) * 100).roundToInt()
+    }
+
+    /**
+     * Update table cards
+     * Remove card from deck and card combinations
+     */
+    fun updateCombinationCards(card: Card): Unit {
+        // add card to table cards
+        tableCards.add(card)
+
+        // remove added card from card combinations
+        cardCombinations.removeIf { it.any { it.toString() == card.toString() } }
+
+        // remove added card from deck
+        deck.removeIf { card.toString() == it.toString() }
     }
 }
