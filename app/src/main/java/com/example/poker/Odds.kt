@@ -56,6 +56,7 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
         var player2 = 0
         var draw = 0
         var combinations = 0
+        val rankOdds = Array(11) { _ -> 0}
 
         val tempTableCards: ArrayList<Card> = ArrayList()
         tempTableCards.addAll(tableCards.toList())
@@ -74,6 +75,7 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
 
                 // use table cards to calculate player hand
                 val playerHand = Hand(playerCards, tempTableCards)
+                rankOdds[playerHand.resultValue]++
 
                 // use 1st combination cards and table cards to calculate opponent hand
                 val opponentHand = Hand(opponentCards, tempTableCards)
@@ -96,6 +98,11 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
             }
         }
 
+        // calculate odds per hand ranking
+        for ((index, value) in rankOdds.withIndex()) {
+            rankOdds[index] = ((value.toFloat() / combinations) * 100).roundToInt()
+        }
+
         // calculate winning odds
         return ((player1.toFloat() / combinations) * 100).roundToInt()
     }
@@ -109,6 +116,7 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
         var player2 = 0
         var draw = 0
         var combinations = 0
+        val rankOdds = Array(11) { _ -> 0}
 
         val tempTableCards: ArrayList<Card> = ArrayList()
         tempTableCards.addAll(tableCards.toList())
@@ -126,6 +134,7 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
 
                 // use table cards to calculate player hand
                 val playerHand = Hand(playerCards, tempTableCards)
+                rankOdds[playerHand.resultValue]++
 
                 // use combination cards and table cards to calculate opponent hand
                 val opponentHand = Hand(opponentCards, tempTableCards)
@@ -144,6 +153,11 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
                 tempTableCards.removeLast()
                 combinations++
             }
+        }
+
+        // calculate odds per hand ranking
+        for ((index, value) in rankOdds.withIndex()) {
+            rankOdds[index] = ((value.toFloat() / combinations) * 100).roundToInt()
         }
 
         // calculate winning odds

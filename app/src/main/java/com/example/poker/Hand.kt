@@ -1,5 +1,16 @@
 package com.example.poker
 
+const val ROYAL_STRAIGHT_FLUSH: Int = 10
+const val STRAIGHT_FLUSH: Int = 9
+const val FOUR_OF_A_KIND: Int = 8
+const val FULL_HOUSE: Int = 7
+const val FLUSH: Int = 6
+const val STRAIGHT: Int = 5
+const val THREE_OF_A_KIND: Int = 4
+const val TWO_PAIR: Int = 3
+const val PAIR: Int = 2
+const val HIGH_CARD: Int = 1
+
 class Hand(private var playerCards: List<Card>, private var tableCards: List<Card>) {
 
     private var allCards = mutableListOf<Card>()
@@ -17,61 +28,61 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
 
     private fun evaluateHand() {
         if (isRoyalStraightFlush()) {
-            resultValue = 10
+            resultValue = ROYAL_STRAIGHT_FLUSH
             resultText = "Royal Straight Flush"
             return
         }
 
         if (isStraightFlush()) {
-            resultValue = 9
+            resultValue = STRAIGHT_FLUSH
             resultText = "Straight Flush"
             return
         }
 
         if (isFourOfAKind()) {
-            resultValue = 8
+            resultValue = FOUR_OF_A_KIND
             resultText = "Four of a Kind"
             return
         }
 
         if (isFullHouse()) {
-            resultValue = 7
+            resultValue = FULL_HOUSE
             resultText = "Full House"
             return
         }
 
         if (isFlush()) {
-            resultValue = 6
+            resultValue = FLUSH
             resultText = "Flush"
             return
         }
 
         if (isStraight()) {
-            resultValue = 5
+            resultValue = STRAIGHT
             resultText = "Straight"
             return
         }
 
         if (isThreeOfAKind()) {
-            resultValue = 4
+            resultValue = THREE_OF_A_KIND
             resultText = "Three of a Kind"
             return
         }
 
         if (isTwoPair()) {
-            resultValue = 3
+            resultValue = TWO_PAIR
             resultText = "Two Pair"
             return
         }
 
         if (isPair()) {
-            resultValue = 2
+            resultValue = PAIR
             resultText = "Pair"
             return
         }
 
         highCards()
-        resultValue = 1
+        resultValue = HIGH_CARD
         resultText = "High Card"
     }
 

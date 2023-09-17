@@ -23,15 +23,15 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
      */
     private fun calculateWinner(): Int {
         return when(player1Result) {
-            9 -> compareStraight()
-            8 -> compareFirstAndLastCard()
-            7 -> compareFirstAndLastCard()
-            6 -> compareFlush()
-            5 -> compareStraight()
-            4 -> compareThreeOfAKind()
-            3 -> compareTwoPair()
-            2 -> compareOnePair()
-            1 -> compareHigherKicker(startIndex = 0, endIndex = 4)
+            STRAIGHT_FLUSH -> compareStraight()
+            FOUR_OF_A_KIND -> compareFirstAndLastCard()
+            FULL_HOUSE -> compareFirstAndLastCard()
+            FLUSH -> compareFlush()
+            STRAIGHT -> compareStraight()
+            THREE_OF_A_KIND -> compareThreeOfAKind()
+            TWO_PAIR -> compareTwoPair()
+            PAIR -> compareOnePair()
+            HIGH_CARD -> compareHigherKicker(startIndex = 0, endIndex = 4)
             else -> {winner}
         }
     }
