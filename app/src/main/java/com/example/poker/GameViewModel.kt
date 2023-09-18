@@ -66,19 +66,19 @@ class GameViewModel : ViewModel() {
     }
 
     fun fold() {
-        playerOddsValue = playerOdds.getFlopOdds()
+        playerOddsValue = playerOdds.getFlopOdds()[RESULT]
     }
 
     fun call() {
         dealer.setTurnCard(tableCards)
         playerOdds.updateCombinationCards(tableCards.last())
-        playerOddsValue = playerOdds.getTurnOdds()
+        playerOddsValue = playerOdds.getTurnOdds()[RESULT]
     }
 
     fun bet() {
         dealer.setRiverCard(tableCards)
         playerOdds.updateCombinationCards(tableCards.last())
-        playerOddsValue = playerOdds.getRiverOdds()
+        playerOddsValue = playerOdds.getRiverOdds()[RESULT]
     }
 
     fun isPlayerTurn() = gameTurn == dealer.playerTurn

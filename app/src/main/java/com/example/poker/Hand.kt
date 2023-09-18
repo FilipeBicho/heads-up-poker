@@ -10,6 +10,7 @@ const val THREE_OF_A_KIND: Int = 4
 const val TWO_PAIR: Int = 3
 const val PAIR: Int = 2
 const val HIGH_CARD: Int = 1
+const val RESULT = 0
 
 class Hand(private var playerCards: List<Card>, private var tableCards: List<Card>) {
 

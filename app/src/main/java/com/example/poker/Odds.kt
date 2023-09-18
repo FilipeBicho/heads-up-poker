@@ -1,5 +1,6 @@
 package com.example.poker
 
+import android.util.Log
 import kotlin.math.roundToInt
 
 class Odds(private var playerCards: List<Card>, private var tableCards: MutableList<Card>) {
@@ -50,13 +51,13 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
     /**
      * Calculate flop odds
      */
-    fun getFlopOdds(): Int {
+    fun getFlopOdds(): Array<Int> {
 
         var player1 = 0
         var player2 = 0
         var draw = 0
         var combinations = 0
-        val rankOdds = Array(11) { _ -> 0}
+        val odds = Array(11) { _ -> 0}
 
         val tempTableCards: ArrayList<Card> = ArrayList()
         tempTableCards.addAll(tableCards.toList())
@@ -75,7 +76,7 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
 
                 // use table cards to calculate player hand
                 val playerHand = Hand(playerCards, tempTableCards)
-                rankOdds[playerHand.resultValue]++
+                odds[playerHand.resultValue]++
 
                 // use 1st combination cards and table cards to calculate opponent hand
                 val opponentHand = Hand(opponentCards, tempTableCards)
@@ -99,24 +100,27 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
         }
 
         // calculate odds per hand ranking
-        for ((index, value) in rankOdds.withIndex()) {
-            rankOdds[index] = ((value.toFloat() / combinations) * 100).roundToInt()
+        for ((index, value) in odds.withIndex()) {
+            odds[index] = ((value.toFloat() / combinations) * 100).roundToInt()
         }
 
-        // calculate winning odds
-        return ((player1.toFloat() / combinations) * 100).roundToInt()
+        // calculate odds
+        odds[RESULT] = ((player1.toFloat() / combinations) * 100).roundToInt()
+
+        Log.d("ODDS", odds.joinToString("\n"))
+        return odds
     }
 
     /**
      * calculate turn odds
      */
-    fun getTurnOdds(): Int {
+    fun getTurnOdds(): Array<Int> {
 
         var player1 = 0
         var player2 = 0
         var draw = 0
         var combinations = 0
-        val rankOdds = Array(11) { _ -> 0}
+        val odds = Array(11) { _ -> 0}
 
         val tempTableCards: ArrayList<Card> = ArrayList()
         tempTableCards.addAll(tableCards.toList())
@@ -134,7 +138,7 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
 
                 // use table cards to calculate player hand
                 val playerHand = Hand(playerCards, tempTableCards)
-                rankOdds[playerHand.resultValue]++
+                odds[playerHand.resultValue]++
 
                 // use combination cards and table cards to calculate opponent hand
                 val opponentHand = Hand(opponentCards, tempTableCards)
@@ -156,26 +160,30 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
         }
 
         // calculate odds per hand ranking
-        for ((index, value) in rankOdds.withIndex()) {
-            rankOdds[index] = ((value.toFloat() / combinations) * 100).roundToInt()
+        for ((index, value) in odds.withIndex()) {
+            odds[index] = ((value.toFloat() / combinations) * 100).roundToInt()
         }
 
-        // calculate winning odds
-        return ((player1.toFloat() / combinations) * 100).roundToInt()
+        // calculate odds
+        odds[RESULT] = ((player1.toFloat() / combinations) * 100).roundToInt()
+        Log.d("ODDS", odds.joinToString("\n"))
+        return odds
     }
 
     /**
      * calculate river odds
      */
-    fun getRiverOdds(): Int {
+    fun getRiverOdds(): Array<Int> {
 
         var player1 = 0
         var player2 = 0
         var draw = 0
         var combinations = 0
+        val odds = Array(11) { _ -> 0}
 
         // use table cards to calculate player hand
         val playerHand = Hand(playerCards, tableCards)
+        odds[playerHand.resultValue] = 100
 
         for (opponentCards: ArrayList<Card> in cardCombinations) {
 
@@ -196,8 +204,10 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
             combinations++
         }
 
-        // calculate winning odds
-        return ((player1.toFloat() / combinations) * 100).roundToInt()
+        // calculate odds
+        odds[RESULT] = ((player1.toFloat() / combinations) * 100).roundToInt()
+        Log.d("ODDS", odds.joinToString("\n"))
+        return odds
     }
 
     /**
