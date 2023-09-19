@@ -3,8 +3,8 @@ package com.example.poker
 import android.util.Log
 import kotlin.math.roundToInt
 
-const val MAX_OPPONENT_COMBINATIONS = 300
-const val MAX_TABLE_COMBINATIONS = 150
+const val MAX_OPPONENT_COMBINATIONS = 200
+const val MAX_TABLE_COMBINATIONS = 100
 
 class Odds(private var playerCards: List<Card>, private var tableCards: MutableList<Card>) {
 
@@ -15,38 +15,41 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
      * set all possible hand combinations
      */
     init {
-        val usedCombinations = mutableListOf<ArrayList<Card>>()
 
-        // remove player cards
-        for (playerCard in playerCards) {
-            deck.removeIf { playerCard.toString() == it.toString() }
-        }
+        if (tableCards.isNotEmpty()) {
+            val usedCombinations = mutableListOf<ArrayList<Card>>()
 
-        // remove table cards
-        for (tableCard in tableCards) {
-            deck.removeIf { tableCard.toString() == it.toString() }
-        }
+            // remove player cards
+            for (playerCard in playerCards) {
+                deck.removeIf { playerCard.toString() == it.toString() }
+            }
 
-        for (card1: Card in deck) {
-            for (card2: Card in deck) {
-                if (card1 == card2) {
-                    continue
+            // remove table cards
+            for (tableCard in tableCards) {
+                deck.removeIf { tableCard.toString() == it.toString() }
+            }
+
+            for (card1: Card in deck) {
+                for (card2: Card in deck) {
+                    if (card1 == card2) {
+                        continue
+                    }
+
+                    // prevent repetitions
+                    if (usedCombinations.isNotEmpty()
+                        && (usedCombinations.contains(listOf(card1, card2))
+                                || usedCombinations.contains(listOf(card2, card1)))
+                    ) {
+                        continue
+                    }
+
+                    // add combination
+                    cardCombinations.add(arrayListOf(card1, card2))
+
+                    // used to prevent repetitions
+                    usedCombinations.add(arrayListOf(card1, card2))
+                    usedCombinations.add(arrayListOf(card2, card1))
                 }
-
-                // prevent repetitions
-                if (usedCombinations.isNotEmpty()
-                    && (usedCombinations.contains(listOf(card1, card2))
-                            || usedCombinations.contains(listOf(card2, card1)))
-                ) {
-                    continue
-                }
-
-                // add combination
-                cardCombinations.add(arrayListOf(card1, card2))
-
-                // used to prevent repetitions
-                usedCombinations.add(arrayListOf(card1, card2))
-                usedCombinations.add(arrayListOf(card2, card1))
             }
         }
     }
@@ -171,6 +174,10 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
 
                 tempTableCards.removeLast()
                 combinations++
+            }
+
+            if (combinations >= MAX_TABLE_COMBINATIONS * MAX_OPPONENT_COMBINATIONS) {
+                break
             }
         }
 
