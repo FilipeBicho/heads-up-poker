@@ -3,6 +3,9 @@ package com.example.poker
 import android.util.Log
 import kotlin.math.roundToInt
 
+const val MAX_OPPONENT_COMBINATIONS = 300
+const val MAX_TABLE_COMBINATIONS = 150
+
 class Odds(private var playerCards: List<Card>, private var tableCards: MutableList<Card>) {
 
     private var cardCombinations = mutableListOf<ArrayList<Card>>()
@@ -57,12 +60,16 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
         var player2 = 0
         var draw = 0
         var combinations = 0
+        var opponentCombinationsCount = 0
+        var tableCombinationsCount: Int
         val odds = Array(11) { _ -> 0}
 
         val tempTableCards: ArrayList<Card> = ArrayList()
         tempTableCards.addAll(tableCards.toList())
 
         for (opponentCards: ArrayList<Card> in cardCombinations) {
+            cardCombinations.shuffle()
+            tableCombinationsCount = 0
             for (tableCards: ArrayList<Card> in cardCombinations) {
                 // continue if 2nd combination contains any card from the 1st combination
                 if (opponentCards.contains(tableCards.component1())
@@ -96,6 +103,16 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
                 tempTableCards.removeLast()
                 tempTableCards.removeLast()
                 combinations++
+
+                tableCombinationsCount++
+                if (tableCombinationsCount >= MAX_TABLE_COMBINATIONS) {
+                    break
+                }
+            }
+
+            opponentCombinationsCount++
+            if (opponentCombinationsCount >= MAX_OPPONENT_COMBINATIONS) {
+                break
             }
         }
 
@@ -106,8 +123,6 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
 
         // calculate odds
         odds[RESULT] = ((player1.toFloat() / combinations) * 100).roundToInt()
-
-        Log.d("ODDS", odds.joinToString("\n"))
         return odds
     }
 
@@ -166,7 +181,6 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
 
         // calculate odds
         odds[RESULT] = ((player1.toFloat() / combinations) * 100).roundToInt()
-        Log.d("ODDS", odds.joinToString("\n"))
         return odds
     }
 
@@ -206,7 +220,6 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
 
         // calculate odds
         odds[RESULT] = ((player1.toFloat() / combinations) * 100).roundToInt()
-        Log.d("ODDS", odds.joinToString("\n"))
         return odds
     }
 

@@ -1,5 +1,6 @@
 package com.example.poker
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -66,19 +67,25 @@ class GameViewModel : ViewModel() {
     }
 
     fun fold() {
+        val start = System.currentTimeMillis()
         playerOddsValue = playerOdds.getFlopOdds()[RESULT]
+        Log.d("FLOP_ODDS", ((System.currentTimeMillis() - start) / 1000).toString())
     }
 
     fun call() {
         dealer.setTurnCard(tableCards)
         playerOdds.updateCombinationCards(tableCards.last())
+        val start = System.currentTimeMillis()
         playerOddsValue = playerOdds.getTurnOdds()[RESULT]
+        Log.d("TURN_ODDS", ((System.currentTimeMillis() - start) / 1000).toString())
     }
 
     fun bet() {
         dealer.setRiverCard(tableCards)
         playerOdds.updateCombinationCards(tableCards.last())
+        val start = System.currentTimeMillis()
         playerOddsValue = playerOdds.getRiverOdds()[RESULT]
+        Log.d("RIVER_ODDS", ((System.currentTimeMillis() - start) / 1000).toString())
     }
 
     fun isPlayerTurn() = gameTurn == dealer.playerTurn
