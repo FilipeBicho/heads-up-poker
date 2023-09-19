@@ -10,6 +10,7 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
 
     private var cardCombinations = mutableListOf<ArrayList<Card>>()
     private var deck = Deck().getDeck()
+    private val odds = Array(11) { _ -> 0}
 
     /**
      * set all possible hand combinations
@@ -65,7 +66,6 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
         var combinations = 0
         var opponentCombinationsCount = 0
         var tableCombinationsCount: Int
-        val odds = Array(11) { _ -> 0}
 
         val tempTableCards: ArrayList<Card> = ArrayList()
         tempTableCards.addAll(tableCards.toList())
@@ -138,7 +138,6 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
         var player2 = 0
         var draw = 0
         var combinations = 0
-        val odds = Array(11) { _ -> 0}
 
         val tempTableCards: ArrayList<Card> = ArrayList()
         tempTableCards.addAll(tableCards.toList())
@@ -200,7 +199,6 @@ class Odds(private var playerCards: List<Card>, private var tableCards: MutableL
         var player2 = 0
         var draw = 0
         var combinations = 0
-        val odds = Array(11) { _ -> 0}
 
         // use table cards to calculate player hand
         val playerHand = Hand(playerCards, tableCards)
