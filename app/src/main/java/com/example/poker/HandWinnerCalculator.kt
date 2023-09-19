@@ -31,7 +31,7 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
             THREE_OF_A_KIND -> compareThreeOfAKind()
             TWO_PAIR -> compareTwoPair()
             PAIR -> compareOnePair()
-            HIGH_CARD -> compareHigherKicker(startIndex = 0, endIndex = 4)
+            HIGH_CARD -> compareHigherKicker(startIndex = 0)
             else -> {winner}
         }
     }
@@ -40,12 +40,12 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
      * Calculate flush winner
      */
     private fun compareFlush(): Int {
-        return if (player1Cards[0].rank == 0 && player2Cards[0].rank != 0) {
+        return if (player1Cards[0].rank == ACE && player2Cards[0].rank != ACE) {
             1
-        } else if (player1Cards[0].rank != 0 && player2Cards[0].rank == 0) {
+        } else if (player1Cards[0].rank != ACE && player2Cards[0].rank == ACE) {
             2
         } else {
-            compareHigherKicker(startIndex = 3, endIndex = 4)
+            compareHigherKicker(startIndex = 3)
         }
     }
 
@@ -67,9 +67,9 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
      */
     private fun compareThreeOfAKind(): Int {
         // check first if there is a three of a kind of Aces
-        return if (player1Cards[0].rank == 0 && player2Cards[0].rank != 0) {
+        return if (player1Cards[0].rank == ACE && player2Cards[0].rank != ACE) {
             1
-        } else if (player1Cards[0].rank != 0 && player2Cards[0].rank == 0) {
+        } else if (player1Cards[0].rank != ACE && player2Cards[0].rank == ACE) {
             2
         } else {
             // check if highest three of a kind
@@ -78,7 +78,7 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
             } else if (player1Cards[0].rank < player2Cards[0].rank) {
                 2
             } else {
-                compareHigherKicker(startIndex = 3, endIndex = 4)
+                compareHigherKicker(startIndex = 3)
             }
         }
     }
@@ -87,9 +87,9 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
      * Calculate 2 pair winner
      */
     private fun compareTwoPair(): Int {
-        return if (player1Cards[0].rank == 0 && player2Cards[0].rank != 0) {
+        return if (player1Cards[0].rank == ACE && player2Cards[0].rank != ACE) {
             1
-        } else if (player1Cards[0].rank != 0 && player2Cards[0].rank == 0) {
+        } else if (player1Cards[0].rank != ACE && player2Cards[0].rank == ACE) {
             2
         } else {
             if (player1Cards[0].rank > player2Cards[0].rank) {
@@ -102,7 +102,7 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
                 } else if (player1Cards[3].rank < player2Cards[3].rank) {
                     2
                 } else {
-                    compareHigherKicker(startIndex = 4, endIndex = 4)
+                    compareHigherKicker(startIndex = 4)
                 }
             }
         }
@@ -112,12 +112,12 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
      * Compare 1 pair winner
      */
     private fun compareOnePair(): Int {
-        return if (player1Cards[0].rank == 0 && player2Cards[0].rank != 0) {
+        return if (player1Cards[0].rank == ACE && player2Cards[0].rank != ACE) {
             1
-        } else if (player1Cards[0].rank != 0 && player2Cards[0].rank == 0) {
+        } else if (player1Cards[0].rank != ACE && player2Cards[0].rank == ACE) {
             2
         } else {
-            compareHigherKicker(startIndex = 2, endIndex = 4)
+            compareHigherKicker(startIndex = 2)
         }
     }
 
@@ -133,9 +133,9 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
             }
 
             // calculate winner via kicker
-            return if (player1Cards.last().rank == 0 && player2Cards.last().rank != 0) {
+            return if (player1Cards.last().rank == ACE && player2Cards.last().rank != ACE) {
                 1
-            } else if (player1Cards.last().rank != 0 && player2Cards.last().rank == 0) {
+            } else if (player1Cards.last().rank != ACE && player2Cards.last().rank == ACE) {
                 2
             } else {
                 if (player1Cards.last().rank > player2Cards.last().rank) {
@@ -149,9 +149,9 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
         }
 
         // calculate winner via higher four of a kind
-        return if (player1Cards[0].rank == 0 && player2Cards[0].rank != 0) {
+        return if (player1Cards[0].rank == ACE && player2Cards[0].rank != ACE) {
             1
-        } else if (player1Cards[0].rank != 0 && player2Cards[0].rank == 0) {
+        } else if (player1Cards[0].rank != ACE && player2Cards[0].rank == ACE) {
             2
         } else {
             if (player1Cards[0].rank > player2Cards[0].rank) {
@@ -167,15 +167,15 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
     /**
      * compare kickers
      */
-    private fun compareHigherKicker (startIndex: Int, endIndex: Int): Int {
+    private fun compareHigherKicker (startIndex: Int): Int {
         // check for kicker Ace
-        if (player1Cards[startIndex].rank == 0 && player2Cards[startIndex].rank != 0) {
+        if (player1Cards[startIndex].rank == ACE && player2Cards[startIndex].rank != ACE) {
             return 1
-        } else if (player1Cards[startIndex].rank != 0 && player2Cards[startIndex].rank == 0) {
+        } else if (player1Cards[startIndex].rank != ACE && player2Cards[startIndex].rank == ACE) {
             return 2
         } else {
             // check higher kicker
-            for (index: Int in startIndex .. endIndex) {
+            for (index: Int in startIndex .. 4) {
                 if (player1Cards[index].rank > player2Cards[index].rank) {
                     return 1
                 } else if (player1Cards[index].rank < player2Cards[index].rank) {
