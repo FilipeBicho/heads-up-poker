@@ -92,7 +92,7 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
      */
     private fun isRoyalStraightFlush(): Boolean {
         // is straight flush hand first card is an Ace
-        if (isStraightFlush() && hand[0].rank == 0) {
+        if (isStraightFlush() && hand[0].rank == ACE) {
             return true
         }
 
@@ -179,7 +179,7 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
         // more than 5 cards with the same suit
         if (flushCards.size >= 5) {
             // has Ace
-            if (flushCards.any { it.rank == 0 }) {
+            if (flushCards.any { it.rank == ACE }) {
                 hand.add(flushCards[0])
                 for (index in flushCards.size - 1 downTo flushCards.size - 4) {
                     hand.add(flushCards[index])
@@ -237,7 +237,7 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
         }
 
         // has straight 10 to Ace
-        if (straight >= 4 && cards.any { it.rank == 0 } && lastSequentialCardRank == 12) {
+        if (straight >= 4 && cards.any { it.rank == ACE } && lastSequentialCardRank == KING) {
             hand.add(cards[0])
             for (index in lastSequentialCardIndex downTo (lastSequentialCardIndex - 3)) {
                 hand.add(cards[index])
@@ -290,7 +290,7 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
 
         if (pairList.size > 1) {
             // has pair of Ace
-            if (pairList.any { it.key == 0 }) {
+            if (pairList.any { it.key == ACE }) {
                 hand.addAll(pairList.last().value)
                 hand.addAll(pairList[0].value)
             } else {
@@ -335,7 +335,7 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
         }
 
         for (index: Int in hand.size..4) {
-            if (otherCards.any { it.rank == 0 }) {
+            if (otherCards.any { it.rank == ACE }) {
                 hand.add(otherCards.removeFirst())
             } else {
                 hand.add(otherCards.removeLast())
