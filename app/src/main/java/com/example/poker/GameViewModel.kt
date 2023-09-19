@@ -58,6 +58,7 @@ class GameViewModel : ViewModel() {
         dealer.setFlopCards(tableCards)
 
         playerOdds = Odds(playerCards.toList(), tableCards.toMutableList())
+        playerOddsValue = PreFlopOdds(playerCards.toList()).getOdds()
 
         gameTurn = if (dealerTurn == dealer.playerTurn) {
             dealer.computerTurn
