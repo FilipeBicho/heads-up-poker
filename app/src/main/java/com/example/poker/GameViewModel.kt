@@ -1,17 +1,24 @@
 package com.example.poker
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import kotlin.random.Random
 
-class GameViewModel : ViewModel() {
+const val POT = 2
+const val SMALL_BLIND = 20
+const val BIG_BLIND = 40
+
+open class GameViewModel : ViewModel() {
 
     private val startMoney: Int = 1500
-    val smallBlind: Int = 20
-    val bigBlind: Int = 40
+    private var gameTurn: Int = -1
+    private var dealer: Int = -1
+    private var blind: Int = -1
+    private var pokerChips = intArrayOf(0, 0, 0)
+    private var bet = intArrayOf(0, 0)
 
     var playerCards = mutableStateListOf<Card>()
     var computerCards = mutableStateListOf<Card>()
@@ -41,60 +48,152 @@ class GameViewModel : ViewModel() {
     var computerBet by mutableStateOf(0)
         private set
 
-    private var gameTurn by mutableStateOf(0)
-
-    private var dealerTurn by mutableStateOf(0)
-
-    var pot by mutableStateOf(0)
+    var potMoney by mutableStateOf(0)
         private set
 
-    private var dealer: Dealer = Dealer()
+    private var cardDealer: Dealer = Dealer()
     private lateinit var playerOdds: Odds
     private lateinit var computerOdds: Odds
 
     init {
-        dealer.setPlayerCards(playerCards = playerCards, computerCards = computerCards)
-        dealerTurn = 1//Random(System.nanoTime()).nextInt(0, 2)
-        dealer.setFlopCards(tableCards)
+        preFlop()
+    }
 
-        playerOdds = Odds(playerCards.toList(), tableCards.toMutableList())
-        playerOddsValue = PreFlopOdds(playerCards.toList()).getOdds()
+    fun preFlop()  {
 
-        gameTurn = if (dealerTurn == dealer.playerTurn) {
-            dealer.computerTurn
+        initGameTurns()
+        resetBets()
+        initPokerChips()
+
+        // set player and computer cards
+        cardDealer.setPlayerCards(playerCards, computerCards)
+
+        if (pokerChips[blind] <= BIG_BLIND) {
+            if (pokerChips[blind] <= SMALL_BLIND) {
+
+                // blind makes all in
+                bet[blind] = pokerChips[blind]
+                pokerChips[blind] = 0
+
+                // dealer pays all in
+                bet[dealer] = bet[blind]
+                pokerChips[dealer] -= bet[dealer]
+
+                // calculate pot
+                pokerChips[POT] = bet[blind] + bet[dealer]
+
+                // update mutable state values
+                updateMutableStateValues()
+
+                // TODO: show down
+            } else {
+
+                // blind makes all in
+                bet[blind] = pokerChips[blind]
+                pokerChips[blind] = 0
+
+                // dealer pay small blind
+                bet[dealer] = SMALL_BLIND
+                pokerChips[dealer] -= bet[dealer]
+
+                // calculate pot
+                pokerChips[POT] = bet[blind] + bet[dealer]
+
+                // update mutable state values
+                updateMutableStateValues()
+
+                gameTurn = dealer
+
+                // TODO: Dealer has the option to Fold or Call
+            }
+        } else if (pokerChips[dealer] <= SMALL_BLIND) {
+
+            // dealer makes all in
+            bet[dealer] = pokerChips[dealer]
+            pokerChips[dealer] = 0
+
+            // blind pays all in
+            bet[blind] = pokerChips[blind]
+            pokerChips[blind] -= bet[blind]
+
+            // calculate pot
+            pokerChips[POT] = bet[blind] + bet[dealer]
+
+            // update mutable state values
+            updateMutableStateValues()
+
+            // TODO: show down
         } else {
-            dealer.playerTurn
+
+            // dealer pay small blind
+            bet[dealer] = SMALL_BLIND
+            pokerChips[dealer] -= bet[dealer]
+
+            // blind pay big blind
+            bet[blind] = BIG_BLIND
+            pokerChips[blind] -= bet[blind]
+
+            // calculate pot
+            pokerChips[POT] = bet[blind] + bet[dealer]
+
+            // update mutable state values
+            updateMutableStateValues()
+
+            gameTurn = dealer
+
+            // TODO: Dealer has the option to Fold, Call or Bet
         }
     }
 
     fun fold() {
-        val start = System.currentTimeMillis()
-        playerOddsValue = playerOdds.getFlopOdds()[RESULT]
-        Log.d("FLOP_ODDS", ((System.currentTimeMillis() - start) / 1000).toString())
     }
 
     fun call() {
-        dealer.setTurnCard(tableCards)
-        playerOdds.updateCombinationCards(tableCards.last())
-        val start = System.currentTimeMillis()
-        playerOddsValue = playerOdds.getTurnOdds()[RESULT]
-        Log.d("TURN_ODDS", ((System.currentTimeMillis() - start) / 1000).toString())
     }
 
     fun bet() {
-        dealer.setRiverCard(tableCards)
-        playerOdds.updateCombinationCards(tableCards.last())
-        val start = System.currentTimeMillis()
-        playerOddsValue = playerOdds.getRiverOdds()[RESULT]
-        Log.d("RIVER_ODDS", ((System.currentTimeMillis() - start) / 1000).toString())
     }
 
-    fun isPlayerTurn() = gameTurn == dealer.playerTurn
+    fun isPlayerTurn() = gameTurn == PLAYER
 
-    fun isPlayerDealer() = dealerTurn == dealer.playerTurn
+    fun isPlayerDealer() = dealer == PLAYER
 
     fun updatePlayerBet(value: Int) {
         playerBet = value
     }
 
+    private fun updateMutableStateValues() {
+        playerBet = bet[PLAYER]
+        computerBet = bet[COMPUTER]
+        playerMoney = pokerChips[PLAYER]
+        computerMoney = pokerChips[COMPUTER]
+        potMoney = pokerChips[POT]
+    }
+
+    private fun initGameTurns() {
+        // Init or change dealer
+        dealer = if (dealer == -1) {
+            Random(System.nanoTime()).nextInt(0, 2)
+        } else {
+            if (dealer == 0) 1 else 0
+        }
+
+        // init blind turn
+        blind = if (dealer == 0) 1 else 0
+
+        // set game turn
+        gameTurn = dealer
+    }
+
+    private fun resetBets() {
+        playerBet = 0
+        computerBet = 0
+        potMoney = 0
+    }
+
+    private fun initPokerChips() {
+        pokerChips[PLAYER] = playerMoney
+        pokerChips[COMPUTER] = computerMoney
+        pokerChips[POT] = potMoney
+    }
 }

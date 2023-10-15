@@ -3,11 +3,12 @@ package com.example.poker
 import android.annotation.SuppressLint
 import androidx.compose.runtime.snapshots.SnapshotStateList
 
+const val PLAYER = 0
+const val COMPUTER = 1
+
 @SuppressLint("MutableCollectionMutableState")
 class Dealer {
 
-    val playerTurn: Int = 0
-    val computerTurn: Int = 1
     private var deck: Deck = Deck()
 
     /**
