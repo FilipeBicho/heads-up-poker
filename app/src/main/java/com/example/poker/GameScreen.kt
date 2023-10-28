@@ -125,7 +125,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         .weight(0.2f)
                 ) {
                     Text(
-                        text = "Pot: ${gameViewModel.pot} €",
+                        text = "Pot: ${gameViewModel.potValue} €",
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
                         modifier = Modifier.align(Alignment.CenterEnd)
@@ -175,10 +175,10 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         horizontalArrangement = Arrangement.spacedBy(1.dp)
                     ) {
                         if (gameViewModel.isPlayerTurn()) {
-                            if (gameViewModel.bigBlind * 2 > gameViewModel.pot) {
-                                BetButton(text = "2 BB") { gameViewModel.updatePlayerBet(gameViewModel.bigBlind * 2) }
+                            if (BIG_BLIND * 2 > gameViewModel.potValue) {
+                                BetButton(text = "2 BB") { gameViewModel.updatePlayerBet(BIG_BLIND * 2) }
                             }
-                            BetButton(text = "Pot") { gameViewModel.updatePlayerBet(gameViewModel.pot) }
+                            BetButton(text = "Pot") { gameViewModel.updatePlayerBet(gameViewModel.potValue) }
                             BetButton(text = "Max") { gameViewModel.updatePlayerBet(gameViewModel.playerMoney) }
                         }
                     }
@@ -430,7 +430,7 @@ private fun BetSlider(gameViewModel: GameViewModel) {
                 onValueChange = { betValue = it.roundToInt() },
                 onValueChangeFinished = { gameViewModel.updatePlayerBet(betValue) },
                 modifier = Modifier.padding(end = 10.dp),
-                valueRange = gameViewModel.bigBlind.toFloat()..1500f,
+                valueRange = BIG_BLIND.toFloat()..1500f,
                 colors = SliderDefaults.colors(
                     thumbColor = Color.LightGray,
                     activeTrackColor = colorResource(id = R.color.button_red),

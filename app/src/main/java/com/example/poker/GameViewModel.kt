@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import kotlin.math.abs
 import kotlin.random.Random
 
 const val POT = 2
@@ -14,17 +15,19 @@ const val BIG_BLIND = 40
 open class GameViewModel : ViewModel() {
 
     private val startMoney: Int = 1500
-    private var gameTurn: Int = -1
+    private var player: Int = -1
+    private var opponent: Int = -1
     private var dealer: Int = -1
     private var blind: Int = -1
     private var pokerChips = intArrayOf(0, 0, 0)
     private var bet = intArrayOf(0, 0)
+    private var preFlopCheck: Boolean = true
 
     var playerCards = mutableStateListOf<Card>()
     var computerCards = mutableStateListOf<Card>()
     var tableCards = mutableStateListOf<Card>()
     var displayComputerCards = false
-
+    
     var playerName by mutableStateOf("Filipe")
         private set
 
@@ -48,7 +51,7 @@ open class GameViewModel : ViewModel() {
     var computerBet by mutableStateOf(0)
         private set
 
-    var potMoney by mutableStateOf(0)
+    var potValue by mutableStateOf(0)
         private set
 
     private var cardDealer: Dealer = Dealer()
@@ -56,14 +59,92 @@ open class GameViewModel : ViewModel() {
     private lateinit var computerOdds: Odds
 
     init {
-        preFlop()
+        newGame()
     }
 
-    fun preFlop()  {
+    fun fold() {
+        // opponent wins the pot
+        pokerChips[opponent] += pokerChips[POT]
 
-        initGameTurns()
-        resetBets()
-        initPokerChips()
+        // update mutable state values
+        updateMutableStateValues()
+
+        // new game
+        newGame()
+    }
+
+    fun call() {
+
+        val currentPlayerBet: Int = bet[player]
+
+        // equals bet from opponent
+        bet[player] = bet[opponent]
+
+        if (pokerChips[player] <= bet[opponent]) {
+
+            // player makes all in
+            bet[player] = pokerChips[player]
+            pokerChips[player] = 0
+
+            // opponent equals player all in
+            bet[opponent] = bet[player]
+            pokerChips[opponent] = pokerChips[opponent] + bet[opponent] - bet[player]
+
+            // calculate pot
+            pokerChips[POT] = bet[blind] + bet[dealer]
+
+            updateMutableStateValues()
+        } else {
+
+            // player equals opponent bet
+            bet[player] = bet[opponent]
+            pokerChips[player] -= abs(currentPlayerBet - bet[player])
+
+            // calculate pot
+            pokerChips[POT] = bet[blind] + bet[dealer]
+
+            updateMutableStateValues()
+        }
+
+        if (preFlopCheck) {
+            // TODO Opponent has the option to check or bet during pre flop
+        } else {
+            preFlopCheck = false
+
+            // TODO Go to next round
+        }
+    }
+
+    fun bet() {
+
+        val currentPlayerBet: Int = bet[player]
+
+        // player makes a bet
+        bet[player] += if (player == PLAYER) playerBet else computerBet
+        pokerChips[player] -= abs(bet[player] - currentPlayerBet)
+
+        // calculate pot
+        pokerChips[POT] = bet[blind] + bet[dealer]
+
+        updateMutableStateValues()
+
+        // TODO Go to next round
+    }
+
+    fun isPlayerTurn() = player == PLAYER
+
+    fun isPlayerDealer() = dealer == PLAYER
+
+    fun updatePlayerBet(value: Int) {
+
+        playerBet = if (value > pokerChips[PLAYER]) {
+            pokerChips[PLAYER]
+        } else {
+            value
+        }
+    }
+
+    private fun preFlop()  {
 
         // set player and computer cards
         cardDealer.setPlayerCards(playerCards, computerCards)
@@ -102,9 +183,9 @@ open class GameViewModel : ViewModel() {
                 // update mutable state values
                 updateMutableStateValues()
 
-                gameTurn = dealer
+                player = dealer
 
-                // TODO: Dealer has the option to Fold or Call
+                // TODO: Opponent has the option to Fold or Call
             }
         } else if (pokerChips[dealer] <= SMALL_BLIND) {
 
@@ -139,38 +220,24 @@ open class GameViewModel : ViewModel() {
             // update mutable state values
             updateMutableStateValues()
 
-            gameTurn = dealer
+            player = dealer
 
-            // TODO: Dealer has the option to Fold, Call or Bet
+            // TODO: Opponent has the option to Fold, Call or Bet
         }
     }
 
-    fun fold() {
-    }
+    private fun newGame() {
+        // reset values
+        playerBet = 0
+        computerBet = 0
+        potValue = 0
+        preFlopCheck = true
 
-    fun call() {
-    }
+        // init poker chips
+        pokerChips[PLAYER] = playerMoney
+        pokerChips[COMPUTER] = computerMoney
+        pokerChips[POT] = potValue
 
-    fun bet() {
-    }
-
-    fun isPlayerTurn() = gameTurn == PLAYER
-
-    fun isPlayerDealer() = dealer == PLAYER
-
-    fun updatePlayerBet(value: Int) {
-        playerBet = value
-    }
-
-    private fun updateMutableStateValues() {
-        playerBet = bet[PLAYER]
-        computerBet = bet[COMPUTER]
-        playerMoney = pokerChips[PLAYER]
-        computerMoney = pokerChips[COMPUTER]
-        potMoney = pokerChips[POT]
-    }
-
-    private fun initGameTurns() {
         // Init or change dealer
         dealer = if (dealer == -1) {
             Random(System.nanoTime()).nextInt(0, 2)
@@ -181,19 +248,19 @@ open class GameViewModel : ViewModel() {
         // init blind turn
         blind = if (dealer == 0) 1 else 0
 
-        // set game turn
-        gameTurn = dealer
+        // set turns
+        player = dealer
+        opponent = blind
+
+        // set pre flop
+        preFlop()
     }
 
-    private fun resetBets() {
-        playerBet = 0
-        computerBet = 0
-        potMoney = 0
-    }
-
-    private fun initPokerChips() {
-        pokerChips[PLAYER] = playerMoney
-        pokerChips[COMPUTER] = computerMoney
-        pokerChips[POT] = potMoney
+    private fun updateMutableStateValues() {
+        playerBet = bet[PLAYER]
+        computerBet = bet[COMPUTER]
+        playerMoney = pokerChips[PLAYER]
+        computerMoney = pokerChips[COMPUTER]
+        potValue = pokerChips[POT]
     }
 }
