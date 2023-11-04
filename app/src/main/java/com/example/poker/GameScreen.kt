@@ -249,9 +249,21 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                                     .weight(0.6f),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
-                                GameActionButton("Fold") { gameViewModel.fold() }
-                                GameActionButton("Call") { gameViewModel.call() }
-                                GameActionButton("Bet") { gameViewModel.bet() }
+                                if (gameViewModel.displayFoldButton) {
+                                    GameActionButton("Fold") { gameViewModel.fold() }
+                                }
+
+                                if (gameViewModel.displayCheckButton) {
+                                    GameActionButton("Check") { gameViewModel.check() }
+                                }
+
+                                if (gameViewModel.displayCallButton) {
+                                    GameActionButton("Call") { gameViewModel.call() }
+                                }
+
+                                if (gameViewModel.displayBetButton) {
+                                    GameActionButton("Bet") { gameViewModel.bet() }
+                                }
                             }
                         }
                     }

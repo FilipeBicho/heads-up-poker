@@ -27,6 +27,10 @@ open class GameViewModel : ViewModel() {
     var computerCards = mutableStateListOf<Card>()
     var tableCards = mutableStateListOf<Card>()
     var displayComputerCards = false
+    var displayFoldButton = false
+    var displayCallButton = false
+    var displayCheckButton = false
+    var displayBetButton = false
     
     var playerName by mutableStateOf("Filipe")
         private set
@@ -62,6 +66,9 @@ open class GameViewModel : ViewModel() {
         newGame()
     }
 
+    /**
+     * Handles fold request
+     */
     fun fold() {
         // opponent wins the pot
         pokerChips[opponent] += pokerChips[POT]
@@ -73,12 +80,28 @@ open class GameViewModel : ViewModel() {
         newGame()
     }
 
+    /**
+     * Handles check request
+     */
+    fun check() {
+
+        if (preFlopCheck) {
+
+            // only valid in the first check during the pre flop bets
+            preFlopCheck = false
+
+            // TODO display check and bet buttons
+        } else {
+            // TODO go to new round if is not last round
+        }
+    }
+
+    /**
+     * Handles call request
+     */
     fun call() {
 
         val currentPlayerBet: Int = bet[player]
-
-        // equals bet from opponent
-        bet[player] = bet[opponent]
 
         if (pokerChips[player] <= bet[opponent]) {
 
@@ -94,6 +117,8 @@ open class GameViewModel : ViewModel() {
             pokerChips[POT] = bet[blind] + bet[dealer]
 
             updateMutableStateValues()
+
+            // TODO Show down
         } else {
 
             // player equals opponent bet
@@ -104,17 +129,20 @@ open class GameViewModel : ViewModel() {
             pokerChips[POT] = bet[blind] + bet[dealer]
 
             updateMutableStateValues()
-        }
 
-        if (preFlopCheck) {
-            // TODO Opponent has the option to check or bet during pre flop
-        } else {
-            preFlopCheck = false
+            if (preFlopCheck) {
+                // TODO Opponent has the option to check or bet during pre flop
+            } else {
+                preFlopCheck = false
 
-            // TODO Go to next round
+                // TODO Go to next round
+            }
         }
     }
 
+    /**
+     * Handles bet request
+     */
     fun bet() {
 
         val currentPlayerBet: Int = bet[player]
@@ -135,6 +163,9 @@ open class GameViewModel : ViewModel() {
 
     fun isPlayerDealer() = dealer == PLAYER
 
+    /**
+     * Update player bet via button interaction
+     */
     fun updatePlayerBet(value: Int) {
 
         playerBet = if (value > pokerChips[PLAYER]) {
@@ -144,10 +175,10 @@ open class GameViewModel : ViewModel() {
         }
     }
 
-    private fun preFlop()  {
-
-        // set player and computer cards
-        cardDealer.setPlayerCards(playerCards, computerCards)
+    /**
+     * Calculate pre flop bets
+     */
+    private fun preFlopBets()  {
 
         if (pokerChips[blind] <= BIG_BLIND) {
             if (pokerChips[blind] <= SMALL_BLIND) {
@@ -226,6 +257,9 @@ open class GameViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Init new game values
+     */
     private fun newGame() {
         // reset values
         playerBet = 0
@@ -252,8 +286,11 @@ open class GameViewModel : ViewModel() {
         player = dealer
         opponent = blind
 
-        // set pre flop
-        preFlop()
+        // set player and computer cards
+        cardDealer.setPlayerCards(playerCards, computerCards)
+
+        // pre flop bets
+        preFlopBets()
     }
 
     private fun updateMutableStateValues() {
