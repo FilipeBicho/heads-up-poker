@@ -55,6 +55,9 @@ open class GameViewModel : ViewModel() {
     var computerBet by mutableStateOf(0)
         private set
 
+    var currentPlayerBet by mutableStateOf(0)
+        private set
+
     var potValue by mutableStateOf(0)
         private set
 
@@ -90,9 +93,19 @@ open class GameViewModel : ViewModel() {
             // only valid in the first check during the pre flop bets
             preFlopCheck = false
 
-            // TODO display check and bet buttons
+            updateMutableStateValues()
+            switchPlayerTurn()
+
+            if (isPlayerTurn()) {
+                displayFoldButton = false
+                displayCheckButton = true
+                displayCallButton = false
+                displayBetButton = true
+            }
         } else {
-            // TODO go to new round if is not last round
+            updateMutableStateValues()
+            // TODO move to next round
+            cardDealer.setFlopCards(tableCards)
         }
     }
 
@@ -106,7 +119,7 @@ open class GameViewModel : ViewModel() {
         if (pokerChips[player] <= bet[opponent]) {
 
             // player makes all in
-            bet[player] = pokerChips[player]
+            bet[player] += pokerChips[player]
             pokerChips[player] = 0
 
             // opponent equals player all in
@@ -129,9 +142,16 @@ open class GameViewModel : ViewModel() {
             pokerChips[POT] = bet[blind] + bet[dealer]
 
             updateMutableStateValues()
+            switchPlayerTurn()
 
             if (preFlopCheck) {
-                // TODO Opponent has the option to check or bet during pre flop
+                if (isPlayerTurn()) {
+                    displayFoldButton = false
+                    displayCheckButton = true
+                    displayCallButton = false
+                    displayBetButton = true
+                }
+
             } else {
                 preFlopCheck = false
 
@@ -145,31 +165,47 @@ open class GameViewModel : ViewModel() {
      */
     fun bet() {
 
-        val currentPlayerBet: Int = bet[player]
+        val oldBet: Int = bet[player]
 
         // player makes a bet
-        bet[player] += if (player == PLAYER) playerBet else computerBet
-        pokerChips[player] -= abs(bet[player] - currentPlayerBet)
+        bet[player] = currentPlayerBet + bet[opponent]
+
+        if (bet[player] >= pokerChips[player] + oldBet) {
+            bet[player] = oldBet + pokerChips[player]
+        }
+
+        pokerChips[player] -= bet[player] - oldBet;
 
         // calculate pot
-        pokerChips[POT] = bet[blind] + bet[dealer]
+        pokerChips[POT] = bet[player] + bet[opponent]
 
         updateMutableStateValues()
+        switchPlayerTurn()
 
-        // TODO Go to next round
+        if (pokerChips[player] + bet[player] <= bet[opponent]) {
+            displayFoldButton = true
+            displayCheckButton = false
+            displayCallButton = true
+            displayBetButton = false
+        } else {
+            displayFoldButton = true
+            displayCheckButton = false
+            displayCallButton = true
+            displayBetButton = true
+        }
     }
 
-    fun isPlayerTurn() = player == PLAYER
+    fun isPlayerTurn() = true
 
-    fun isPlayerDealer() = dealer == PLAYER
+    fun isPlayerDealer() = dealer == player
 
     /**
      * Update player bet via button interaction
      */
     fun updatePlayerBet(value: Int) {
 
-        playerBet = if (value > pokerChips[PLAYER]) {
-            pokerChips[PLAYER]
+        currentPlayerBet = if (value > pokerChips[player]) {
+            pokerChips[player]
         } else {
             value
         }
@@ -216,7 +252,12 @@ open class GameViewModel : ViewModel() {
 
                 player = dealer
 
-                // TODO: Opponent has the option to Fold or Call
+                if (isPlayerTurn()) {
+                    displayFoldButton = true
+                    displayCheckButton = false
+                    displayCallButton = true
+                    displayBetButton = false
+                }
             }
         } else if (pokerChips[dealer] <= SMALL_BLIND) {
 
@@ -253,7 +294,12 @@ open class GameViewModel : ViewModel() {
 
             player = dealer
 
-            // TODO: Opponent has the option to Fold, Call or Bet
+            if (isPlayerTurn()) {
+                displayFoldButton = true
+                displayCheckButton = false
+                displayCallButton = true
+                displayBetButton = true
+            }
         }
     }
 
@@ -299,5 +345,21 @@ open class GameViewModel : ViewModel() {
         playerMoney = pokerChips[PLAYER]
         computerMoney = pokerChips[COMPUTER]
         potValue = pokerChips[POT]
+        currentPlayerBet = BIG_BLIND
+    }
+
+    /**
+     * Switch player turns
+     */
+    private fun switchPlayerTurn() {
+        player = if (player == PLAYER) COMPUTER else PLAYER
+        opponent = if (player == COMPUTER) PLAYER else COMPUTER
+    }
+
+    private fun hideButtons() {
+        displayFoldButton = false
+        displayCheckButton = false
+        displayCallButton = false
+        displayBetButton = false
     }
 }

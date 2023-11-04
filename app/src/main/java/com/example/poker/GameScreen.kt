@@ -386,6 +386,7 @@ private fun GameActionButton(text: String, onClick: () -> Unit) {
                 containerColor = Color.Transparent,
                 contentColor = Color.White
             ),
+            contentPadding = PaddingValues(4.dp),
             modifier = Modifier.align(Alignment.Center)
         )
         {
@@ -397,7 +398,7 @@ private fun GameActionButton(text: String, onClick: () -> Unit) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun BetSlider(gameViewModel: GameViewModel) {
-    var betValue by remember { mutableStateOf(gameViewModel.playerBet) }
+    var betValue by remember { mutableStateOf(gameViewModel.currentPlayerBet) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
