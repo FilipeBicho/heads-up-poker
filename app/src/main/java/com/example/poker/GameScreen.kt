@@ -398,7 +398,7 @@ private fun GameActionButton(text: String, onClick: () -> Unit) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun BetSlider(gameViewModel: GameViewModel) {
-    var betValue by remember { mutableStateOf(gameViewModel.currentPlayerBet) }
+    var betValue by remember(key1 = gameViewModel.playerBetValue) { mutableStateOf(gameViewModel.playerBetValue) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 

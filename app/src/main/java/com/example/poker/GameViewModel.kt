@@ -22,6 +22,7 @@ open class GameViewModel : ViewModel() {
     private var pokerChips = intArrayOf(0, 0, 0)
     private var bet = intArrayOf(0, 0)
     private var preFlopCheck: Boolean = true
+    private var round = PRE_FLOP
 
     var playerCards = mutableStateListOf<Card>()
     var computerCards = mutableStateListOf<Card>()
@@ -55,7 +56,7 @@ open class GameViewModel : ViewModel() {
     var computerBet by mutableStateOf(0)
         private set
 
-    var currentPlayerBet by mutableStateOf(0)
+    var playerBetValue by mutableStateOf(0)
         private set
 
     var potValue by mutableStateOf(0)
@@ -104,8 +105,7 @@ open class GameViewModel : ViewModel() {
             }
         } else {
             updateMutableStateValues()
-            // TODO move to next round
-            cardDealer.setFlopCards(tableCards)
+            nextRound()
         }
     }
 
@@ -154,8 +154,7 @@ open class GameViewModel : ViewModel() {
 
             } else {
                 preFlopCheck = false
-
-                // TODO Go to next round
+                nextRound()
             }
         }
     }
@@ -168,7 +167,11 @@ open class GameViewModel : ViewModel() {
         val oldBet: Int = bet[player]
 
         // player makes a bet
-        bet[player] = currentPlayerBet + bet[opponent]
+        if (playerBetValue > bet[opponent] + BIG_BLIND) {
+            bet[player] = playerBetValue
+        } else {
+            bet[player] = playerBetValue + bet[opponent]
+        }
 
         if (bet[player] >= pokerChips[player] + oldBet) {
             bet[player] = oldBet + pokerChips[player]
@@ -178,6 +181,9 @@ open class GameViewModel : ViewModel() {
 
         // calculate pot
         pokerChips[POT] = bet[player] + bet[opponent]
+
+        // not possible anymore to do check in pre flop
+        preFlopCheck = false
 
         updateMutableStateValues()
         switchPlayerTurn()
@@ -204,7 +210,7 @@ open class GameViewModel : ViewModel() {
      */
     fun updatePlayerBet(value: Int) {
 
-        currentPlayerBet = if (value > pokerChips[player]) {
+        playerBetValue = if (value > pokerChips[player]) {
             pokerChips[player]
         } else {
             value
@@ -312,6 +318,7 @@ open class GameViewModel : ViewModel() {
         computerBet = 0
         potValue = 0
         preFlopCheck = true
+        round = PRE_FLOP
 
         // init poker chips
         pokerChips[PLAYER] = playerMoney
@@ -332,6 +339,11 @@ open class GameViewModel : ViewModel() {
         player = dealer
         opponent = blind
 
+        // clear cards
+        playerCards.clear()
+        computerCards.clear()
+        tableCards.clear()
+
         // set player and computer cards
         cardDealer.setPlayerCards(playerCards, computerCards)
 
@@ -339,13 +351,16 @@ open class GameViewModel : ViewModel() {
         preFlopBets()
     }
 
+    /**
+     * update game screen
+     */
     private fun updateMutableStateValues() {
         playerBet = bet[PLAYER]
         computerBet = bet[COMPUTER]
         playerMoney = pokerChips[PLAYER]
         computerMoney = pokerChips[COMPUTER]
         potValue = pokerChips[POT]
-        currentPlayerBet = BIG_BLIND
+        playerBetValue = BIG_BLIND
     }
 
     /**
@@ -356,7 +371,33 @@ open class GameViewModel : ViewModel() {
         opponent = if (player == COMPUTER) PLAYER else COMPUTER
     }
 
-    private fun hideButtons() {
+    /**
+     * set next round
+     */
+    private fun nextRound() {
+        round++
+
+        if (player == dealer) {
+            switchPlayerTurn()
+        }
+
+        playerBet = 0
+        computerBet = 0
+        bet[PLAYER] = 0
+        bet[COMPUTER] = 0
+
+        when (round) {
+            FLOP -> cardDealer.setFlopCards(tableCards)
+            TURN -> cardDealer.setTurnCard(tableCards)
+            RIVER -> cardDealer.setRiverCard(tableCards)
+            else -> calculateWinner()
+        }
+    }
+
+    /**
+     * Calculate winner
+     */
+    private fun calculateWinner() {
         displayFoldButton = false
         displayCheckButton = false
         displayCallButton = false
