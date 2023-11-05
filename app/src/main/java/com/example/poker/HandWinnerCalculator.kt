@@ -2,7 +2,7 @@ package com.example.poker
 
 class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
 
-    private var winner: Int = 3
+    private var winner: Int = 2
     private val player1Cards = player1Hand.getHand()
     private val player2Cards = player2Hand.getHand()
     private val player1Result = player1Hand.resultValue
@@ -10,9 +10,9 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
 
     init {
         winner = if (player1Result > player2Result) {
-            1
+            0
         } else if (player1Result < player2Result) {
-            2
+            1
         } else {
             calculateWinner()
         }

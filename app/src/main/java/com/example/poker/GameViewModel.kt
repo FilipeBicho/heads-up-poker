@@ -402,5 +402,22 @@ open class GameViewModel : ViewModel() {
         displayCheckButton = false
         displayCallButton = false
         displayBetButton = false
+
+        val playerHand = Hand(playerCards = playerCards, tableCards = tableCards)
+        val computerHand = Hand(playerCards = computerCards, tableCards = tableCards)
+        val winnerCalculator = HandWinnerCalculator(playerHand, computerHand)
+
+        when (winnerCalculator.getWinner()) {
+            PLAYER -> pokerChips[PLAYER] += pokerChips[POT]
+            COMPUTER -> pokerChips[COMPUTER] += pokerChips[POT]
+            else -> {
+                pokerChips[PLAYER] += (pokerChips[POT]/2)
+                pokerChips[COMPUTER] += pokerChips[POT]/2
+            }
+        }
+
+        updateMutableStateValues()
+
+        newGame()
     }
 }
