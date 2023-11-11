@@ -21,7 +21,7 @@ open class GameViewModel : ViewModel() {
     private var blind: Int = -1
     private var pokerChips = intArrayOf(0, 0, 0)
     private var bet = intArrayOf(0, 0)
-    private var preFlopCheck: Boolean = true
+    private var checkAvailable: Boolean = true
     private var round = PRE_FLOP
 
     var playerCards = mutableStateListOf<Card>()
@@ -89,10 +89,9 @@ open class GameViewModel : ViewModel() {
      */
     fun check() {
 
-        if (preFlopCheck) {
+        if (checkAvailable && round !== PRE_FLOP) {
 
-            // only valid in the first check during the pre flop bets
-            preFlopCheck = false
+            checkAvailable = false
 
             updateMutableStateValues()
             switchPlayerTurn()
@@ -102,6 +101,8 @@ open class GameViewModel : ViewModel() {
                 displayCheckButton = true
                 displayCallButton = false
                 displayBetButton = true
+            } else {
+                check()
             }
         } else {
             updateMutableStateValues()
@@ -144,16 +145,17 @@ open class GameViewModel : ViewModel() {
             updateMutableStateValues()
             switchPlayerTurn()
 
-            if (preFlopCheck) {
+            if (checkAvailable && round == PRE_FLOP) {
                 if (isPlayerTurn()) {
                     displayFoldButton = false
                     displayCheckButton = true
                     displayCallButton = false
                     displayBetButton = true
+                } else {
+                    check()
                 }
 
             } else {
-                preFlopCheck = false
                 nextRound()
             }
         }
@@ -163,6 +165,8 @@ open class GameViewModel : ViewModel() {
      * Handles bet request
      */
     fun bet() {
+
+        checkAvailable = false
 
         val oldBet: Int = bet[player]
 
@@ -182,28 +186,41 @@ open class GameViewModel : ViewModel() {
         // calculate pot
         pokerChips[POT] = bet[player] + bet[opponent]
 
-        // not possible anymore to do check in pre flop
-        preFlopCheck = false
-
         updateMutableStateValues()
         switchPlayerTurn()
 
         if (pokerChips[player] + bet[player] <= bet[opponent]) {
-            displayFoldButton = true
-            displayCheckButton = false
-            displayCallButton = true
-            displayBetButton = false
+
+            if (isPlayerTurn()) {
+                displayFoldButton = true
+                displayCheckButton = false
+                displayCallButton = true
+                displayBetButton = false
+            } else {
+                call()
+            }
+
         } else {
-            displayFoldButton = true
-            displayCheckButton = false
-            displayCallButton = true
-            displayBetButton = true
+            if (isPlayerTurn()) {
+                displayFoldButton = true
+                displayCheckButton = false
+                displayCallButton = true
+                displayBetButton = true
+            } else {
+                call()
+            }
         }
     }
 
-    fun isPlayerTurn() = true
+    /**
+     * check if is player turn
+     */
+    fun isPlayerTurn() = player == PLAYER
 
-    fun isPlayerDealer() = dealer == player
+    /**
+     * check if player is dealer
+     */
+    fun isPlayerDealer() = dealer == PLAYER
 
     /**
      * Update player bet via button interaction
@@ -305,6 +322,8 @@ open class GameViewModel : ViewModel() {
                 displayCheckButton = false
                 displayCallButton = true
                 displayBetButton = true
+            } else {
+                call()
             }
         }
     }
@@ -317,7 +336,7 @@ open class GameViewModel : ViewModel() {
         playerBet = 0
         computerBet = 0
         potValue = 0
-        preFlopCheck = true
+        checkAvailable = true
         round = PRE_FLOP
 
         // init poker chips
@@ -326,11 +345,7 @@ open class GameViewModel : ViewModel() {
         pokerChips[POT] = potValue
 
         // Init or change dealer
-        dealer = if (dealer == -1) {
-            Random(System.nanoTime()).nextInt(0, 2)
-        } else {
-            if (dealer == 0) 1 else 0
-        }
+        dealer = 0
 
         // init blind turn
         blind = if (dealer == 0) 1 else 0
@@ -372,7 +387,7 @@ open class GameViewModel : ViewModel() {
     }
 
     /**
-     * set next round
+     * go to next round
      */
     private fun nextRound() {
         round++
@@ -385,11 +400,47 @@ open class GameViewModel : ViewModel() {
         computerBet = 0
         bet[PLAYER] = 0
         bet[COMPUTER] = 0
+        checkAvailable = true
 
         when (round) {
-            FLOP -> cardDealer.setFlopCards(tableCards)
-            TURN -> cardDealer.setTurnCard(tableCards)
-            RIVER -> cardDealer.setRiverCard(tableCards)
+            FLOP -> {
+                cardDealer.setFlopCards(tableCards)
+
+                if (player == PLAYER) {
+                    displayFoldButton = false
+                    displayCheckButton = true
+                    displayCallButton = false
+                    displayBetButton = true
+                } else {
+                    check()
+                }
+
+            }
+            TURN -> {
+                cardDealer.setTurnCard(tableCards)
+
+                if (player == PLAYER) {
+                    displayFoldButton = false
+                    displayCheckButton = true
+                    displayCallButton = false
+                    displayBetButton = true
+                } else {
+                    check()
+                }
+
+            }
+            RIVER -> {
+                cardDealer.setRiverCard(tableCards)
+
+                if (player == PLAYER) {
+                    displayFoldButton = false
+                    displayCheckButton = true
+                    displayCallButton = false
+                    displayBetButton = true
+                } else {
+                    check()
+                }
+            }
             else -> calculateWinner()
         }
     }

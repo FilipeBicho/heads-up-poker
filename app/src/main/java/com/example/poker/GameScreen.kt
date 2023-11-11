@@ -231,10 +231,10 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         .fillMaxHeight()
                         .weight(0.3f)
                 ) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        if (gameViewModel.isPlayerTurn()) {
+                    if (gameViewModel.isPlayerTurn()) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
