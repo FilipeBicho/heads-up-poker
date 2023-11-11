@@ -59,7 +59,7 @@ open class GameViewModel : ViewModel() {
     var playerBetValue by mutableStateOf(0)
         private set
 
-    var potValue by mutableStateOf(0)
+    var potTotal by mutableStateOf(0)
         private set
 
     private var cardDealer: Dealer = Dealer()
@@ -75,7 +75,7 @@ open class GameViewModel : ViewModel() {
      */
     fun fold() {
         // opponent wins the pot
-        pokerChips[opponent] += pokerChips[POT]
+        pokerChips[opponent] += pokerChips[POT] + potTotal
 
         // update mutable state values
         updateMutableStateValues()
@@ -102,7 +102,8 @@ open class GameViewModel : ViewModel() {
                 displayCallButton = false
                 displayBetButton = true
             } else {
-                check()
+                computerBet = BIG_BLIND
+                bet()
             }
         } else {
             updateMutableStateValues()
@@ -152,7 +153,8 @@ open class GameViewModel : ViewModel() {
                     displayCallButton = false
                     displayBetButton = true
                 } else {
-                    check()
+                    computerBet = BIG_BLIND
+                    bet()
                 }
 
             } else {
@@ -335,14 +337,14 @@ open class GameViewModel : ViewModel() {
         // reset values
         playerBet = 0
         computerBet = 0
-        potValue = 0
+        potTotal = 0
         checkAvailable = true
         round = PRE_FLOP
 
         // init poker chips
         pokerChips[PLAYER] = playerMoney
         pokerChips[COMPUTER] = computerMoney
-        pokerChips[POT] = potValue
+        pokerChips[POT] = 0
 
         // Init or change dealer
         dealer = 0
@@ -374,7 +376,6 @@ open class GameViewModel : ViewModel() {
         computerBet = bet[COMPUTER]
         playerMoney = pokerChips[PLAYER]
         computerMoney = pokerChips[COMPUTER]
-        potValue = pokerChips[POT]
         playerBetValue = BIG_BLIND
     }
 
@@ -401,6 +402,7 @@ open class GameViewModel : ViewModel() {
         bet[PLAYER] = 0
         bet[COMPUTER] = 0
         checkAvailable = true
+        potTotal += pokerChips[POT]
 
         when (round) {
             FLOP -> {
@@ -412,7 +414,8 @@ open class GameViewModel : ViewModel() {
                     displayCallButton = false
                     displayBetButton = true
                 } else {
-                    check()
+                    computerBet = BIG_BLIND
+                    bet()
                 }
 
             }
@@ -425,7 +428,8 @@ open class GameViewModel : ViewModel() {
                     displayCallButton = false
                     displayBetButton = true
                 } else {
-                    check()
+                    computerBet = BIG_BLIND
+                    bet()
                 }
 
             }
@@ -438,7 +442,8 @@ open class GameViewModel : ViewModel() {
                     displayCallButton = false
                     displayBetButton = true
                 } else {
-                    check()
+                    computerBet = BIG_BLIND
+                    bet()
                 }
             }
             else -> calculateWinner()
@@ -459,11 +464,11 @@ open class GameViewModel : ViewModel() {
         val winnerCalculator = HandWinnerCalculator(playerHand, computerHand)
 
         when (winnerCalculator.getWinner()) {
-            PLAYER -> pokerChips[PLAYER] += pokerChips[POT]
-            COMPUTER -> pokerChips[COMPUTER] += pokerChips[POT]
+            PLAYER -> pokerChips[PLAYER] += potTotal
+            COMPUTER -> pokerChips[COMPUTER] += potTotal
             else -> {
-                pokerChips[PLAYER] += (pokerChips[POT]/2)
-                pokerChips[COMPUTER] += pokerChips[POT]/2
+                pokerChips[PLAYER] += potTotal/2
+                pokerChips[COMPUTER] += potTotal/2
             }
         }
 

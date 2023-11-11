@@ -125,7 +125,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         .weight(0.2f)
                 ) {
                     Text(
-                        text = "Pot: ${gameViewModel.potValue} €",
+                        text = "Pot: ${gameViewModel.potTotal} €",
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
                         modifier = Modifier.align(Alignment.CenterEnd)
@@ -175,10 +175,10 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         horizontalArrangement = Arrangement.spacedBy(1.dp)
                     ) {
                         if (gameViewModel.isPlayerTurn()) {
-                            if (BIG_BLIND * 2 > gameViewModel.potValue) {
+                            if (BIG_BLIND * 2 > gameViewModel.potTotal) {
                                 BetButton(text = "2 BB") { gameViewModel.updatePlayerBet(BIG_BLIND * 2) }
                             }
-                            BetButton(text = "Pot") { gameViewModel.updatePlayerBet(gameViewModel.potValue) }
+                            BetButton(text = "Pot") { gameViewModel.updatePlayerBet(gameViewModel.potTotal) }
                             BetButton(text = "Max") { gameViewModel.updatePlayerBet(gameViewModel.playerMoney) }
                         }
                     }
