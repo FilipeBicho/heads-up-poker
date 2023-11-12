@@ -379,8 +379,14 @@ open class GameViewModel : ViewModel() {
 
         // set table cards
         cardDealer.setFlopCards(tableCards)
-        cardDealer.setTurnCard(tableCards)
-        cardDealer.setRiverCard(tableCards)
+//        cardDealer.setTurnCard(tableCards)
+//        cardDealer.setRiverCard(tableCards)
+
+        // set player odds
+        playerOdds = Odds(tableCards)
+        displayComputerCards = true
+        playerOddsValue = playerOdds.getFlopOdds(playerCards)
+
 
         // pre flop bets
         preFlopBets()
@@ -505,6 +511,7 @@ open class GameViewModel : ViewModel() {
     private fun showdown() {
 
         displayComputerCards = true
+
 
         when (round) {
             PRE_FLOP -> {

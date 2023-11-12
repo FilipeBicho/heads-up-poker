@@ -10,9 +10,9 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
 
     init {
         winner = if (player1Result > player2Result) {
-            0
-        } else if (player1Result < player2Result) {
             1
+        } else if (player1Result < player2Result) {
+            2
         } else {
             calculateWinner()
         }
