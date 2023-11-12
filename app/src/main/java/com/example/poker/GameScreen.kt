@@ -179,13 +179,13 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
 
                                 AnimatedVisibility(
                                     visible = gameViewModel.displayTurn,
-                                    enter = expandHorizontally(tween(1000, 1000))
+                                    enter = expandHorizontally(tween(1000, gameViewModel.turnDelayTime))
                                 ) {
                                     CardImage(card = gameViewModel.tableCards[3], Modifier.padding(all = 5.dp), true)
                                 }
                                 AnimatedVisibility(
                                     visible = gameViewModel.displayRiver,
-                                    enter = expandHorizontally(tween(1000, 2000))
+                                    enter = expandHorizontally(tween(1000, gameViewModel.riverDelayTime))
                                 ) {
                                     CardImage(card = gameViewModel.tableCards[4], Modifier.padding(all = 5.dp), true)
                                 }

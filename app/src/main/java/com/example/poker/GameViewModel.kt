@@ -69,6 +69,12 @@ open class GameViewModel : ViewModel() {
     var displayRiver by mutableStateOf(false)
         private set
 
+    var turnDelayTime by mutableStateOf(1000)
+        private set
+
+    var riverDelayTime by mutableStateOf(2000)
+        private set
+
     private var cardDealer: Dealer = Dealer()
     private lateinit var playerOdds: Odds
     private lateinit var computerOdds: Odds
@@ -419,6 +425,8 @@ open class GameViewModel : ViewModel() {
         when (round) {
             FLOP -> {
                 displayFlop = true
+                turnDelayTime = 0
+                riverDelayTime = 1000
 
                 if (player == PLAYER) {
                     displayFoldButton = false
@@ -433,6 +441,8 @@ open class GameViewModel : ViewModel() {
             }
             TURN -> {
                displayTurn = true
+                turnDelayTime = 0
+                riverDelayTime = 0
 
                 if (player == PLAYER) {
                     displayFoldButton = false
@@ -494,6 +504,8 @@ open class GameViewModel : ViewModel() {
      */
     private fun showdown() {
 
+        displayComputerCards = true
+
         when (round) {
             PRE_FLOP -> {
                 displayFlop = true
@@ -511,7 +523,6 @@ open class GameViewModel : ViewModel() {
                 showdown()
             }
             RIVER -> {
-
 
             }
         }
