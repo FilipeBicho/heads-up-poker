@@ -62,6 +62,13 @@ open class GameViewModel : ViewModel() {
     var potTotal by mutableStateOf(0)
         private set
 
+    var displayFlop by mutableStateOf(false)
+        private set
+    var displayTurn by mutableStateOf(false)
+        private set
+    var displayRiver by mutableStateOf(false)
+        private set
+
     private var cardDealer: Dealer = Dealer()
     private lateinit var playerOdds: Odds
     private lateinit var computerOdds: Odds
@@ -133,7 +140,7 @@ open class GameViewModel : ViewModel() {
 
             updateMutableStateValues()
 
-            // TODO Show down
+            showdown()
         } else {
 
             // player equals opponent bet
@@ -153,7 +160,7 @@ open class GameViewModel : ViewModel() {
                     displayCallButton = false
                     displayBetButton = true
                 } else {
-                    computerBet = BIG_BLIND
+                    computerBet = pokerChips[COMPUTER]
                     bet()
                 }
 
@@ -258,7 +265,7 @@ open class GameViewModel : ViewModel() {
                 // update mutable state values
                 updateMutableStateValues()
 
-                // TODO: show down
+                showdown()
             } else {
 
                 // blind makes all in
@@ -300,7 +307,7 @@ open class GameViewModel : ViewModel() {
             // update mutable state values
             updateMutableStateValues()
 
-            // TODO: show down
+            showdown()
         } else {
 
             // dealer pay small blind
@@ -364,6 +371,11 @@ open class GameViewModel : ViewModel() {
         // set player and computer cards
         cardDealer.setPlayerCards(playerCards, computerCards)
 
+        // set table cards
+        cardDealer.setFlopCards(tableCards)
+        cardDealer.setTurnCard(tableCards)
+        cardDealer.setRiverCard(tableCards)
+
         // pre flop bets
         preFlopBets()
     }
@@ -406,7 +418,7 @@ open class GameViewModel : ViewModel() {
 
         when (round) {
             FLOP -> {
-                cardDealer.setFlopCards(tableCards)
+                displayFlop = true
 
                 if (player == PLAYER) {
                     displayFoldButton = false
@@ -420,7 +432,7 @@ open class GameViewModel : ViewModel() {
 
             }
             TURN -> {
-                cardDealer.setTurnCard(tableCards)
+               displayTurn = true
 
                 if (player == PLAYER) {
                     displayFoldButton = false
@@ -434,7 +446,7 @@ open class GameViewModel : ViewModel() {
 
             }
             RIVER -> {
-                cardDealer.setRiverCard(tableCards)
+                displayRiver = true
 
                 if (player == PLAYER) {
                     displayFoldButton = false
@@ -446,7 +458,7 @@ open class GameViewModel : ViewModel() {
                     bet()
                 }
             }
-            else -> calculateWinner()
+            else -> showdown()
         }
     }
 
@@ -475,5 +487,32 @@ open class GameViewModel : ViewModel() {
         updateMutableStateValues()
 
         newGame()
+    }
+
+    /**
+     * Show all cards and calculate winner
+     */
+    private fun showdown() {
+
+        when (round) {
+            PRE_FLOP -> {
+                displayFlop = true
+                round = FLOP
+
+            }
+            FLOP -> {
+                displayFlop = true
+                round = TURN
+                showdown()
+            }
+            TURN -> {
+                displayFlop = true
+                round = RIVER
+                showdown()
+            }
+            RIVER -> {
+                calculateWinner()
+            }
+        }
     }
 }

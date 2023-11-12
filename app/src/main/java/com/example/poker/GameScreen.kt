@@ -1,6 +1,8 @@
 package com.example.poker
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -149,7 +151,40 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
 
                         if (gameViewModel.tableCards.isNotEmpty()) {
                             Row(modifier = Modifier.weight(0.6f)) {
-                                TableCards(Modifier.padding(all = 5.dp), gameViewModel.tableCards)
+
+                                AnimatedVisibility(
+                                    visible = gameViewModel.displayFlop,
+                                    enter = expandHorizontally { 0 }
+                                ) {
+                                    CardImage(card = gameViewModel.tableCards[0], Modifier.padding(all = 5.dp), true)
+                                }
+
+                                AnimatedVisibility(
+                                    visible = gameViewModel.displayFlop,
+                                    enter = expandHorizontally { 0 }
+                                ) {
+                                    CardImage(card = gameViewModel.tableCards[1], Modifier.padding(all = 5.dp), true)
+                                }
+
+                                AnimatedVisibility(
+                                    visible = gameViewModel.displayFlop,
+                                    enter = expandHorizontally { 0 }
+                                ) {
+                                    CardImage(card = gameViewModel.tableCards[2], Modifier.padding(all = 5.dp), true)
+                                }
+
+                                AnimatedVisibility(
+                                    visible = gameViewModel.displayTurn,
+                                    enter = expandHorizontally { 0 }
+                                ) {
+                                    CardImage(card = gameViewModel.tableCards[3], Modifier.padding(all = 5.dp), true)
+                                }
+                                AnimatedVisibility(
+                                    visible = gameViewModel.displayRiver,
+                                    enter = expandHorizontally { 0 }
+                                ) {
+                                    CardImage(card = gameViewModel.tableCards[4], Modifier.padding(all = 5.dp), true)
+                                }
                             }
                         }
 
