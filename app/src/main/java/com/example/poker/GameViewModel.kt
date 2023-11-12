@@ -498,20 +498,21 @@ open class GameViewModel : ViewModel() {
             PRE_FLOP -> {
                 displayFlop = true
                 round = FLOP
-
+                showdown()
             }
             FLOP -> {
-                displayFlop = true
+                displayTurn = true
                 round = TURN
                 showdown()
             }
             TURN -> {
-                displayFlop = true
+                displayRiver = true
                 round = RIVER
                 showdown()
             }
             RIVER -> {
-                calculateWinner()
+
+
             }
         }
     }
