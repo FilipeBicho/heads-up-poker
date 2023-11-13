@@ -1,5 +1,6 @@
 package com.example.poker
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -78,6 +79,9 @@ open class GameViewModel : ViewModel() {
     private var cardDealer: Dealer = Dealer()
     private lateinit var playerOdds: Odds
     private lateinit var computerOdds: Odds
+    private lateinit var showdownFlopOdds: Array<Int>
+    private lateinit var showdownTurnOdds: Array<Int>
+    private lateinit var showdownRiverOdds: Array<Int>
 
     init {
         newGame()
@@ -377,16 +381,16 @@ open class GameViewModel : ViewModel() {
         // set player and computer cards
         cardDealer.setPlayerCards(playerCards, computerCards)
 
-        // set table cards
+        // init table cards
         cardDealer.setFlopCards(tableCards)
-//        cardDealer.setTurnCard(tableCards)
-//        cardDealer.setRiverCard(tableCards)
+        computerOdds = Odds(tableCards)
+        computerOdds.calculateFlopOdds(computerCards)
+        cardDealer.setTurnCard(tableCards)
+        computerOdds.calculateTurnOdds(computerCards, tableCards[3])
+        cardDealer.setRiverCard(tableCards)
+        computerOdds.calculateRiverOdds(computerCards, tableCards[4])
 
-        // set player odds
-        playerOdds = Odds(tableCards)
         displayComputerCards = true
-        playerOddsValue = playerOdds.getFlopOdds(playerCards)
-
 
         // pre flop bets
         preFlopBets()
@@ -433,6 +437,7 @@ open class GameViewModel : ViewModel() {
                 displayFlop = true
                 turnDelayTime = 0
                 riverDelayTime = 1000
+                computerOddsValue = computerOdds.getFlopOdds()
 
                 if (player == PLAYER) {
                     displayFoldButton = false
@@ -446,9 +451,10 @@ open class GameViewModel : ViewModel() {
 
             }
             TURN -> {
-               displayTurn = true
+                displayTurn = true
                 turnDelayTime = 0
                 riverDelayTime = 0
+                computerOddsValue = computerOdds.getTurnOdds()
 
                 if (player == PLAYER) {
                     displayFoldButton = false
@@ -463,6 +469,7 @@ open class GameViewModel : ViewModel() {
             }
             RIVER -> {
                 displayRiver = true
+                computerOddsValue = computerOdds.getRiverOdds()
 
                 if (player == PLAYER) {
                     displayFoldButton = false

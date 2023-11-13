@@ -11,11 +11,14 @@ class Odds(private var tableCards: MutableList<Card>) {
     private var cardCombinations = mutableListOf<ArrayList<Card>>()
     private var deck = Deck().getDeck()
     private val odds = Array(11) { _ -> 0}
+    private var flopOdds = 0
+    private var turnOdds = 0
+    private var riverOdds = 0
 
     /**
      * Calculate flop odds
      */
-    fun getFlopOdds(playerCards: MutableList<Card>): Int {
+    fun calculateFlopOdds(playerCards: MutableList<Card>) {
 
         var player1 = 0
         var player2 = 0
@@ -88,21 +91,23 @@ class Odds(private var tableCards: MutableList<Card>) {
         Log.d("ODDS player2", player2.toString())
         Log.d("ODDS draw", draw.toString())
         Log.d("ODDS combinations", combinations.toString())
+        Log.d("ODDS result", ((player1.toDouble()/combinations) * 100).roundToInt().toString())
 
         // calculate odds
-
-        return ((player1.toFloat() / combinations) * 100).roundToInt()
+        flopOdds = ((player1.toDouble()/combinations) * 100).roundToInt()
     }
 
     /**
      * calculate turn odds
      */
-    fun getTurnOdds(playerCards: MutableList<Card>): Array<Int> {
+    fun calculateTurnOdds(playerCards: MutableList<Card>, turnCard: Card) {
 
         var player1 = 0
         var player2 = 0
         var draw = 0
         var combinations = 0
+
+        updateCombinationCards(turnCard)
 
         val tempTableCards: ArrayList<Card> = ArrayList()
         tempTableCards.addAll(tableCards.toList())
@@ -151,19 +156,29 @@ class Odds(private var tableCards: MutableList<Card>) {
         }
 
         // calculate odds
-        odds[RESULT] = ((player1.toFloat() / combinations) * 100).roundToInt()
-        return odds
+        odds[RESULT] = ((player1.toDouble()/combinations) * 100).toInt()
+
+        Log.d("ODDS", odds.joinToString("\n"))
+        Log.d("ODDS player1", player1.toString())
+        Log.d("ODDS player2", player2.toString())
+        Log.d("ODDS draw", draw.toString())
+        Log.d("ODDS combinations", combinations.toString())
+
+        // calculate odds
+        turnOdds = ((player1.toDouble()/combinations) * 100).roundToInt()
     }
 
     /**
      * calculate river odds
      */
-    fun getRiverOdds(playerCards: MutableList<Card>): Array<Int> {
+    fun calculateRiverOdds(playerCards: MutableList<Card>, riverCard: Card) {
 
         var player1 = 0
         var player2 = 0
         var draw = 0
         var combinations = 0
+
+        updateCombinationCards(riverCard)
 
         // use table cards to calculate player hand
         val playerHand = Hand(playerCards, tableCards)
@@ -189,17 +204,29 @@ class Odds(private var tableCards: MutableList<Card>) {
         }
 
         // calculate odds
-        odds[RESULT] = ((player1.toFloat() / combinations) * 100).roundToInt()
-        return odds
+        riverOdds = ((player1.toDouble()/combinations) * 100).roundToInt()
     }
+
+    /**
+     * get flop odds
+     */
+    fun getFlopOdds() = flopOdds
+
+    /**
+     * get turn odds
+     */
+    fun getTurnOdds() = turnOdds
+
+    /**
+     * get river odds
+     */
+    fun getRiverOdds() = riverOdds
 
     /**
      * Update table cards
      * Remove card from deck and card combinations
      */
-    fun updateCombinationCards(card: Card): Unit {
-        // add card to table cards
-        tableCards.add(card)
+    private fun updateCombinationCards(card: Card): Unit {
 
         // remove added card from card combinations
         cardCombinations.removeIf { it.any { it.toString() == card.toString() } }
