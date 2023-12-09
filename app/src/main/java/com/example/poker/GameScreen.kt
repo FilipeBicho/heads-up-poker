@@ -242,7 +242,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         }
                     }
                     Box(modifier = Modifier.align(Alignment.CenterEnd)) {
-                        if (!gameViewModel.playerOddsValue.equals(0.0F)) {
+                        if (gameViewModel.playerOddsValue.toFloat() != 0.0F) {
                             Text(
                                 text = "${gameViewModel.playerOddsValue} %",
                                 fontSize = 15.sp,
@@ -270,7 +270,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         .fillMaxHeight()
                         .weight(0.3f)
                 ) {
-                    if (gameViewModel.isPlayerTurn()) {
+                    if (gameViewModel.isPlayerTurn() && gameViewModel.playerMoney > 0) {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
@@ -482,7 +482,7 @@ private fun BetSlider(gameViewModel: GameViewModel) {
                 onValueChange = { betValue = it.roundToInt() },
                 onValueChangeFinished = { gameViewModel.updatePlayerBet(betValue) },
                 modifier = Modifier.padding(end = 10.dp),
-                valueRange = BIG_BLIND.toFloat()..1500f,
+                valueRange = BIG_BLIND.toFloat()..gameViewModel.playerMoney.toFloat(),
                 colors = SliderDefaults.colors(
                     thumbColor = Color.LightGray,
                     activeTrackColor = colorResource(id = R.color.button_red),

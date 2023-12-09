@@ -3,8 +3,8 @@ package com.example.poker
 import android.util.Log
 import kotlin.math.roundToInt
 
-const val MAX_OPPONENT_COMBINATIONS = 200
-const val MAX_TABLE_COMBINATIONS = 100
+const val MAX_OPPONENT_COMBINATIONS = 100
+const val MAX_TABLE_COMBINATIONS = 50
 
 class Odds(private var tableCards: MutableList<Card>) {
 
