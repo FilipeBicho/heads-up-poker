@@ -60,7 +60,10 @@ open class GameViewModel : ViewModel() {
     var playerBetValue by mutableStateOf(0)
         private set
 
-    var potTotal by mutableStateOf(0)
+    var totalPot by mutableStateOf(0)
+        private set
+
+    var currentPot by mutableStateOf(0)
         private set
 
     var displayFlop by mutableStateOf(false)
@@ -92,7 +95,7 @@ open class GameViewModel : ViewModel() {
      */
     fun fold() {
         // opponent wins the pot
-        pokerChips[opponent] += pokerChips[POT] + potTotal
+        pokerChips[opponent] += pokerChips[POT] + totalPot
 
         // update mutable state values
         updateMutableStateValues()
@@ -265,7 +268,7 @@ open class GameViewModel : ViewModel() {
         // reset values
         playerBet = 0
         computerBet = 0
-        potTotal = 0
+        totalPot = 0
         checkAvailable = true
         round = PRE_FLOP
 
@@ -326,7 +329,7 @@ open class GameViewModel : ViewModel() {
         computerBet = bet[COMPUTER]
         playerMoney = pokerChips[PLAYER]
         computerMoney = pokerChips[COMPUTER]
-        potTotal = pokerChips[POT]
+        currentPot = pokerChips[POT]
         playerBetValue = BIG_BLIND
     }
 
@@ -436,70 +439,70 @@ open class GameViewModel : ViewModel() {
      * go to next round
      */
     private fun nextRound() {
-//        round++
-//
-//        if (player == dealer) {
-//            switchPlayerTurn()
-//        }
-//
-//        playerBet = 0
-//        computerBet = 0
-//        bet[PLAYER] = 0
-//        bet[COMPUTER] = 0
-//        checkAvailable = true
-//        potTotal += pokerChips[POT]
-//
-//        when (round) {
-//            FLOP -> {
-//                displayFlop = true
-//                turnDelayTime = 0
-//                riverDelayTime = 1000
-//                computerOddsValue = computerOdds.getFlopOdds()
-//
-//                if (player == PLAYER) {
-//                    displayFoldButton = false
-//                    displayCheckButton = true
-//                    displayCallButton = false
-//                    displayBetButton = true
-//                } else {
-//                    computerBet = BIG_BLIND
-//                    bet()
-//                }
-//
-//            }
-//            TURN -> {
-//                displayTurn = true
-//                turnDelayTime = 0
-//                riverDelayTime = 0
-//                computerOddsValue = computerOdds.getTurnOdds()
-//
-//                if (player == PLAYER) {
-//                    displayFoldButton = false
-//                    displayCheckButton = true
-//                    displayCallButton = false
-//                    displayBetButton = true
-//                } else {
-//                    computerBet = BIG_BLIND
-//                    bet()
-//                }
-//
-//            }
-//            RIVER -> {
-//                displayRiver = true
-//                computerOddsValue = computerOdds.getRiverOdds()
-//
-//                if (player == PLAYER) {
-//                    displayFoldButton = false
-//                    displayCheckButton = true
-//                    displayCallButton = false
-//                    displayBetButton = true
-//                } else {
-//                    computerBet = BIG_BLIND
-//                    bet()
-//                }
-//            }
-//            else -> showdown()
-//        }
+        round++
+
+        if (player == dealer) {
+            switchPlayerTurn()
+        }
+
+        playerBet = 0
+        computerBet = 0
+        bet[PLAYER] = 0
+        bet[COMPUTER] = 0
+        totalPot += pokerChips[POT]
+        checkAvailable = true
+
+        when (round) {
+            FLOP -> {
+                displayFlop = true
+                turnDelayTime = 0
+                riverDelayTime = 1000
+                computerOddsValue = computerOdds.getFlopOdds()
+
+                if (player == PLAYER) {
+                    displayFoldButton = false
+                    displayCheckButton = true
+                    displayCallButton = false
+                    displayBetButton = true
+                } else {
+                    computerBet = BIG_BLIND
+                    bet()
+                }
+
+            }
+            TURN -> {
+                displayTurn = true
+                turnDelayTime = 0
+                riverDelayTime = 0
+                computerOddsValue = computerOdds.getTurnOdds()
+
+                if (player == PLAYER) {
+                    displayFoldButton = false
+                    displayCheckButton = true
+                    displayCallButton = false
+                    displayBetButton = true
+                } else {
+                    computerBet = BIG_BLIND
+                    bet()
+                }
+
+            }
+            RIVER -> {
+                displayRiver = true
+                computerOddsValue = computerOdds.getRiverOdds()
+
+                if (player == PLAYER) {
+                    displayFoldButton = false
+                    displayCheckButton = true
+                    displayCallButton = false
+                    displayBetButton = true
+                } else {
+                    computerBet = BIG_BLIND
+                    bet()
+                }
+            }
+            else -> showdown()
+        }
     }
 
     /**
@@ -516,11 +519,11 @@ open class GameViewModel : ViewModel() {
         val winnerCalculator = HandWinnerCalculator(player1Hand = playerHand, player2Hand = computerHand)
 
         when (winnerCalculator.getWinner()) {
-            PLAYER -> pokerChips[PLAYER] += potTotal
-            COMPUTER -> pokerChips[COMPUTER] += potTotal
+            PLAYER -> pokerChips[PLAYER] += totalPot
+            COMPUTER -> pokerChips[COMPUTER] += totalPot
             else -> {
-                pokerChips[PLAYER] += potTotal/2
-                pokerChips[COMPUTER] += potTotal/2
+                pokerChips[PLAYER] += totalPot/2
+                pokerChips[COMPUTER] += totalPot/2
             }
         }
 

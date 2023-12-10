@@ -58,6 +58,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -67,6 +68,7 @@ import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 @Composable
+@Preview
 fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
     Background()
     Column(modifier = Modifier.fillMaxSize()) {
@@ -130,12 +132,20 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         .fillMaxHeight()
                         .weight(0.2f)
                 ) {
-                    Text(
-                        text = "Pot: ${gameViewModel.potTotal} €",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp,
+                    Column (
                         modifier = Modifier.align(Alignment.CenterEnd)
-                    )
+                    ) {
+                        Text(
+                            text = "Pot: ${gameViewModel.currentPot} €",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                        )
+                        Text(
+                            text = "Total: ${gameViewModel.totalPot} €",
+                            fontSize = 12.sp
+                        )
+                    }
+
                 }
                 Box(
                     modifier = Modifier
@@ -214,10 +224,10 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         horizontalArrangement = Arrangement.spacedBy(1.dp)
                     ) {
                         if (gameViewModel.isPlayerTurn()) {
-                            if (BIG_BLIND * 2 > gameViewModel.potTotal) {
+                            if (BIG_BLIND * 2 > gameViewModel.totalPot) {
                                 BetButton(text = "2 BB") { gameViewModel.updatePlayerBet(BIG_BLIND * 2) }
                             }
-                            BetButton(text = "Pot") { gameViewModel.updatePlayerBet(gameViewModel.potTotal) }
+                            BetButton(text = "Pot") { gameViewModel.updatePlayerBet(gameViewModel.totalPot) }
                             BetButton(text = "Max") { gameViewModel.updatePlayerBet(gameViewModel.playerMoney) }
                         }
                     }
