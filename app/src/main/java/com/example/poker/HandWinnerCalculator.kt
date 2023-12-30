@@ -10,9 +10,9 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
 
     init {
         winner = if (player1Result > player2Result) {
-            1
+            PLAYER
         } else if (player1Result < player2Result) {
-            2
+            COMPUTER
         } else {
             calculateWinner()
         }
@@ -41,9 +41,9 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
      */
     private fun compareFlush(): Int {
         return if (player1Cards[0].rank == ACE && player2Cards[0].rank != ACE) {
-            1
+            PLAYER
         } else if (player1Cards[0].rank != ACE && player2Cards[0].rank == ACE) {
-            2
+            COMPUTER
         } else {
             compareHigherKicker(startIndex = 3)
         }
@@ -54,11 +54,11 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
      */
     private fun compareStraight(): Int {
         return if (player1Cards.last().rank > player2Cards.last().rank) {
-            1
+            PLAYER
         } else  if (player1Cards.last().rank < player2Cards.last().rank) {
-            2
+            COMPUTER
         } else {
-            3
+            2
         }
     }
 
@@ -68,15 +68,15 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
     private fun compareThreeOfAKind(): Int {
         // check first if there is a three of a kind of Aces
         return if (player1Cards[0].rank == ACE && player2Cards[0].rank != ACE) {
-            1
+            PLAYER
         } else if (player1Cards[0].rank != ACE && player2Cards[0].rank == ACE) {
-            2
+            COMPUTER
         } else {
             // check if highest three of a kind
             if (player1Cards[0].rank > player2Cards[0].rank) {
-                1
+                PLAYER
             } else if (player1Cards[0].rank < player2Cards[0].rank) {
-                2
+                COMPUTER
             } else {
                 compareHigherKicker(startIndex = 3)
             }
@@ -88,19 +88,19 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
      */
     private fun compareTwoPair(): Int {
         return if (player1Cards[0].rank == ACE && player2Cards[0].rank != ACE) {
-            1
+            PLAYER
         } else if (player1Cards[0].rank != ACE && player2Cards[0].rank == ACE) {
-            2
+            COMPUTER
         } else {
             if (player1Cards[0].rank > player2Cards[0].rank) {
-                1
+                PLAYER
             } else if (player1Cards[0].rank < player2Cards[0].rank) {
-                2
+                COMPUTER
             } else {
                 if (player1Cards[3].rank > player2Cards[3].rank) {
-                    1
+                    PLAYER
                 } else if (player1Cards[3].rank < player2Cards[3].rank) {
-                    2
+                    COMPUTER
                 } else {
                     compareHigherKicker(startIndex = 4)
                 }
@@ -113,9 +113,9 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
      */
     private fun compareOnePair(): Int {
         return if (player1Cards[0].rank == ACE && player2Cards[0].rank != ACE) {
-            1
+            PLAYER
         } else if (player1Cards[0].rank != ACE && player2Cards[0].rank == ACE) {
-            2
+            COMPUTER
         } else {
             compareHigherKicker(startIndex = 2)
         }
@@ -129,37 +129,37 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
         if (player1Cards[0].rank == player2Cards[0].rank) {
             // players have the same kicker
             if (player1Cards.last().rank == player2Cards.last().rank ) {
-                return 3
+                return 2
             }
 
             // calculate winner via kicker
             return if (player1Cards.last().rank == ACE && player2Cards.last().rank != ACE) {
-                1
+                PLAYER
             } else if (player1Cards.last().rank != ACE && player2Cards.last().rank == ACE) {
-                2
+                COMPUTER
             } else {
                 if (player1Cards.last().rank > player2Cards.last().rank) {
-                    1
+                    PLAYER
                 } else if (player1Cards.last().rank < player2Cards.last().rank) {
-                    2
+                    COMPUTER
                 } else {
-                    3
+                    2
                 }
             }
         }
 
         // calculate winner via higher four of a kind
         return if (player1Cards[0].rank == ACE && player2Cards[0].rank != ACE) {
-            1
+            PLAYER
         } else if (player1Cards[0].rank != ACE && player2Cards[0].rank == ACE) {
-            2
+            COMPUTER
         } else {
             if (player1Cards[0].rank > player2Cards[0].rank) {
-                1
+                PLAYER
             } else if (player1Cards[0].rank < player2Cards[0].rank) {
-                2
+                COMPUTER
             } else {
-                3
+                2
             }
         }
     }
@@ -170,19 +170,19 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
     private fun compareHigherKicker (startIndex: Int): Int {
         // check for kicker Ace
         if (player1Cards[startIndex].rank == ACE && player2Cards[startIndex].rank != ACE) {
-            return 1
+            return PLAYER
         } else if (player1Cards[startIndex].rank != ACE && player2Cards[startIndex].rank == ACE) {
-            return 2
+            return COMPUTER
         } else {
             // check higher kicker
             for (index: Int in startIndex .. 4) {
                 if (player1Cards[index].rank > player2Cards[index].rank) {
-                    return 1
+                    return PLAYER
                 } else if (player1Cards[index].rank < player2Cards[index].rank) {
-                    return 2
+                    return COMPUTER
                 }
             }
-            return 3
+            return 2
         }
     }
 
@@ -191,9 +191,9 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
      */
     fun getResult(): String {
         return when (winner) {
-            1 -> "player 1 wins"
-            2 -> "player 2 wins"
-            3 -> "draw"
+            PLAYER -> "player 1 wins"
+            COMPUTER -> "player 2 wins"
+            2 -> "draw"
             else -> {"draw"}
         }
     }

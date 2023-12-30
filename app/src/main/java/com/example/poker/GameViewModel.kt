@@ -127,7 +127,7 @@ open class GameViewModel : ViewModel() {
             }
         } else {
             updateMutableStateValues()
-           // nextRound()
+            nextRound()
         }
     }
 
@@ -278,12 +278,11 @@ open class GameViewModel : ViewModel() {
         pokerChips[POT] = 0
 
         // Init or change dealer
-        dealer = 0
-//        dealer = if (dealer == -1) {
-//            Random(System.nanoTime()).nextInt(0, 2)
-//        } else {
-//            if (dealer == 0) 1 else 0
-//        }
+        dealer = if (dealer == -1) {
+            Random(System.nanoTime()).nextInt(0, 2)
+        } else {
+            if (dealer == 0) 1 else 0
+        }
 
         // init blind turn
         blind = if (dealer == 0) 1 else 0
@@ -300,22 +299,10 @@ open class GameViewModel : ViewModel() {
         // set player and computer cards
         cardDealer.setPlayerCards(playerCards, computerCards)
 
-        // init table cards
-
-        // flop
-        cardDealer.setFlopCards(tableCards)
-        computerOdds = Odds(tableCards)
-        computerOdds.calculateFlopOdds(computerCards)
-
-        // turn
-        cardDealer.setTurnCard(tableCards)
-        computerOdds.calculateTurnOdds(computerCards, tableCards[3])
-
-        //river
-        cardDealer.setRiverCard(tableCards)
-        computerOdds.calculateRiverOdds(computerCards, tableCards[4])
-
         displayComputerCards = true
+        displayFlop = false
+        displayTurn = false
+        displayRiver = false
 
         // pre flop bets
         preFlopBets()
@@ -439,7 +426,6 @@ open class GameViewModel : ViewModel() {
      * go to next round
      */
     private fun nextRound() {
-        round++
 
         if (player == dealer) {
             switchPlayerTurn()
@@ -453,11 +439,35 @@ open class GameViewModel : ViewModel() {
         checkAvailable = true
 
         when (round) {
-            FLOP -> {
+            PRE_FLOP -> {
                 displayFlop = true
                 turnDelayTime = 0
                 riverDelayTime = 1000
+                cardDealer.setFlopCards(tableCards)
+                computerOdds = Odds(tableCards)
+                computerOdds.calculateFlopOdds(computerCards)
                 computerOddsValue = computerOdds.getFlopOdds()
+                round = FLOP
+
+                if (player == PLAYER) {
+                    displayFoldButton = false
+                    displayCheckButton = true
+                    displayCallButton = false
+                    displayBetButton = true
+                } else {
+                    computerBet = BIG_BLIND
+                    bet()
+                }
+
+            }
+            FLOP -> {
+                displayTurn = true
+                turnDelayTime = 0
+                riverDelayTime = 0
+                cardDealer.setTurnCard(tableCards)
+                computerOdds.calculateTurnOdds(computerCards, tableCards[3])
+                computerOddsValue = computerOdds.getTurnOdds()
+                round = TURN
 
                 if (player == PLAYER) {
                     displayFoldButton = false
@@ -471,10 +481,11 @@ open class GameViewModel : ViewModel() {
 
             }
             TURN -> {
-                displayTurn = true
-                turnDelayTime = 0
-                riverDelayTime = 0
-                computerOddsValue = computerOdds.getTurnOdds()
+                displayRiver = true
+                cardDealer.setRiverCard(tableCards)
+                computerOdds.calculateRiverOdds(computerCards, tableCards[4])
+                computerOddsValue = computerOdds.getRiverOdds()
+                round = RIVER
 
                 if (player == PLAYER) {
                     displayFoldButton = false
@@ -485,23 +496,10 @@ open class GameViewModel : ViewModel() {
                     computerBet = BIG_BLIND
                     bet()
                 }
-
             }
             RIVER -> {
-                displayRiver = true
-                computerOddsValue = computerOdds.getRiverOdds()
-
-                if (player == PLAYER) {
-                    displayFoldButton = false
-                    displayCheckButton = true
-                    displayCallButton = false
-                    displayBetButton = true
-                } else {
-                    computerBet = BIG_BLIND
-                    bet()
-                }
+                showdown()
             }
-            else -> showdown()
         }
     }
 
@@ -537,28 +535,28 @@ open class GameViewModel : ViewModel() {
      */
     private fun showdown() {
 
-//        displayComputerCards = true
-//
-//
-//        when (round) {
-//            PRE_FLOP -> {
-//                displayFlop = true
-//                round = FLOP
-//                showdown()
-//            }
-//            FLOP -> {
-//                displayTurn = true
-//                round = TURN
-//                showdown()
-//            }
-//            TURN -> {
-//                displayRiver = true
-//                round = RIVER
-//                showdown()
-//            }
-//            RIVER -> {
-//                calculateWinner()
-//            }
-//        }
+        displayComputerCards = true
+
+
+        when (round) {
+            PRE_FLOP -> {
+                displayFlop = true
+                round = FLOP
+                showdown()
+            }
+            FLOP -> {
+                displayTurn = true
+                round = TURN
+                showdown()
+            }
+            TURN -> {
+                displayRiver = true
+                round = RIVER
+                showdown()
+            }
+            RIVER -> {
+                calculateWinner()
+            }
+        }
     }
 }
