@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import kotlin.math.abs
 import kotlin.random.Random
+import kotlin.system.measureTimeMillis
 
 const val POT = 2
 const val SMALL_BLIND = 20
@@ -299,6 +300,24 @@ open class GameViewModel : ViewModel() {
         // set player and computer cards
         cardDealer.setPlayerCards(playerCards, computerCards)
 
+        // init table cards
+
+        // flop
+        cardDealer.setFlopCards(tableCards)
+        computerOdds = Odds(tableCards)
+        val time = measureTimeMillis {
+            computerOdds.calculateFlopOdds(computerCards)
+        }
+        Log.d("ODDS flop time", time.toString())
+
+        // turn
+        cardDealer.setTurnCard(tableCards)
+        computerOdds.calculateTurnOdds(computerCards, tableCards[3])
+
+        //river
+        cardDealer.setRiverCard(tableCards)
+        computerOdds.calculateRiverOdds(computerCards, tableCards[4])
+
         displayComputerCards = true
         displayFlop = false
         displayTurn = false
@@ -443,12 +462,8 @@ open class GameViewModel : ViewModel() {
                 displayFlop = true
                 turnDelayTime = 0
                 riverDelayTime = 1000
-                cardDealer.setFlopCards(tableCards)
-                computerOdds = Odds(tableCards)
-                computerOdds.calculateFlopOdds(computerCards)
-                computerOddsValue = computerOdds.getFlopOdds()
                 round = FLOP
-
+                computerOddsValue = computerOdds.getFlopOdds()
                 if (player == PLAYER) {
                     displayFoldButton = false
                     displayCheckButton = true
@@ -464,8 +479,6 @@ open class GameViewModel : ViewModel() {
                 displayTurn = true
                 turnDelayTime = 0
                 riverDelayTime = 0
-                cardDealer.setTurnCard(tableCards)
-                computerOdds.calculateTurnOdds(computerCards, tableCards[3])
                 computerOddsValue = computerOdds.getTurnOdds()
                 round = TURN
 
@@ -482,8 +495,6 @@ open class GameViewModel : ViewModel() {
             }
             TURN -> {
                 displayRiver = true
-                cardDealer.setRiverCard(tableCards)
-                computerOdds.calculateRiverOdds(computerCards, tableCards[4])
                 computerOddsValue = computerOdds.getRiverOdds()
                 round = RIVER
 

@@ -2,6 +2,7 @@ package com.example.poker
 
 import android.util.Log
 import kotlin.math.roundToInt
+import kotlin.system.measureTimeMillis
 
 const val MAX_OPPONENT_COMBINATIONS = 100
 const val MAX_TABLE_COMBINATIONS = 50
@@ -58,9 +59,9 @@ class Odds(private var tableCards: MutableList<Card>) {
                     player1Hand = playerHand,
                     player2Hand = opponentHand
                 ).getWinner()) {
-                    1 -> player1++
-                    2 -> player2++
-                    3 -> draw++
+                    0 -> player1++
+                    1 -> player2++
+                    2 -> draw++
                     else -> {}
                 }
 
@@ -90,7 +91,7 @@ class Odds(private var tableCards: MutableList<Card>) {
         Log.d("ODDS player1", player1.toString())
         Log.d("ODDS player2", player2.toString())
         Log.d("ODDS draw", draw.toString())
-        Log.d("ODDS combinations", combinations.toString())
+        Log.d("ODDS comparisons", combinations.toString())
         Log.d("ODDS result", ((player1.toDouble()/combinations) * 100).roundToInt().toString())
 
         // calculate odds
@@ -135,9 +136,9 @@ class Odds(private var tableCards: MutableList<Card>) {
                     player1Hand = playerHand,
                     player2Hand = opponentHand
                 ).getWinner()) {
-                    1 -> player1++
-                    2 -> player2++
-                    3 -> draw++
+                    0 -> player1++
+                    1 -> player2++
+                    2 -> draw++
                     else -> {}
                 }
 
@@ -157,12 +158,6 @@ class Odds(private var tableCards: MutableList<Card>) {
 
         // calculate odds
         odds[RESULT] = ((player1.toDouble()/combinations) * 100).toInt()
-
-        Log.d("ODDS", odds.joinToString("\n"))
-        Log.d("ODDS player1", player1.toString())
-        Log.d("ODDS player2", player2.toString())
-        Log.d("ODDS draw", draw.toString())
-        Log.d("ODDS combinations", combinations.toString())
 
         // calculate odds
         turnOdds = ((player1.toDouble()/combinations) * 100).roundToInt()
@@ -194,9 +189,9 @@ class Odds(private var tableCards: MutableList<Card>) {
                 player1Hand = playerHand,
                 player2Hand = opponentHand
             ).getWinner()) {
-                1 -> player1++
-                2 -> player2++
-                3 -> draw++
+                0 -> player1++
+                1 -> player2++
+                2 -> draw++
                 else -> {}
             }
 
@@ -241,7 +236,7 @@ class Odds(private var tableCards: MutableList<Card>) {
     private fun setCardCombinations(removeCards: List<Card>)
     {
         if (removeCards.isNotEmpty()) {
-            val usedCombinations = mutableListOf<ArrayList<Card>>()
+            val usedCombinations = mutableMapOf<String, ArrayList<Card>>()
 
             // remove player cards
             for (card in removeCards) {
@@ -254,10 +249,13 @@ class Odds(private var tableCards: MutableList<Card>) {
                         continue
                     }
 
+                    val combination1 = "$card1-$card2"
+                    val combination2 = "$card2-$card1"
+
                     // prevent repetitions
                     if (usedCombinations.isNotEmpty()
-                        && (usedCombinations.contains(listOf(card1, card2))
-                                || usedCombinations.contains(listOf(card2, card1)))
+                        && (usedCombinations.contains(combination1)
+                                || usedCombinations.contains(combination2))
                     ) {
                         continue
                     }
@@ -266,8 +264,8 @@ class Odds(private var tableCards: MutableList<Card>) {
                     cardCombinations.add(arrayListOf(card1, card2))
 
                     // used to prevent repetitions
-                    usedCombinations.add(arrayListOf(card1, card2))
-                    usedCombinations.add(arrayListOf(card2, card1))
+                    usedCombinations[combination1] = arrayListOf(card1, card2)
+                    usedCombinations[combination2] = arrayListOf(card2, card1)
                 }
             }
         }

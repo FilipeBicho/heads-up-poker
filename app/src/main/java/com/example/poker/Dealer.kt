@@ -24,9 +24,11 @@ class Dealer {
         computerCards: SnapshotStateList<Card>
     ) {
         playerCards.add(deck.dealCard())
-        computerCards.add(deck.dealCard())
+        computerCards.add(Card(1, 3))
+        deck.getDeck().remove(Card(1, 3))
         playerCards.add(deck.dealCard())
-        computerCards.add(deck.dealCard())
+        computerCards.add(Card(8, 1))
+        deck.getDeck().remove(Card(8, 1))
     }
 
     /**
@@ -35,9 +37,16 @@ class Dealer {
     fun setFlopCards(tableCards: SnapshotStateList<Card>) {
 
         deck.dealCard();
-        for (i in 0 until 3) {
-            tableCards.add(deck.dealCard())
-        }
+       // for (i in 0 until 3) {
+        tableCards.add(Card(7, 1))
+        deck.getDeck().remove(Card(7, 1))
+
+        tableCards.add(Card(6, 0))
+        deck.getDeck().remove(Card(6, 0))
+
+        tableCards.add(Card(10, 3))
+        deck.getDeck().remove(Card(10, 3))
+       // }
     }
 
     /**
