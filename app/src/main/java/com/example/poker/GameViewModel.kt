@@ -80,7 +80,7 @@ open class GameViewModel : ViewModel() {
     var riverDelayTime by mutableStateOf(2000)
         private set
 
-    private var cardDealer: Dealer = Dealer()
+    private lateinit var cardDealer: Dealer
     private lateinit var playerOdds: Odds
     private lateinit var computerOdds: Odds
     private lateinit var showdownFlopOdds: Array<Int>
@@ -271,6 +271,7 @@ open class GameViewModel : ViewModel() {
         computerBet = 0
         totalPot = 0
         checkAvailable = true
+        cardDealer = Dealer()
         round = PRE_FLOP
 
         // init poker chips
