@@ -1,11 +1,12 @@
 package com.example.poker
 
 import android.util.Log
+import java.util.Collections
 import kotlin.math.roundToInt
+import kotlin.random.Random
 import kotlin.system.measureTimeMillis
 
-const val MAX_OPPONENT_COMBINATIONS = 100
-const val MAX_TABLE_COMBINATIONS = 50
+const val MAX_COMBINATIONS = 1000
 
 class Odds(private var tableCards: MutableList<Card>) {
 
@@ -25,18 +26,18 @@ class Odds(private var tableCards: MutableList<Card>) {
         var player2 = 0
         var draw = 0
         var combinations = 0
-        var opponentCombinationsCount = 0
-        var tableCombinationsCount: Int
 
         setCardCombinations(playerCards + tableCards)
 
         val tempTableCards: ArrayList<Card> = ArrayList()
         tempTableCards.addAll(tableCards.toList())
 
-        for (opponentCards: ArrayList<Card> in cardCombinations) {
-            cardCombinations.shuffle()
-            tableCombinationsCount = 0
-            for (tableCards: ArrayList<Card> in cardCombinations) {
+        while (combinations < MAX_COMBINATIONS) {
+            for (i in 0 until cardCombinations.size - 2) {
+
+                val opponentCards = cardCombinations[i]
+                val tableCards = cardCombinations[i+1]
+
                 // continue if 2nd combination contains any card from the 1st combination
                 if (opponentCards.contains(tableCards.component1())
                     || opponentCards.contains(tableCards.component2())
@@ -65,22 +66,16 @@ class Odds(private var tableCards: MutableList<Card>) {
                     else -> {}
                 }
 
+                combinations++
+
                 // remove temporarily table cards
                 tempTableCards.removeLast()
                 tempTableCards.removeLast()
-                combinations++
 
-                tableCombinationsCount++
-                if (tableCombinationsCount >= MAX_TABLE_COMBINATIONS) {
-                    break
-                }
             }
-
-            opponentCombinationsCount++
-            if (opponentCombinationsCount >= MAX_OPPONENT_COMBINATIONS) {
-                break
-            }
+            cardCombinations.shuffle()
         }
+
 
         // calculate odds per hand ranking
         for ((index, value) in odds.withIndex()) {
@@ -88,9 +83,6 @@ class Odds(private var tableCards: MutableList<Card>) {
         }
 
         Log.d("ODDS", odds.joinToString("\n"))
-        Log.d("ODDS player1", player1.toString())
-        Log.d("ODDS player2", player2.toString())
-        Log.d("ODDS draw", draw.toString())
         Log.d("ODDS comparisons", combinations.toString())
         Log.d("ODDS result", ((player1.toDouble()/combinations) * 100).roundToInt().toString())
 
@@ -113,8 +105,11 @@ class Odds(private var tableCards: MutableList<Card>) {
         val tempTableCards: ArrayList<Card> = ArrayList()
         tempTableCards.addAll(tableCards.toList())
 
-        for (opponentCards: ArrayList<Card> in cardCombinations) {
-            for (turnCard: Card in deck) {
+        while (combinations < MAX_COMBINATIONS) {
+            for (i in 0 until cardCombinations.size - 1) {
+
+                val turnCard = deck[Random.nextInt((deck.size-1) + 1)]
+                val opponentCards = cardCombinations[i]
 
                 // continue if turn card is in card combination
                 if (opponentCards.contains(turnCard)) {
@@ -145,10 +140,7 @@ class Odds(private var tableCards: MutableList<Card>) {
                 tempTableCards.removeLast()
                 combinations++
             }
-
-            if (combinations >= MAX_TABLE_COMBINATIONS * MAX_OPPONENT_COMBINATIONS) {
-                break
-            }
+            cardCombinations.shuffle()
         }
 
         // calculate odds per hand ranking

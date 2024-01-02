@@ -312,7 +312,10 @@ open class GameViewModel : ViewModel() {
 
         // turn
         cardDealer.setTurnCard(tableCards)
-        computerOdds.calculateTurnOdds(computerCards, tableCards[3])
+        val time1 = measureTimeMillis {
+            computerOdds.calculateTurnOdds(computerCards, tableCards[3])
+        }
+        Log.d("ODDS turn time", time1.toString())
 
         //river
         cardDealer.setRiverCard(tableCards)
