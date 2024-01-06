@@ -81,8 +81,7 @@ open class GameViewModel : ViewModel() {
         private set
 
     private lateinit var cardDealer: Dealer
-    private lateinit var playerOdds: Odds
-    private lateinit var computerOdds: Odds
+    private lateinit var odds: Odds
     private lateinit var showdownFlopOdds: Array<Int>
     private lateinit var showdownTurnOdds: Array<Int>
     private lateinit var showdownRiverOdds: Array<Int>
@@ -305,27 +304,24 @@ open class GameViewModel : ViewModel() {
 
         // flop
         cardDealer.setFlopCards(tableCards)
-        computerOdds = Odds(tableCards)
-        val time = measureTimeMillis {
-            computerOdds.calculateFlopOdds(computerCards)
-        }
-        Log.d("ODDS flop time", time.toString())
+        odds = Odds(tableCards)
+        odds.calculateFlopOdds(computerCards)
 
         // turn
         cardDealer.setTurnCard(tableCards)
-        val time1 = measureTimeMillis {
-            computerOdds.calculateTurnOdds(computerCards, tableCards[3])
-        }
-        Log.d("ODDS turn time", time1.toString())
+        odds.calculateTurnOdds(computerCards)
 
         //river
         cardDealer.setRiverCard(tableCards)
-        computerOdds.calculateRiverOdds(computerCards, tableCards[4])
+        odds.calculateRiverOdds(computerCards)
 
         displayComputerCards = true
         displayFlop = false
         displayTurn = false
         displayRiver = false
+
+        playerOddsValue = PreFlopOdds(playerCards).getOdds()
+        computerOddsValue = PreFlopOdds(computerCards).getOdds()
 
         // pre flop bets
         preFlopBets()
@@ -467,7 +463,9 @@ open class GameViewModel : ViewModel() {
                 turnDelayTime = 0
                 riverDelayTime = 1000
                 round = FLOP
-                computerOddsValue = computerOdds.getFlopOdds()
+                odds.calculateShowdownFlopOdds(playerCards = playerCards, opponentCards = computerCards)
+                playerOddsValue = odds.getShowdownPlayerOdds()
+                computerOddsValue = odds.getShowdownOpponentOdds()
                 if (player == PLAYER) {
                     displayFoldButton = false
                     displayCheckButton = true
@@ -483,7 +481,10 @@ open class GameViewModel : ViewModel() {
                 displayTurn = true
                 turnDelayTime = 0
                 riverDelayTime = 0
-                computerOddsValue = computerOdds.getTurnOdds()
+                cardDealer.setTurnCard(tableCards)
+                odds.calculateShowdownTurnOdds(playerCards = playerCards, opponentCards = computerCards)
+                playerOddsValue = odds.getShowdownPlayerOdds()
+                computerOddsValue = odds.getShowdownOpponentOdds()
                 round = TURN
 
                 if (player == PLAYER) {
@@ -499,7 +500,8 @@ open class GameViewModel : ViewModel() {
             }
             TURN -> {
                 displayRiver = true
-                computerOddsValue = computerOdds.getRiverOdds()
+                cardDealer.setRiverCard(tableCards)
+                computerOddsValue = odds.getRiverOdds()
                 round = RIVER
 
                 if (player == PLAYER) {
