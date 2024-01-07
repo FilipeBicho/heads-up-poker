@@ -1,5 +1,6 @@
 package com.example.poker
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -7,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import kotlin.math.abs
 import kotlin.random.Random
+import kotlin.system.measureTimeMillis
 
 const val POT = 2
 const val SMALL_BLIND = 20
@@ -285,7 +287,9 @@ open class GameViewModel : ViewModel() {
 
         updateMutableStateValues()
 
-        newGame()
+        if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
+            newGame()
+        }
     }
 
     /**
@@ -332,7 +336,12 @@ open class GameViewModel : ViewModel() {
         // flop
         cardDealer.setFlopCards(tableCards)
 
-        combinations = Combinations(tableCards).combinations
+        val time = measureTimeMillis {
+            combinations = Combinations(tableCards).combinations
+        }
+        Log.d("ODDS combinations time", time.toString())
+
+
         odds = Odds(combinations)
 
         // turn
@@ -341,9 +350,20 @@ open class GameViewModel : ViewModel() {
         //river
         cardDealer.setRiverCard(tableCards)
 
-        odds.calculateFlopOdds(computerCards, tableCards.subList(0,3))
-        odds.calculateTurnOdds(computerCards, tableCards.subList(0,4))
-        odds.calculateRiverOdds(computerCards, tableCards)
+        val time1 = measureTimeMillis {
+            odds.calculateFlopOdds(computerCards, tableCards.subList(0,3))
+        }
+        Log.d("ODDS flop odds time", time1.toString())
+
+        val time3 = measureTimeMillis {
+            odds.calculateTurnOdds(computerCards, tableCards.subList(0,4))
+        }
+        Log.d("ODDS turn odds time", time3.toString())
+
+        val time5 = measureTimeMillis {
+            odds.calculateRiverOdds(computerCards, tableCards)
+        }
+        Log.d("ODDS turn odds time", time5.toString())
 
         displayComputerCards = true
         displayFlop = false
@@ -379,13 +399,7 @@ open class GameViewModel : ViewModel() {
                 turnDelayTime = 0
                 riverDelayTime = 1000
                 round = FLOP
-                odds.calculateShowdownFlopOdds(
-                    playerCards = playerCards,
-                    opponentCards = computerCards,
-                    tableCards = tableCards.subList(0, 3)
-                )
-                playerOddsValue = odds.getShowdownPlayerOdds()
-                computerOddsValue = odds.getShowdownOpponentOdds()
+                computerOddsValue = odds.getFlopOdds()
                 if (player == PLAYER) {
                     displayFoldButton = false
                     displayCheckButton = true
@@ -402,14 +416,7 @@ open class GameViewModel : ViewModel() {
                 displayTurn = true
                 turnDelayTime = 0
                 riverDelayTime = 0
-                cardDealer.setTurnCard(tableCards)
-                odds.calculateShowdownTurnOdds(
-                    playerCards = playerCards,
-                    opponentCards = computerCards,
-                    tableCards = tableCards.subList(0, 4)
-                )
-                playerOddsValue = odds.getShowdownPlayerOdds()
-                computerOddsValue = odds.getShowdownOpponentOdds()
+                computerOddsValue = odds.getTurnOdds()
                 round = TURN
 
                 if (player == PLAYER) {
@@ -567,11 +574,21 @@ open class GameViewModel : ViewModel() {
     private fun showdown() {
 
         displayComputerCards = true
+        turnDelayTime = 2000
+        riverDelayTime = 3000
 
         when (round) {
             PRE_FLOP -> {
                 displayFlop = true
                 round = FLOP
+                odds.calculateShowdownFlopOdds(
+                    playerCards = playerCards,
+                    opponentCards = computerCards,
+                    tableCards = tableCards.subList(0, 3)
+                )
+                playerOddsValue = odds.getShowdownPlayerOdds()
+                computerOddsValue = odds.getShowdownOpponentOdds()
+
                 showdown()
             }
 
@@ -579,6 +596,13 @@ open class GameViewModel : ViewModel() {
                 displayTurn = true
                 round = TURN
                 showdown()
+                odds.calculateShowdownTurnOdds(
+                    playerCards = playerCards,
+                    opponentCards = computerCards,
+                    tableCards = tableCards.subList(0, 4)
+                )
+                playerOddsValue = odds.getShowdownPlayerOdds()
+                computerOddsValue = odds.getShowdownOpponentOdds()
             }
 
             TURN -> {
