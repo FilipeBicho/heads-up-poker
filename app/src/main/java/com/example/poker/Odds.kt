@@ -1,17 +1,14 @@
 package com.example.poker
 
 import android.util.Log
-import java.util.Collections
 import kotlin.math.roundToInt
 import kotlin.random.Random
-import kotlin.system.measureTimeMillis
 
 const val MAX_COMBINATIONS = 1000
 
-class Odds(private var tableCards: MutableList<Card>) {
+class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
 
-    private var cardCombinations = mutableListOf<ArrayList<Card>>()
-    private var deck = Deck().getDeck()
+    private var fullDeck = Deck().getDeck()
     private val odds = Array(11) { _ -> 0}
     private var flopOdds = 0
     private var turnOdds = 0
@@ -19,39 +16,41 @@ class Odds(private var tableCards: MutableList<Card>) {
     private var showdownPlayerOdds = 0
     private var showdownOpponentOdds = 0
 
-    init {
-        setCardCombinations(tableCards)
-    }
-
     /**
      * Calculate flop odds
      */
-    fun calculateFlopOdds(playerCards: MutableList<Card>) {
+    fun calculateFlopOdds(playerCards: MutableList<Card>, tableCards: MutableList<Card>) {
 
         var player1 = 0
         var player2 = 0
         var draw = 0
         var count = 0
-        val combinations = getCardCombinations(playerCards, cardCombinations.toMutableList())
+        val combinations = allCombinations.toMutableList()
 
+        // remove player and table cards from combinations
+        for (card in playerCards + tableCards) {
+            combinations.removeIf { it.any { it.toString() == card.toString() } }
+        }
+
+        // init table cards
         val tempTableCards: ArrayList<Card> = ArrayList()
         tempTableCards.addAll(tableCards.toList())
 
         while (count < MAX_COMBINATIONS) {
             for (i in 0 until combinations.size - 2) {
 
+                // add 1st combination cards to opponent
                 val opponentCards = combinations[i]
-                val tableCards = combinations[i+1]
 
                 // continue if 2nd combination contains any card from the 1st combination
-                if (opponentCards.contains(tableCards.component1())
-                    || opponentCards.contains(tableCards.component2())
+                if (opponentCards.contains(combinations[i+1].component1())
+                    || opponentCards.contains(combinations[i+1].component2())
                 ) {
                     continue
                 }
 
                 // add 2nd combination cards to table cards
-                tempTableCards.addAll(tableCards)
+                tempTableCards.addAll(combinations[i+1])
 
                 // use table cards to calculate player hand
                 val playerHand = Hand(playerCards, tempTableCards)
@@ -85,7 +84,6 @@ class Odds(private var tableCards: MutableList<Card>) {
             combinations.shuffle()
         }
 
-
         // calculate odds per hand ranking
         for ((index, value) in odds.withIndex()) {
             odds[index] = ((value.toFloat() / count) * 100).roundToInt()
@@ -102,16 +100,22 @@ class Odds(private var tableCards: MutableList<Card>) {
     /**
      * calculate turn odds
      */
-    fun calculateTurnOdds(playerCards: MutableList<Card>) {
+    fun calculateTurnOdds(playerCards: MutableList<Card>, tableCards: MutableList<Card>) {
 
         var player1 = 0
         var player2 = 0
         var draw = 0
         var count = 0
-
-        val combinations = getCardCombinations(playerCards + tableCards, cardCombinations.toMutableList())
-
+        val deck = fullDeck
+        val combinations = allCombinations.toMutableList()
         val tempTableCards: ArrayList<Card> = ArrayList()
+
+        // remove player and table cards from combinations
+        for (card in playerCards + tableCards) {
+            combinations.removeIf { it.any { it.toString() == card.toString() } }
+            deck.removeIf { card.toString() == it.toString() }
+        }
+
         tempTableCards.addAll(tableCards.toList())
 
         while (count < MAX_COMBINATIONS) {
@@ -173,13 +177,18 @@ class Odds(private var tableCards: MutableList<Card>) {
     /**
      * calculate river odds
      */
-    fun calculateRiverOdds(playerCards: MutableList<Card>) {
+    fun calculateRiverOdds(playerCards: MutableList<Card>, tableCards: MutableList<Card>) {
 
         var player1 = 0
         var player2 = 0
         var draw = 0
         var count = 0
-        val combinations = getCardCombinations(playerCards + tableCards, cardCombinations.toMutableList())
+        val combinations = allCombinations.toMutableList()
+
+        // remove player and table cards from combinations
+        for (card in playerCards + tableCards) {
+            combinations.removeIf { it.any { it.toString() == card.toString() } }
+        }
 
         // use table cards to calculate player hand
         val playerHand = Hand(playerCards, tableCards)
@@ -211,16 +220,21 @@ class Odds(private var tableCards: MutableList<Card>) {
     /**
      * calculate showdown flop odds
      */
-    fun calculateShowdownFlopOdds(playerCards: MutableList<Card>, opponentCards: MutableList<Card>)
+    fun calculateShowdownFlopOdds(playerCards: MutableList<Card>, opponentCards: MutableList<Card>, tableCards: MutableList<Card>)
     {
         var player1 = 0
         var player2 = 0
         var draw = 0
         var count = 0
-        val combinations = getCardCombinations(playerCards + opponentCards, cardCombinations.toMutableList())
-
+        val combinations = allCombinations.toMutableList()
         val tempTableCards: ArrayList<Card> = ArrayList()
-        tempTableCards.addAll(tableCards.subList(0, 3))
+
+        // remove player and table cards from combinations
+        for (card in playerCards + opponentCards + tableCards) {
+            combinations.removeIf { it.any { it.toString() == card.toString() } }
+        }
+
+        tempTableCards.addAll(tableCards)
 
         for (cards: ArrayList<Card> in combinations) {
             // add table cards
@@ -255,15 +269,21 @@ class Odds(private var tableCards: MutableList<Card>) {
     /**
      * calculate showdown turn odds
      */
-    fun calculateShowdownTurnOdds(playerCards: MutableList<Card>, opponentCards: MutableList<Card>)
+    fun calculateShowdownTurnOdds(playerCards: MutableList<Card>, opponentCards: MutableList<Card>, tableCards: MutableList<Card>)
     {
         var player1 = 0
         var player2 = 0
         var draw = 0
         var count = 0
-
+        val deck = fullDeck
         val tempTableCards: ArrayList<Card> = ArrayList()
-        tempTableCards.addAll(tableCards.subList(0, 4))
+
+        // remove player and table cards from combinations
+        for (card in playerCards + opponentCards + tableCards) {
+            deck.removeIf { card.toString() == it.toString() }
+        }
+
+        tempTableCards.addAll(tableCards)
 
         for (card: Card in deck) {
             // add table cards
@@ -318,62 +338,4 @@ class Odds(private var tableCards: MutableList<Card>) {
      * get showdown opponent odds
      */
     fun getShowdownOpponentOdds() = showdownOpponentOdds
-
-    /**
-     * Update table cards
-     * Remove card from deck and card combinations
-     */
-    private fun getCardCombinations(cards: List<Card>, combinations: MutableList<ArrayList<Card>>):  MutableList<ArrayList<Card>>
-    {
-        for (card in cards) {
-            // remove added card from card combinations
-            combinations.removeIf { it.any { it.toString() == card.toString() } }
-
-            // remove added card from deck
-            deck.removeIf { card.toString() == it.toString() }
-        }
-
-        return combinations
-    }
-
-    /**
-     * set card combinations
-     */
-    private fun setCardCombinations(removeCards: List<Card>)
-    {
-        if (removeCards.isNotEmpty()) {
-            val usedCombinations = mutableMapOf<String, ArrayList<Card>>()
-
-            // remove player cards
-            for (card in removeCards) {
-                deck.removeIf { card.toString() == it.toString() }
-            }
-
-            for (card1: Card in deck) {
-                for (card2: Card in deck) {
-                    if (card1 == card2) {
-                        continue
-                    }
-
-                    val combination1 = "$card1-$card2"
-                    val combination2 = "$card2-$card1"
-
-                    // prevent repetitions
-                    if (usedCombinations.isNotEmpty()
-                        && (usedCombinations.contains(combination1)
-                                || usedCombinations.contains(combination2))
-                    ) {
-                        continue
-                    }
-
-                    // add combination
-                    cardCombinations.add(arrayListOf(card1, card2))
-
-                    // used to prevent repetitions
-                    usedCombinations[combination1] = arrayListOf(card1, card2)
-                    usedCombinations[combination2] = arrayListOf(card2, card1)
-                }
-            }
-        }
-    }
 }
