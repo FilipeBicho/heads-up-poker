@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,7 +34,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,12 +63,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 @Composable
 @Preview
 fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
+    val gameUiState by gameViewModel.uiState.collectAsState()
     Background()
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -89,9 +88,9 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         }
                     }
                     Box(modifier = Modifier.align(Alignment.CenterEnd)) {
-                        if (!gameViewModel.computerOddsValue.equals(0.0F)) {
+                        if (!gameUiState.computerOddsValue.equals(0.0F)) {
                             Text(
-                                text = "${gameViewModel.computerOddsValue} %",
+                                text = "${gameUiState.computerOddsValue} %",
                                 fontSize = 15.sp,
                             )
                         }
@@ -106,9 +105,9 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                     if (gameViewModel.computerCards.isNotEmpty()) {
                         CardsSection(
                             gameViewModel.computerCards,
-                            gameViewModel.computerName,
-                            gameViewModel.computerMoney,
-                            gameViewModel.displayComputerCards
+                            gameUiState.computerName,
+                            gameUiState.computerMoney,
+                            gameUiState.displayComputerCards
                         )
                     }
                 }
@@ -136,12 +135,12 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         modifier = Modifier.align(Alignment.CenterEnd)
                     ) {
                         Text(
-                            text = "Pot: ${gameViewModel.currentPot} €",
+                            text = "Pot: ${gameUiState.currentPot} €",
                             fontWeight = FontWeight.Bold,
                             fontSize = 15.sp,
                         )
                         Text(
-                            text = "Total: ${gameViewModel.totalPot} €",
+                            text = "Total: ${gameUiState.totalPot} €",
                             fontSize = 12.sp
                         )
                     }
@@ -155,7 +154,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                 ) {
                     Column {
                         Text(
-                            text = "${gameViewModel.computerBet} €",
+                            text = "${gameUiState.computerBet} €",
                             modifier = Modifier
                                 .weight(0.2f)
                                 .align(Alignment.CenterHorizontally)
@@ -167,35 +166,35 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                             Row(modifier = Modifier.weight(0.6f)) {
 
                                 AnimatedVisibility(
-                                    visible = gameViewModel.displayFlop,
+                                    visible = gameUiState.displayFlop,
                                     enter = expandHorizontally(tween(1000, 0))
                                 ) {
                                     CardImage(card = gameViewModel.tableCards[0], Modifier.padding(all = 5.dp), true)
                                 }
 
                                 AnimatedVisibility(
-                                    visible = gameViewModel.displayFlop,
+                                    visible = gameUiState.displayFlop,
                                     enter = expandHorizontally(tween(1000, 0))
                                 ) {
                                     CardImage(card = gameViewModel.tableCards[1], Modifier.padding(all = 5.dp), true)
                                 }
 
                                 AnimatedVisibility(
-                                    visible = gameViewModel.displayFlop,
+                                    visible = gameUiState.displayFlop,
                                     enter = expandHorizontally(tween(1000, 0))
                                 ) {
                                     CardImage(card = gameViewModel.tableCards[2], Modifier.padding(all = 5.dp), true)
                                 }
 
                                 AnimatedVisibility(
-                                    visible = gameViewModel.displayTurn,
-                                    enter = expandHorizontally(tween(1000, gameViewModel.turnDelayTime))
+                                    visible = gameUiState.displayTurn,
+                                    enter = expandHorizontally(tween(1000, gameUiState.turnDelayTime))
                                 ) {
                                     CardImage(card = gameViewModel.tableCards[3], Modifier.padding(all = 5.dp), true)
                                 }
                                 AnimatedVisibility(
-                                    visible = gameViewModel.displayRiver,
-                                    enter = expandHorizontally(tween(1000, gameViewModel.riverDelayTime))
+                                    visible = gameUiState.displayRiver,
+                                    enter = expandHorizontally(tween(1000, gameUiState.riverDelayTime))
                                 ) {
                                     CardImage(card = gameViewModel.tableCards[4], Modifier.padding(all = 5.dp), true)
                                 }
@@ -203,7 +202,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         }
 
                         Text(
-                            text = "${gameViewModel.playerBet} €",
+                            text = "${gameUiState.playerBet} €",
                             modifier = Modifier
                                 .weight(0.2f)
                                 .align(Alignment.CenterHorizontally)
@@ -224,11 +223,11 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         horizontalArrangement = Arrangement.spacedBy(1.dp)
                     ) {
                         if (gameViewModel.isPlayerTurn()) {
-                            if (BIG_BLIND * 2 > gameViewModel.totalPot) {
+                            if (BIG_BLIND * 2 > gameUiState.totalPot) {
                                 BetButton(text = "2 BB") { gameViewModel.updatePlayerBet(BIG_BLIND * 2) }
                             }
-                            BetButton(text = "Pot") { gameViewModel.updatePlayerBet(gameViewModel.totalPot) }
-                            BetButton(text = "Max") { gameViewModel.updatePlayerBet(gameViewModel.playerMoney) }
+                            BetButton(text = "Pot") { gameViewModel.updatePlayerBet(gameUiState.totalPot) }
+                            BetButton(text = "Max") { gameViewModel.updatePlayerBet(gameUiState.playerMoney) }
                         }
                     }
                 }
@@ -252,9 +251,9 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         }
                     }
                     Box(modifier = Modifier.align(Alignment.CenterEnd)) {
-                        if (gameViewModel.playerOddsValue.toFloat() != 0.0F) {
+                        if (gameUiState.playerOddsValue.toFloat() != 0.0F) {
                             Text(
-                                text = "${gameViewModel.playerOddsValue} %",
+                                text = "${gameUiState.playerOddsValue} %",
                                 fontSize = 15.sp,
                             )
                         }
@@ -269,8 +268,8 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                     if (gameViewModel.playerCards.isNotEmpty()) {
                         CardsSection(
                             gameViewModel.playerCards,
-                            gameViewModel.playerName,
-                            gameViewModel.playerMoney,
+                            gameUiState.playerName,
+                            gameUiState.playerMoney,
                             true
                         )
                     }
@@ -280,7 +279,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         .fillMaxHeight()
                         .weight(0.3f)
                 ) {
-                    if (gameViewModel.isPlayerTurn() && gameViewModel.playerMoney > 0) {
+                    if (gameViewModel.isPlayerTurn() && gameUiState.playerMoney > 0) {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
@@ -289,7 +288,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                                     .fillMaxWidth()
                                     .weight(0.4f)
                             ) {
-                                BetSlider(gameViewModel)
+                                BetSlider(gameUiState, gameViewModel)
                             }
 
                             Row(
@@ -298,19 +297,19 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                                     .weight(0.6f),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
-                                if (gameViewModel.displayFoldButton) {
+                                if (gameUiState.displayFoldButton) {
                                     GameActionButton("Fold") { gameViewModel.fold() }
                                 }
 
-                                if (gameViewModel.displayCheckButton) {
+                                if (gameUiState.displayCheckButton) {
                                     GameActionButton("Check") { gameViewModel.check() }
                                 }
 
-                                if (gameViewModel.displayCallButton) {
+                                if (gameUiState.displayCallButton) {
                                     GameActionButton("Call") { gameViewModel.call() }
                                 }
 
-                                if (gameViewModel.displayBetButton) {
+                                if (gameUiState.displayBetButton) {
                                     GameActionButton("Bet") { gameViewModel.bet() }
                                 }
                             }
@@ -373,13 +372,6 @@ private fun CardsSection(cards: MutableList<Card>, name: String, money: Int, dis
                 textAlign = TextAlign.Center
             )
         }
-    }
-}
-
-@Composable
-private fun TableCards(modifier: Modifier, tableCards: MutableList<Card>) {
-    for (card in tableCards) {
-        CardImage(card = card, modifier, true)
     }
 }
 
@@ -446,8 +438,8 @@ private fun GameActionButton(text: String, onClick: () -> Unit) {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun BetSlider(gameViewModel: GameViewModel) {
-    var betValue by remember(key1 = gameViewModel.playerBetValue) { mutableStateOf(gameViewModel.playerBetValue) }
+private fun BetSlider(gameUiState: GameUiState, gameViewModel: GameViewModel) {
+    var betValue by remember(key1 = gameUiState.playerBetValue) { mutableStateOf(gameUiState.playerBetValue) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
@@ -462,7 +454,7 @@ private fun BetSlider(gameViewModel: GameViewModel) {
             BasicTextField(
                 value = betValue.toString(),
                 onValueChange = {
-                    if (it.isNotEmpty() && it.isDigitsOnly() && it.toInt() <= gameViewModel.playerMoney) {
+                    if (it.isNotEmpty() && it.isDigitsOnly() && it.toInt() <= gameUiState.playerMoney) {
                         betValue = it.toInt()
                     }
                 },
@@ -492,7 +484,7 @@ private fun BetSlider(gameViewModel: GameViewModel) {
                 onValueChange = { betValue = it.roundToInt() },
                 onValueChangeFinished = { gameViewModel.updatePlayerBet(betValue) },
                 modifier = Modifier.padding(end = 10.dp),
-                valueRange = BIG_BLIND.toFloat()..gameViewModel.playerMoney.toFloat(),
+                valueRange = BIG_BLIND.toFloat()..gameUiState.playerMoney.toFloat(),
                 colors = SliderDefaults.colors(
                     thumbColor = Color.LightGray,
                     activeTrackColor = colorResource(id = R.color.button_red),
