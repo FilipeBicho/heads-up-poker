@@ -6,9 +6,9 @@ data class GameUiState(
 
     val computerName: String = "Computer",
 
-    val playerMoney: Int = 1500,
+    val playerMoney: Int = INITIAL_MONEY,
 
-    val computerMoney: Int = 1500,
+    val computerMoney: Int = INITIAL_MONEY,
 
     val playerOddsValue: Int = 0,
 
@@ -44,5 +44,7 @@ data class GameUiState(
 
     val turnDelayTime: Int = 1000,
 
-    val riverDelayTime: Int = 1000
+    val riverDelayTime: Int = 1000,
+
+    val showdown: Boolean = false
 )

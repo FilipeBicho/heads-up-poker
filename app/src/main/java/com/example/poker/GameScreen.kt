@@ -88,7 +88,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         }
                     }
                     Box(modifier = Modifier.align(Alignment.CenterEnd)) {
-                        if (!gameUiState.computerOddsValue.equals(0.0F)) {
+                        if (gameUiState.showdown) {
                             Text(
                                 text = "${gameUiState.computerOddsValue} %",
                                 fontSize = 15.sp,
@@ -251,7 +251,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         }
                     }
                     Box(modifier = Modifier.align(Alignment.CenterEnd)) {
-                        if (gameUiState.playerOddsValue.toFloat() != 0.0F) {
+                        if (gameUiState.showdown) {
                             Text(
                                 text = "${gameUiState.playerOddsValue} %",
                                 fontSize = 15.sp,
