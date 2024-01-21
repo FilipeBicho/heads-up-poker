@@ -66,8 +66,6 @@ open class GameViewModel : ViewModel() {
         if (checkAvailable && round != PRE_FLOP) {
 
             checkAvailable = false
-
-            updateMutableStateValues()
             switchPlayerTurn()
 
             if (isPlayerTurn()) {
@@ -82,7 +80,6 @@ open class GameViewModel : ViewModel() {
                 bet()
             }
         } else {
-            updateMutableStateValues()
             nextRound()
         }
     }
@@ -108,7 +105,6 @@ open class GameViewModel : ViewModel() {
             pokerChips[POT] = bet[blind] + bet[dealer]
 
             updateMutableStateValues()
-
             showdown()
         } else {
 
@@ -139,8 +135,6 @@ open class GameViewModel : ViewModel() {
                 nextRound()
             }
         }
-
-        updateMutableStateValues()
     }
 
     /**
@@ -236,7 +230,8 @@ open class GameViewModel : ViewModel() {
             playerMoney = pokerChips[PLAYER],
             computerMoney = pokerChips[COMPUTER],
             currentPot = pokerChips[POT],
-            playerBetValue = BIG_BLIND
+            playerBetValue = BIG_BLIND,
+            totalPot = totalPot
         )}
     }
 
@@ -261,8 +256,7 @@ open class GameViewModel : ViewModel() {
 
         val playerHand = Hand(playerCards = playerCards, tableCards = tableCards)
         val computerHand = Hand(playerCards = computerCards, tableCards = tableCards)
-        val winnerCalculator =
-            HandWinnerCalculator(player1Hand = playerHand, player2Hand = computerHand)
+        val winnerCalculator = HandWinnerCalculator(player1Hand = playerHand, player2Hand = computerHand)
 
         when (winnerCalculator.getWinner()) {
             PLAYER -> {
@@ -384,9 +378,7 @@ open class GameViewModel : ViewModel() {
                 // calculate pot
                 pokerChips[POT] = bet[blind] + bet[dealer]
 
-                // update mutable state values
                 updateMutableStateValues()
-
                 showdown()
             } else {
 
@@ -401,9 +393,7 @@ open class GameViewModel : ViewModel() {
                 // calculate pot
                 pokerChips[POT] = bet[blind] + bet[dealer]
 
-                // update mutable state values
                 updateMutableStateValues()
-
                 player = dealer
 
                 if (isPlayerTurn()) {
@@ -430,9 +420,7 @@ open class GameViewModel : ViewModel() {
             // calculate pot
             pokerChips[POT] = bet[blind] + bet[dealer]
 
-            // update mutable state values
             updateMutableStateValues()
-
             showdown()
         } else {
 
@@ -447,9 +435,7 @@ open class GameViewModel : ViewModel() {
             // calculate pot
             pokerChips[POT] = bet[blind] + bet[dealer]
 
-            // update mutable state values
             updateMutableStateValues()
-
             player = dealer
 
             if (isPlayerTurn()) {
@@ -478,10 +464,6 @@ open class GameViewModel : ViewModel() {
         bet[PLAYER] = 0
         bet[COMPUTER] = 0
         checkAvailable = true
-
-        _uiState.update { currentState -> currentState.copy(
-            totalPot = totalPot
-        ) }
 
         updateMutableStateValues()
 
