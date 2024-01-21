@@ -78,7 +78,7 @@ open class GameViewModel : ViewModel() {
                     displayBetButton = true
                 )}
             } else {
-                bet[COMPUTER] = BIG_BLIND
+                betValue = BIG_BLIND
                 bet()
             }
         } else {
@@ -131,7 +131,7 @@ open class GameViewModel : ViewModel() {
                         displayBetButton = true
                     )}
                 } else {
-                    bet[COMPUTER] = BIG_BLIND
+                    betValue = BIG_BLIND
                     bet()
                 }
 
@@ -151,10 +151,6 @@ open class GameViewModel : ViewModel() {
         checkAvailable = false
 
         val oldBet: Int = bet[player]
-
-        if (!isPlayerTurn()) {
-            betValue = bet[COMPUTER]
-        }
 
         // player makes a bet
         if (betValue > bet[opponent] + BIG_BLIND) {
@@ -202,7 +198,7 @@ open class GameViewModel : ViewModel() {
                     displayBetButton = true
                 )}
             } else {
-                bet[COMPUTER] = BIG_BLIND
+                betValue = BIG_BLIND
                 bet()
             }
         }
@@ -281,8 +277,8 @@ open class GameViewModel : ViewModel() {
                 pokerChips[COMPUTER] += totalPot
 
                 _uiState.update { currentState -> currentState.copy(
-                    playerOddsValue = 100,
-                    computerOddsValue = 0
+                    playerOddsValue = 0,
+                    computerOddsValue = 100
                 )}
             }
             else -> {
@@ -298,9 +294,9 @@ open class GameViewModel : ViewModel() {
 
         updateMutableStateValues()
 
-        if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
-            newGame()
-        }
+//        if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
+//            newGame()
+//        }
     }
 
     /**
@@ -312,7 +308,8 @@ open class GameViewModel : ViewModel() {
             displayComputerCards = true,
             turnDelayTime = 2000,
             riverDelayTime = 3000,
-            showdown = true
+            showdown = true,
+            totalPot = totalPot
         )}
 
         when (round) {
@@ -486,6 +483,8 @@ open class GameViewModel : ViewModel() {
             totalPot = totalPot
         ) }
 
+        updateMutableStateValues()
+
         when (round) {
             PRE_FLOP -> {
                 round = FLOP
@@ -505,7 +504,7 @@ open class GameViewModel : ViewModel() {
                         displayBetButton = true
                     )}
                 } else {
-                    bet[COMPUTER] = BIG_BLIND
+                    betValue = BIG_BLIND
                     bet()
                 }
             }
@@ -528,7 +527,7 @@ open class GameViewModel : ViewModel() {
                         displayBetButton = true
                     )}
                 } else {
-                    bet[COMPUTER] = BIG_BLIND
+                    betValue = BIG_BLIND
                     bet()
                 }
 
@@ -552,7 +551,7 @@ open class GameViewModel : ViewModel() {
                         displayBetButton = true
                     )}
                 } else {
-                    bet[COMPUTER] = BIG_BLIND
+                    betValue = BIG_BLIND
                     bet()
                 }
             }
