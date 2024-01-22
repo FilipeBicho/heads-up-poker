@@ -3,10 +3,14 @@ package com.example.poker
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.random.Random
 import kotlin.system.measureTimeMillis
@@ -21,7 +25,7 @@ open class GameViewModel : ViewModel() {
     private var opponent: Int = -1
     private var dealer: Int = -1
     private var blind: Int = -1
-    private var totalPot: Int = 0
+    private var totalPotValue: Int = 0
     private var betValue: Int = 0
     private var pokerChips = intArrayOf(0, 0, 0)
     private var bet = intArrayOf(0, 0)
@@ -49,7 +53,7 @@ open class GameViewModel : ViewModel() {
      */
     fun fold() {
         // opponent wins the pot
-        pokerChips[opponent] += pokerChips[POT] + totalPot
+        pokerChips[opponent] += pokerChips[POT] + totalPotValue
 
         // update mutable state values
         updateMutableStateValues()
@@ -80,7 +84,10 @@ open class GameViewModel : ViewModel() {
                 bet()
             }
         } else {
-            nextRound()
+            viewModelScope.launch {
+                delay(1000)
+                nextRound()
+            }
         }
     }
 
@@ -132,7 +139,10 @@ open class GameViewModel : ViewModel() {
                 }
 
             } else {
-                nextRound()
+                viewModelScope.launch {
+                    delay(1000)
+                    nextRound()
+                }
             }
         }
     }
@@ -231,7 +241,7 @@ open class GameViewModel : ViewModel() {
             computerMoney = pokerChips[COMPUTER],
             currentPot = pokerChips[POT],
             playerBetValue = BIG_BLIND,
-            totalPot = totalPot
+            totalPot = totalPotValue
         )}
     }
 
@@ -260,7 +270,7 @@ open class GameViewModel : ViewModel() {
 
         when (winnerCalculator.getWinner()) {
             PLAYER -> {
-                pokerChips[PLAYER] += totalPot
+                pokerChips[PLAYER] += totalPotValue
 
                 _uiState.update { currentState -> currentState.copy(
                     playerOddsValue = 100,
@@ -268,7 +278,7 @@ open class GameViewModel : ViewModel() {
                 )}
             }
             COMPUTER -> {
-                pokerChips[COMPUTER] += totalPot
+                pokerChips[COMPUTER] += totalPotValue
 
                 _uiState.update { currentState -> currentState.copy(
                     playerOddsValue = 0,
@@ -276,8 +286,8 @@ open class GameViewModel : ViewModel() {
                 )}
             }
             else -> {
-                pokerChips[PLAYER] += totalPot / 2
-                pokerChips[COMPUTER] += totalPot / 2
+                pokerChips[PLAYER] += totalPotValue / 2
+                pokerChips[COMPUTER] += totalPotValue / 2
 
                 _uiState.update { currentState -> currentState.copy(
                     playerOddsValue = 0,
@@ -291,72 +301,6 @@ open class GameViewModel : ViewModel() {
 //        if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
 //            newGame()
 //        }
-    }
-
-    /**
-     * Show all cards and calculate winner
-     */
-    private fun showdown() {
-
-        _uiState.update { currentState -> currentState.copy(
-            displayComputerCards = true,
-            turnDelayTime = 2000,
-            riverDelayTime = 3000,
-            showdown = true,
-            totalPot = totalPot
-        )}
-
-        when (round) {
-            PRE_FLOP -> {
-                round = FLOP
-
-                odds.calculateShowdownFlopOdds(
-                    playerCards = playerCards,
-                    opponentCards = computerCards,
-                    tableCards = tableCards.subList(0, 3)
-                )
-
-                _uiState.update { currentState -> currentState.copy(
-                    displayFlop = true,
-                    playerOddsValue = odds.getShowdownPlayerOdds(),
-                    computerOddsValue = odds.getShowdownOpponentOdds()
-                )}
-
-                showdown()
-            }
-
-            FLOP -> {
-                round = TURN
-
-                odds.calculateShowdownTurnOdds(
-                    playerCards = playerCards,
-                    opponentCards = computerCards,
-                    tableCards = tableCards.subList(0, 4)
-                )
-
-                _uiState.update { currentState -> currentState.copy(
-                    displayTurn = true,
-                    playerOddsValue = odds.getShowdownPlayerOdds(),
-                    computerOddsValue = odds.getShowdownOpponentOdds()
-                )}
-
-                showdown()
-            }
-
-            TURN -> {
-                round = RIVER
-
-                _uiState.update { currentState -> currentState.copy(
-                    displayRiver = true
-                )}
-
-                showdown()
-            }
-
-            RIVER -> {
-                calculateWinner()
-            }
-        }
     }
 
     /**
@@ -451,6 +395,88 @@ open class GameViewModel : ViewModel() {
         }
     }
 
+    private fun showdownFlop() {
+        round = FLOP
+
+        odds.calculateShowdownFlopOdds(
+            playerCards = playerCards,
+            opponentCards = computerCards,
+            tableCards = tableCards.subList(0, 3)
+        )
+
+        _uiState.update { currentState -> currentState.copy(
+            displayFlop = true,
+            playerOddsValue = odds.getShowdownPlayerOdds(),
+            computerOddsValue = odds.getShowdownOpponentOdds()
+        )}
+    }
+
+    private fun showdownTurn() {
+        round = TURN
+
+        odds.calculateShowdownTurnOdds(
+            playerCards = playerCards,
+            opponentCards = computerCards,
+            tableCards = tableCards.subList(0, 4)
+        )
+        _uiState.update { currentState -> currentState.copy(
+            displayTurn = true,
+            playerOddsValue = odds.getShowdownPlayerOdds(),
+            computerOddsValue = odds.getShowdownOpponentOdds()
+        )}
+    }
+
+    private fun showdownRiver() {
+        round = RIVER
+        _uiState.update { currentState -> currentState.copy(
+            displayRiver = true
+        )}
+    }
+
+    /**
+     * Show all cards and calculate winner
+     */
+    private fun showdown() {
+
+        totalPotValue = pokerChips[POT]
+
+        _uiState.update { currentState -> currentState.copy(
+            displayComputerCards = true,
+            showdown = true,
+            totalPot = totalPotValue
+        )}
+
+        viewModelScope.launch {
+            when (round) {
+                PRE_FLOP -> {
+                    viewModelScope.launch {
+                        delay(2000)
+                        showdownFlop()
+                        showdown()
+                    }
+                }
+
+                FLOP -> {
+                    viewModelScope.launch {
+                        delay(2000)
+                        showdownTurn()
+                        showdown()
+                    }
+                }
+
+                TURN -> {
+                    viewModelScope.launch {
+                        delay(2000)
+                        showdownRiver()
+                        showdown()
+                    }
+                }
+            }
+        }
+
+
+    }
+
     /**
      * go to next round
      */
@@ -460,7 +486,7 @@ open class GameViewModel : ViewModel() {
             switchPlayerTurn()
         }
 
-        totalPot += pokerChips[POT]
+        totalPotValue += pokerChips[POT]
         bet[PLAYER] = 0
         bet[COMPUTER] = 0
         checkAvailable = true
@@ -548,13 +574,12 @@ open class GameViewModel : ViewModel() {
      * Init new game values
      */
     private fun newGame() {
-
         round = PRE_FLOP
 
         // reset values
         bet[PLAYER] = 0
         bet[COMPUTER] = 0
-        totalPot = 0
+        totalPotValue = 0
         checkAvailable = true
         cardDealer = Dealer()
 
