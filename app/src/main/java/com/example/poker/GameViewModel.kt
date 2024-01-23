@@ -228,6 +228,10 @@ open class GameViewModel : ViewModel() {
         } else {
             value
         }
+
+        _uiState.update { currentState -> currentState.copy(
+            playerBetValue = betValue
+        ) }
     }
 
     /**
@@ -298,9 +302,9 @@ open class GameViewModel : ViewModel() {
 
         updateMutableStateValues()
 
-//        if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
-//            newGame()
-//        }
+        if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
+            newGame()
+        }
     }
 
     /**
@@ -446,35 +450,34 @@ open class GameViewModel : ViewModel() {
             totalPot = totalPotValue
         )}
 
-        viewModelScope.launch {
-            when (round) {
-                PRE_FLOP -> {
-                    viewModelScope.launch {
-                        delay(2000)
-                        showdownFlop()
-                        showdown()
-                    }
-                }
+        when (round) {
+            PRE_FLOP -> {
+                showdownFlop()
+                showdown()
+            }
 
-                FLOP -> {
-                    viewModelScope.launch {
-                        delay(2000)
-                        showdownTurn()
-                        showdown()
-                    }
+            FLOP -> {
+                viewModelScope.launch {
+                    delay(2000)
+                    showdownTurn()
+                    showdown()
                 }
+            }
 
-                TURN -> {
-                    viewModelScope.launch {
-                        delay(2000)
-                        showdownRiver()
-                        showdown()
-                    }
+            TURN -> {
+                viewModelScope.launch {
+                    delay(1000)
+                    showdownRiver()
+                    showdown()
+                }
+            }
+
+            RIVER -> {
+                viewModelScope.launch {
+                    calculateWinner()
                 }
             }
         }
-
-
     }
 
     /**
