@@ -239,8 +239,8 @@ open class GameViewModel : ViewModel() {
      */
     private fun updateMutableStateValues() {
         _uiState.update { currentState -> currentState.copy(
-            playerBet = bet[PLAYER],
-            computerBet = bet[COMPUTER],
+            playerText = "${bet[PLAYER]} €",
+            computerText = "${bet[COMPUTER]} €",
             playerMoney = pokerChips[PLAYER],
             computerMoney = pokerChips[COMPUTER],
             currentPot = pokerChips[POT],
@@ -272,13 +272,15 @@ open class GameViewModel : ViewModel() {
         val computerHand = Hand(playerCards = computerCards, tableCards = tableCards)
         val winnerCalculator = HandWinnerCalculator(player1Hand = playerHand, player2Hand = computerHand)
 
+
         when (winnerCalculator.getWinner()) {
             PLAYER -> {
                 pokerChips[PLAYER] += totalPotValue
 
                 _uiState.update { currentState -> currentState.copy(
                     playerOddsValue = 100,
-                    computerOddsValue = 0
+                    computerOddsValue = 0,
+                    winnerText = "Player wins ${totalPotValue} €"
                 )}
             }
             COMPUTER -> {
@@ -286,7 +288,8 @@ open class GameViewModel : ViewModel() {
 
                 _uiState.update { currentState -> currentState.copy(
                     playerOddsValue = 0,
-                    computerOddsValue = 100
+                    computerOddsValue = 100,
+                    winnerText = "Computer wins ${totalPotValue} €"
                 )}
             }
             else -> {
@@ -295,15 +298,27 @@ open class GameViewModel : ViewModel() {
 
                 _uiState.update { currentState -> currentState.copy(
                     playerOddsValue = 0,
-                    computerOddsValue = 0
+                    computerOddsValue = 0,
+                    winnerText = "Draw, split ${totalPotValue} €"
                 )}
             }
         }
 
-        updateMutableStateValues()
+        _uiState.update { currentState -> currentState.copy(
+            playerText = playerHand.resultText,
+            computerText = computerHand.resultText,
+            playerMoney = pokerChips[PLAYER],
+            computerMoney = pokerChips[COMPUTER],
+            currentPot = pokerChips[POT],
+            playerBetValue = BIG_BLIND,
+            totalPot = totalPotValue
+        )}
 
-        if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
-            newGame()
+        viewModelScope.launch {
+            delay(2000)
+            if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
+                newGame()
+            }
         }
     }
 
@@ -568,7 +583,7 @@ open class GameViewModel : ViewModel() {
             }
 
             RIVER -> {
-                showdown()
+                calculateWinner()
             }
         }
     }
@@ -643,6 +658,7 @@ open class GameViewModel : ViewModel() {
             computerBetValue = 0,
             totalPot = 0,
             currentPot = 0,
+            winnerText = ""
         )}
 
         // pre flop bets

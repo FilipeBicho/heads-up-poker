@@ -14,11 +14,11 @@ data class GameUiState(
 
     val computerOddsValue: Int = 0,
 
-    val playerBet: Int = 0,
+    val playerText: String = "",
 
     val playerBetValue: Int = 0,
 
-    val computerBet: Int = 0,
+    val computerText: String = "",
 
     val computerBetValue: Int = 0,
 
@@ -46,5 +46,7 @@ data class GameUiState(
 
     val riverDelayTime: Int = 1000,
 
-    val showdown: Boolean = false
+    val showdown: Boolean = false,
+
+    val winnerText: String = ""
 )

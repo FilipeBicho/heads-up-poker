@@ -154,7 +154,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                 ) {
                     Column {
                         Text(
-                            text = "${gameUiState.computerBet} €",
+                            text = gameUiState.computerText,
                             modifier = Modifier
                                 .weight(0.2f)
                                 .align(Alignment.CenterHorizontally)
@@ -201,8 +201,18 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                             }
                         }
 
+                        if (gameUiState.winnerText != "") {
+                            Text(
+                                text = gameUiState.winnerText,
+                                modifier = Modifier
+                                    .weight(0.4f)
+                                    .align(Alignment.CenterHorizontally)
+                                    .wrapContentHeight(Alignment.Bottom)
+                            )
+                        }
+
                         Text(
-                            text = "${gameUiState.playerBet} €",
+                            text = gameUiState.playerText,
                             modifier = Modifier
                                 .weight(0.2f)
                                 .align(Alignment.CenterHorizontally)

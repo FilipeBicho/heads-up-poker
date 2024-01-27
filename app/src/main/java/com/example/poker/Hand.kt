@@ -19,7 +19,7 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
     private lateinit var suitRepeatedCards: MutableList<Map.Entry<Int, List<Card>>>
     private lateinit var rankRepeatedCards: MutableList<Map.Entry<Int, List<Card>>>
     private lateinit var flushCards: List<Card>
-    private var resultText: String = ""
+    var resultText: String = ""
     var resultValue: Int = 0
 
     init {
