@@ -29,7 +29,9 @@ open class GameViewModel : ViewModel() {
     private var checkAvailable: Boolean = true
     private var round = PRE_FLOP
     private var playerName = arrayOf("Player", "Computer")
-    private var gameSummary: MutableList<String> = ArrayList()
+    private var gameSummaryMap: MutableList<List<String>> = ArrayList()
+    private var gameSummaryList: MutableList<String> = ArrayList()
+    private var gameNumber: Int = -1
 
     var playerCards = mutableStateListOf<Card>()
     var computerCards = mutableStateListOf<Card>()
@@ -54,8 +56,10 @@ open class GameViewModel : ViewModel() {
         // opponent wins the pot
         pokerChips[opponent] += pokerChips[POT] + totalPotValue
 
-        gameSummary += "${playerName[player]} folds"
-        gameSummary += "${playerName[opponent]} wins ${pokerChips[POT]}"
+        gameSummaryList += "${playerName[player]} folds"
+        gameSummaryList += "${playerName[opponent]} wins ${pokerChips[POT]}"
+
+        gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
         // update mutable state values
         updateMutableStateValues()
@@ -73,6 +77,9 @@ open class GameViewModel : ViewModel() {
 
             checkAvailable = false
             switchPlayerTurn()
+
+            gameSummaryList += "${playerName[player]} checks"
+            gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
             if (isPlayerTurn()) {
                 _uiState.update { currentState -> currentState.copy(
@@ -113,6 +120,9 @@ open class GameViewModel : ViewModel() {
             // calculate pot
             pokerChips[POT] = bet[blind] + bet[dealer]
 
+            gameSummaryList += "${playerName[player]} calls ${bet[player]}"
+            gameSummaryMap[gameNumber] = gameSummaryList.toList()
+
             updateMutableStateValues()
             showdown()
         } else {
@@ -123,6 +133,9 @@ open class GameViewModel : ViewModel() {
 
             // calculate pot
             pokerChips[POT] = bet[blind] + bet[dealer]
+
+            gameSummaryList += "${playerName[player]} calls ${bet[player]}"
+            gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
             updateMutableStateValues()
             switchPlayerTurn()
@@ -178,6 +191,9 @@ open class GameViewModel : ViewModel() {
 
         // calculate pot
         pokerChips[POT] = bet[player] + bet[opponent]
+
+        gameSummaryList += "${playerName[player]} bets ${bet[player]}"
+        gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
         updateMutableStateValues()
         switchPlayerTurn()
@@ -248,7 +264,7 @@ open class GameViewModel : ViewModel() {
             currentPot = pokerChips[POT],
             playerBetValue = BIG_BLIND,
             totalPot = totalPotValue,
-            gameSummary = gameSummary
+            gameSummary = gameSummaryMap
         )}
     }
 
@@ -599,6 +615,8 @@ open class GameViewModel : ViewModel() {
         checkAvailable = true
         cardDealer = Dealer()
 
+        gameNumber++
+
         // init poker chips
         pokerChips[PLAYER] = uiState.value.playerMoney
         pokerChips[COMPUTER] = uiState.value.computerMoney
@@ -646,7 +664,10 @@ open class GameViewModel : ViewModel() {
         // calculate river odds
         odds.calculateRiverOdds(computerCards, tableCards)
 
-        gameSummary.add("new game")
+        gameSummaryList.clear()
+
+        gameSummaryList.add("Game $gameNumber")
+        gameSummaryMap.add(gameNumber, gameSummaryList.toList())
 
         _uiState.update { currentState -> currentState.copy(
             displayComputerCards = true,
@@ -658,7 +679,7 @@ open class GameViewModel : ViewModel() {
             totalPot = 0,
             currentPot = 0,
             winnerText = "",
-            gameSummary = gameSummary
+            gameSummary = gameSummaryMap
         )}
 
         // pre flop bets

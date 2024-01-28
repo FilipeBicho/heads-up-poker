@@ -252,21 +252,25 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
 
                     Column(
                         modifier = Modifier
-                            .size(500.dp)
+                            .fillMaxWidth()
+                            .fillMaxHeight()
                             .clip(shape = RoundedCornerShape(10.dp))
                             .background(Color.White)
-                            .border(
-                                1.dp,
-                                colorResource(id = R.color.border_gray),
-                                shape = RoundedCornerShape(10.dp)
-                            )
+                            .padding(10.dp)
                             .verticalScroll(rememberScrollState())
                     ) {
-                        gameUiState.gameSummary.forEach {
-                            Text(
-                                text = it,
-                                fontSize = 11.sp,
-                                color = Color.Black
+
+                        gameUiState.gameSummary.forEach { it ->
+                            it.forEach {
+                                Text(
+                                    text = it,
+                                    fontSize = 11.sp,
+                                    color = Color.Black
+                                )
+                            }
+
+                            Divider(
+                                thickness = 1.dp
                             )
                         }
                     }
