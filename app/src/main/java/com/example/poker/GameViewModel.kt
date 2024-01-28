@@ -1,10 +1,8 @@
 package com.example.poker
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,7 +11,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.random.Random
-import kotlin.system.measureTimeMillis
 
 const val POT = 2
 const val SMALL_BLIND = 20
@@ -31,6 +28,8 @@ open class GameViewModel : ViewModel() {
     private var bet = intArrayOf(0, 0)
     private var checkAvailable: Boolean = true
     private var round = PRE_FLOP
+    private var playerName = arrayOf("Player", "Computer")
+    private var gameSummary: MutableList<String> = ArrayList()
 
     var playerCards = mutableStateListOf<Card>()
     var computerCards = mutableStateListOf<Card>()
@@ -54,6 +53,9 @@ open class GameViewModel : ViewModel() {
     fun fold() {
         // opponent wins the pot
         pokerChips[opponent] += pokerChips[POT] + totalPotValue
+
+        gameSummary += "${playerName[player]} folds"
+        gameSummary += "${playerName[opponent]} wins ${pokerChips[POT]}"
 
         // update mutable state values
         updateMutableStateValues()
@@ -245,7 +247,8 @@ open class GameViewModel : ViewModel() {
             computerMoney = pokerChips[COMPUTER],
             currentPot = pokerChips[POT],
             playerBetValue = BIG_BLIND,
-            totalPot = totalPotValue
+            totalPot = totalPotValue,
+            gameSummary = gameSummary
         )}
     }
 
@@ -278,18 +281,18 @@ open class GameViewModel : ViewModel() {
                 pokerChips[PLAYER] += totalPotValue
 
                 _uiState.update { currentState -> currentState.copy(
-                    playerOddsValue = 100,
-                    computerOddsValue = 0,
-                    winnerText = "Player wins ${totalPotValue} €"
+                    playerText = "${playerHand.resultText} 100 %",
+                    computerText = "${computerHand.resultText} 0 %",
+                    winnerText = "Player wins $totalPotValue €"
                 )}
             }
             COMPUTER -> {
                 pokerChips[COMPUTER] += totalPotValue
 
                 _uiState.update { currentState -> currentState.copy(
-                    playerOddsValue = 0,
-                    computerOddsValue = 100,
-                    winnerText = "Computer wins ${totalPotValue} €"
+                    playerText = "${playerHand.resultText} 0 %",
+                    computerText = "${computerHand.resultText} 100 %",
+                    winnerText = "Computer wins $totalPotValue €"
                 )}
             }
             else -> {
@@ -297,16 +300,14 @@ open class GameViewModel : ViewModel() {
                 pokerChips[COMPUTER] += totalPotValue / 2
 
                 _uiState.update { currentState -> currentState.copy(
-                    playerOddsValue = 0,
-                    computerOddsValue = 0,
-                    winnerText = "Draw, split ${totalPotValue} €"
+                    playerText = "${playerHand.resultText} 0 %",
+                    computerText = "${computerHand.resultText} 0 %",
+                    winnerText = "Draw, split $totalPotValue €"
                 )}
             }
         }
 
         _uiState.update { currentState -> currentState.copy(
-            playerText = playerHand.resultText,
-            computerText = computerHand.resultText,
             playerMoney = pokerChips[PLAYER],
             computerMoney = pokerChips[COMPUTER],
             currentPot = pokerChips[POT],
@@ -425,8 +426,8 @@ open class GameViewModel : ViewModel() {
 
         _uiState.update { currentState -> currentState.copy(
             displayFlop = true,
-            playerOddsValue = odds.getShowdownPlayerOdds(),
-            computerOddsValue = odds.getShowdownOpponentOdds()
+            playerText = "${odds.getShowdownPlayerOdds()} %",
+            computerText = "${odds.getShowdownOpponentOdds()} %"
         )}
     }
 
@@ -440,8 +441,8 @@ open class GameViewModel : ViewModel() {
         )
         _uiState.update { currentState -> currentState.copy(
             displayTurn = true,
-            playerOddsValue = odds.getShowdownPlayerOdds(),
-            computerOddsValue = odds.getShowdownOpponentOdds()
+            playerText = "${odds.getShowdownPlayerOdds()} %",
+            computerText = "${odds.getShowdownOpponentOdds()} %"
         )}
     }
 
@@ -519,7 +520,6 @@ open class GameViewModel : ViewModel() {
                     displayFlop = true,
                     turnDelayTime = 0,
                     riverDelayTime = 1000,
-                    computerOddsValue = odds.getFlopOdds()
                 ) }
 
                 if (player == PLAYER) {
@@ -542,7 +542,6 @@ open class GameViewModel : ViewModel() {
                     displayTurn = true,
                     turnDelayTime = 0,
                     riverDelayTime = 0,
-                    computerOddsValue = odds.getTurnOdds()
                 )}
 
                 if (player == PLAYER) {
@@ -566,7 +565,6 @@ open class GameViewModel : ViewModel() {
 
                 _uiState.update { currentState -> currentState.copy(
                     displayRiver = true,
-                    computerOddsValue = odds.getRiverOdds()
                 )}
 
                 if (player == PLAYER) {
@@ -648,17 +646,19 @@ open class GameViewModel : ViewModel() {
         // calculate river odds
         odds.calculateRiverOdds(computerCards, tableCards)
 
+        gameSummary.add("new game")
+
         _uiState.update { currentState -> currentState.copy(
             displayComputerCards = true,
             displayFlop = false,
             displayTurn = false,
             displayRiver = false,
-            computerOddsValue = PreFlopOdds(computerCards).getOdds(),
             playerBetValue = 0,
             computerBetValue = 0,
             totalPot = 0,
             currentPot = 0,
-            winnerText = ""
+            winnerText = "",
+            gameSummary = gameSummary
         )}
 
         // pre flop bets

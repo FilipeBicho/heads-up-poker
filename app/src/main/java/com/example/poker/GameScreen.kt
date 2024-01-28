@@ -22,10 +22,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -81,27 +83,20 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(0.3f)
-                ) {
-                    Box(modifier = Modifier.align(Alignment.BottomEnd)) {
-                        if (!gameViewModel.isPlayerDealer()) {
-                            DealerChipImage()
-                        }
-                    }
-                    Box(modifier = Modifier.align(Alignment.CenterEnd)) {
-                        if (gameUiState.showdown) {
-                            Text(
-                                text = "${gameUiState.computerOddsValue} %",
-                                fontSize = 15.sp,
-                            )
-                        }
-                    }
-                }
+                ) {}
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(0.3f)
                         .wrapContentWidth(Alignment.CenterHorizontally)
                 ) {
+
+                    Box(modifier = Modifier.align(Alignment.TopStart)) {
+                        if (!gameViewModel.isPlayerDealer()) {
+                            DealerChipImage()
+                        }
+                    }
+
                     if (gameViewModel.computerCards.isNotEmpty()) {
                         CardsSection(
                             gameViewModel.computerCards,
@@ -253,18 +248,25 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(0.3f)
-
                 ) {
-                    Box(modifier = Modifier.align(Alignment.TopEnd)) {
-                        if (gameViewModel.isPlayerDealer()) {
-                            DealerChipImage()
-                        }
-                    }
-                    Box(modifier = Modifier.align(Alignment.CenterEnd)) {
-                        if (gameUiState.showdown) {
+
+                    Column(
+                        modifier = Modifier
+                            .size(500.dp)
+                            .clip(shape = RoundedCornerShape(10.dp))
+                            .background(Color.White)
+                            .border(
+                                1.dp,
+                                colorResource(id = R.color.border_gray),
+                                shape = RoundedCornerShape(10.dp)
+                            )
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        gameUiState.gameSummary.forEach {
                             Text(
-                                text = "${gameUiState.playerOddsValue} %",
-                                fontSize = 15.sp,
+                                text = it,
+                                fontSize = 11.sp,
+                                color = Color.Black
                             )
                         }
                     }
@@ -275,6 +277,13 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         .weight(0.3f)
                         .wrapContentWidth(Alignment.CenterHorizontally)
                 ) {
+
+                    Box(modifier = Modifier.align(Alignment.TopStart)) {
+                        if (gameViewModel.isPlayerDealer()) {
+                            DealerChipImage()
+                        }
+                    }
+
                     if (gameViewModel.playerCards.isNotEmpty()) {
                         CardsSection(
                             gameViewModel.playerCards,

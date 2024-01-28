@@ -10,10 +10,6 @@ data class GameUiState(
 
     val computerMoney: Int = INITIAL_MONEY,
 
-    val playerOddsValue: Int = 0,
-
-    val computerOddsValue: Int = 0,
-
     val playerText: String = "",
 
     val playerBetValue: Int = 0,
@@ -48,5 +44,7 @@ data class GameUiState(
 
     val showdown: Boolean = false,
 
-    val winnerText: String = ""
+    val winnerText: String = "",
+
+    val gameSummary: List<String> = ArrayList()
 )
