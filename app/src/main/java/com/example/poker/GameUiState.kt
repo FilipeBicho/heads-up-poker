@@ -46,5 +46,5 @@ data class GameUiState(
 
     val winnerText: String = "",
 
-    val gameSummary: MutableList<List<String>> = ArrayList()
+    val gameSummary: List<List<String>> = ArrayList()
 )
