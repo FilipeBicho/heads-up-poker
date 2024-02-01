@@ -249,7 +249,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         .fillMaxHeight()
                         .weight(0.3f)
                 ) {
-
+                    
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -257,7 +257,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                             .clip(shape = RoundedCornerShape(10.dp))
                             .background(Color.White)
                             .padding(10.dp)
-                            .verticalScroll(rememberScrollState())
+                            .verticalScroll(rememberScrollState(), true, null, true)
                     ) {
 
                         gameUiState.gameSummary.forEach { it ->
@@ -268,7 +268,6 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                                     color = Color.Black
                                 )
                             }
-
                             Divider(
                                 thickness = 1.dp
                             )

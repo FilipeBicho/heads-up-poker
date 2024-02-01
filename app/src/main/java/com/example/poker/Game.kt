@@ -104,9 +104,8 @@ abstract class Game: ViewModel() {
                 // calculate pot
                 pokerChips[POT] = bet[blind] + bet[dealer]
 
-                gameSummaryList += "${playerName[blind]} makes all in ${bet[blind]}"
-                gameSummaryList += "${playerName[dealer]} pays all in ${bet[dealer]}"
-                gameSummaryMap[gameNumber] = gameSummaryList.toList()
+                gameSummaryList += "${playerName[blind]} makes all in ${bet[blind]} €"
+                gameSummaryList += "${playerName[dealer]} pays all in ${bet[dealer]} €"
 
                 updateMutableStateValues()
                 showdown()
@@ -123,9 +122,8 @@ abstract class Game: ViewModel() {
                 // calculate pot
                 pokerChips[POT] = bet[blind] + bet[dealer]
 
-                gameSummaryList += "${playerName[blind]} makes all in ${bet[blind]}"
-                gameSummaryList += "${playerName[dealer]} pays small blind ${bet[dealer]}"
-                gameSummaryMap[gameNumber] = gameSummaryList.toList()
+                gameSummaryList += "${playerName[blind]} makes all in ${bet[blind]} €"
+                gameSummaryList += "${playerName[dealer]} pays small blind ${bet[dealer]} €"
 
                 updateMutableStateValues()
                 player = dealer
@@ -154,9 +152,8 @@ abstract class Game: ViewModel() {
             // calculate pot
             pokerChips[POT] = bet[blind] + bet[dealer]
 
-            gameSummaryList += "${playerName[blind]} makes all in ${bet[blind]}"
-            gameSummaryList += "${playerName[dealer]} pays all in ${bet[dealer]}"
-            gameSummaryMap[gameNumber] = gameSummaryList.toList()
+            gameSummaryList += "${playerName[blind]} makes all in ${bet[blind]} €"
+            gameSummaryList += "${playerName[dealer]} pays all in ${bet[dealer]} €"
 
             updateMutableStateValues()
             showdown()
@@ -173,9 +170,8 @@ abstract class Game: ViewModel() {
             // calculate pot
             pokerChips[POT] = bet[blind] + bet[dealer]
 
-            gameSummaryList += "${playerName[dealer]} pays small blind ${bet[dealer]}"
-            gameSummaryList += "${playerName[blind]} pays big blind ${bet[blind]}"
-            gameSummaryMap[gameNumber] = gameSummaryList.toList()
+            gameSummaryList += "${playerName[dealer]} pays small blind ${bet[dealer]} €"
+            gameSummaryList += "${playerName[blind]} pays big blind ${bet[blind]} €"
 
             updateMutableStateValues()
             player = dealer
@@ -208,10 +204,23 @@ abstract class Game: ViewModel() {
         val computerHand = Hand(playerCards = computerCards, tableCards = tableCards)
         val winnerCalculator = HandWinnerCalculator(player1Hand = playerHand, player2Hand = computerHand)
 
+        var playerHandString = ""
+        playerHand.getHand().forEach {
+            playerHandString += it.cardString()+" "
+        }
+
+        var computerHandString = ""
+        computerHand.getHand().forEach {
+            computerHandString += it.cardString()+" "
+        }
+
+        gameSummaryList += "${playerName[PLAYER]} hand:  $playerHandString - ${playerHand.resultText}"
+        gameSummaryList += "${playerName[COMPUTER]} hand:  $computerHandString - ${computerHand.resultText}"
+
         when (winnerCalculator.getWinner()) {
             PLAYER -> {
                 pokerChips[PLAYER] += totalPotValue
-                gameSummaryList += "${playerName[PLAYER]} wins $totalPotValue"
+                gameSummaryList += "${playerName[PLAYER]} wins $totalPotValue €"
 
                 mutableStateFlow.update { currentState -> currentState.copy(
                     playerText = "${playerHand.resultText} 100 %",
@@ -221,7 +230,7 @@ abstract class Game: ViewModel() {
             }
             COMPUTER -> {
                 pokerChips[COMPUTER] += totalPotValue
-                gameSummaryList += "${playerName[COMPUTER]} wins $totalPotValue"
+                gameSummaryList += "${playerName[COMPUTER]} wins $totalPotValue €"
                 mutableStateFlow.update { currentState -> currentState.copy(
                     playerText = "${playerHand.resultText} 0 %",
                     computerText = "${computerHand.resultText} 100 %",
@@ -231,7 +240,7 @@ abstract class Game: ViewModel() {
             else -> {
                 pokerChips[PLAYER] += totalPotValue / 2
                 pokerChips[COMPUTER] += totalPotValue / 2
-                gameSummaryList += "Split pot with value $totalPotValue"
+                gameSummaryList += "Split pot with value $totalPotValue €"
 
                 mutableStateFlow.update { currentState -> currentState.copy(
                     playerText = "${playerHand.resultText} 0 %",
@@ -269,10 +278,16 @@ abstract class Game: ViewModel() {
             tableCards = tableCards.subList(0, 3)
         )
 
+        var flopString = ""
+        tableCards.subList(0,3).forEach { flopString += it.cardString()+" " }
+        gameSummaryList.add("---- $flopString ----")
+        gameSummaryMap[gameNumber] = gameSummaryList.toList()
+
         mutableStateFlow.update { currentState -> currentState.copy(
             displayFlop = true,
             playerText = "${odds.getShowdownPlayerOdds()} %",
-            computerText = "${odds.getShowdownOpponentOdds()} %"
+            computerText = "${odds.getShowdownOpponentOdds()} %",
+            gameSummary = gameSummaryMap
         )}
     }
 
@@ -284,17 +299,31 @@ abstract class Game: ViewModel() {
             opponentCards = computerCards,
             tableCards = tableCards.subList(0, 4)
         )
+
+        var turnString = ""
+        tableCards.subList(0,4).forEach { turnString += it.cardString()+" " }
+        gameSummaryList.add("---- $turnString ----")
+        gameSummaryMap[gameNumber] = gameSummaryList.toList()
+
         mutableStateFlow.update { currentState -> currentState.copy(
             displayTurn = true,
             playerText = "${odds.getShowdownPlayerOdds()} %",
-            computerText = "${odds.getShowdownOpponentOdds()} %"
+            computerText = "${odds.getShowdownOpponentOdds()} %",
+            gameSummary = gameSummaryMap
         )}
     }
 
     private fun showdownRiver() {
         round = RIVER
+
+        var riverString = ""
+        tableCards.forEach { riverString += it.cardString()+" " }
+        gameSummaryList.add("---- $riverString ----")
+        gameSummaryMap[gameNumber] = gameSummaryList.toList()
+
         mutableStateFlow.update { currentState -> currentState.copy(
-            displayRiver = true
+            displayRiver = true,
+            gameSummary = gameSummaryMap
         )}
     }
 
@@ -367,9 +396,10 @@ abstract class Game: ViewModel() {
                     riverDelayTime = 1000,
                 ) }
 
+                var flopString = ""
+                tableCards.subList(0,3).forEach { flopString += it.cardString()+" " }
 
-                gameSummaryList.add("Flop: ${tableCards.subList(0, 2)}")
-                gameSummaryMap[gameNumber] = gameSummaryList.toList()
+                gameSummaryList.add("---- $flopString ----")
 
                 if (player == PLAYER) {
                     mutableStateFlow.update { currentState -> currentState.copy(
@@ -392,6 +422,10 @@ abstract class Game: ViewModel() {
                     turnDelayTime = 0,
                     riverDelayTime = 0,
                 )}
+                var turnString = ""
+                tableCards.subList(0,4).forEach { turnString += it.cardString()+" " }
+
+                gameSummaryList.add("---- $turnString ----")
 
                 if (player == PLAYER) {
                     mutableStateFlow.update { currentState -> currentState.copy(
@@ -404,7 +438,6 @@ abstract class Game: ViewModel() {
                     betValue = BIG_BLIND
                     bet()
                 }
-
             }
 
             TURN -> {
@@ -415,6 +448,11 @@ abstract class Game: ViewModel() {
                 mutableStateFlow.update { currentState -> currentState.copy(
                     displayRiver = true,
                 )}
+
+                var riverString = ""
+                tableCards.forEach { riverString += it.cardString()+" " }
+
+                gameSummaryList.add("---- $riverString ----")
 
                 if (player == PLAYER) {
                     mutableStateFlow.update { currentState -> currentState.copy(
@@ -499,7 +537,7 @@ abstract class Game: ViewModel() {
 
         gameSummaryList.clear()
 
-        gameSummaryList.add("Game $gameNumber")
+        gameSummaryList.add("Game ${gameNumber+1}")
         gameSummaryMap.add(gameNumber, gameSummaryList.toList())
 
         mutableStateFlow.update { currentState -> currentState.copy(

@@ -24,9 +24,7 @@ open class GameViewModel : Game() {
         pokerChips[opponent] += pokerChips[POT] + totalPotValue
 
         gameSummaryList += "${playerName[player]} folds"
-        gameSummaryList += "${playerName[opponent]} wins ${pokerChips[POT]}"
-
-        gameSummaryMap[gameNumber] = gameSummaryList.toList()
+        gameSummaryList += "${playerName[opponent]} wins ${pokerChips[POT]} €"
 
         // update mutable state values
         updateMutableStateValues()
@@ -46,7 +44,6 @@ open class GameViewModel : Game() {
             switchPlayerTurn()
 
             gameSummaryList += "${playerName[player]} checks"
-            gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
             updateMutableStateValues()
 
@@ -89,8 +86,7 @@ open class GameViewModel : Game() {
             // calculate pot
             pokerChips[POT] = bet[blind] + bet[dealer]
 
-            gameSummaryList += "${playerName[player]} calls ${bet[player]}"
-            gameSummaryMap[gameNumber] = gameSummaryList.toList()
+            gameSummaryList += "${playerName[player]} calls ${bet[player]} €"
 
             updateMutableStateValues()
             showdown()
@@ -103,8 +99,7 @@ open class GameViewModel : Game() {
             // calculate pot
             pokerChips[POT] = bet[blind] + bet[dealer]
 
-            gameSummaryList += "${playerName[player]} calls ${bet[player]}"
-            gameSummaryMap[gameNumber] = gameSummaryList.toList()
+            gameSummaryList += "${playerName[player]} calls ${bet[player]} €"
 
             updateMutableStateValues()
             switchPlayerTurn()
@@ -161,8 +156,7 @@ open class GameViewModel : Game() {
         // calculate pot
         pokerChips[POT] = bet[player] + bet[opponent]
 
-        gameSummaryList += "${playerName[player]} bets ${bet[player]}"
-        gameSummaryMap[gameNumber] = gameSummaryList.toList()
+        gameSummaryList += "${playerName[player]} bets ${bet[player]} €"
 
         updateMutableStateValues()
         switchPlayerTurn()
@@ -199,6 +193,9 @@ open class GameViewModel : Game() {
      * update game screen
      */
     override fun updateMutableStateValues() {
+
+        gameSummaryMap[gameNumber] = gameSummaryList.toList()
+
         mutableStateFlow.update { currentState -> currentState.copy(
             playerText = "${bet[PLAYER]} €",
             computerText = "${bet[COMPUTER]} €",
