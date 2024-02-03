@@ -78,12 +78,15 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                 .fillMaxWidth()
                 .weight(0.3f)
         ) {
+            // top row
             Row {
+                // top left side - empty
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(0.3f)
                 ) {}
+                // top center - computer cards
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
@@ -106,6 +109,8 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         )
                     }
                 }
+
+                // top right side - empty
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
@@ -120,7 +125,9 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                 .fillMaxWidth()
                 .weight(0.4f)
         ) {
+            // middle row
             Row {
+                // left center side - pot and current bet
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
@@ -141,6 +148,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                     }
 
                 }
+                // middle center - table cards, hand result, winner text
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
@@ -148,6 +156,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         .wrapContentWidth(Alignment.CenterHorizontally)
                 ) {
                     Column {
+                        // Computer text - odds, bet value
                         Text(
                             text = gameUiState.computerText,
                             modifier = Modifier
@@ -157,6 +166,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                             fontSize = 15.sp,
                         )
 
+                        // table cards
                         if (gameViewModel.tableCards.isNotEmpty()) {
                             Row(modifier = Modifier.weight(0.6f)) {
 
@@ -196,7 +206,8 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                             }
                         }
 
-                        if (gameUiState.winnerText != "") {
+                        // winner text
+                        if (gameUiState.winnerText != "" && gameUiState.showdown) {
                             Text(
                                 text = gameUiState.winnerText,
                                 modifier = Modifier
@@ -206,6 +217,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                             )
                         }
 
+                        // Player text - odds, bet value
                         Text(
                             text = gameUiState.playerText,
                             modifier = Modifier
@@ -216,6 +228,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         )
                     }
                 }
+                // middle left side - 2bb, pot and max betting
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
@@ -227,7 +240,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                             .height(25.dp),
                         horizontalArrangement = Arrangement.spacedBy(1.dp)
                     ) {
-                        if (gameViewModel.isPlayerTurn()) {
+                        if (gameViewModel.isPlayerTurn() && !gameUiState.showdown) {
                             if (BIG_BLIND * 2 > gameUiState.totalPot) {
                                 BetButton(text = "2 BB") { gameViewModel.updatePlayerBet(BIG_BLIND * 2) }
                             }
@@ -243,7 +256,9 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                 .fillMaxWidth()
                 .weight(0.3f)
         ) {
+            // bottom row
             Row {
+                // bottom left side - game summary
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
@@ -274,6 +289,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         }
                     }
                 }
+                // bottom center, player cards
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
@@ -296,12 +312,13 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         )
                     }
                 }
+                // bottom right side - player bet buttons
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(0.3f)
                 ) {
-                    if (gameViewModel.isPlayerTurn() && gameUiState.playerMoney > 0) {
+                    if (gameViewModel.isPlayerTurn() && gameUiState.playerMoney > 0 && !gameUiState.showdown) {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {

@@ -221,7 +221,7 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
             }
 
             // is a sequential card
-            if (currentRank == nextCardRank - 1) {
+            if (currentRank == (nextCardRank - 1)) {
                 sequentialCardsCount++
 
                 if (straight < sequentialCardsCount) {

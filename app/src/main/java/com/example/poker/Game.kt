@@ -197,7 +197,9 @@ abstract class Game: ViewModel() {
             displayFoldButton = false,
             displayCheckButton = false,
             displayCallButton = false,
-            displayBetButton = false
+            displayBetButton = false,
+            displayComputerCards = true,
+            showdown = true
         )}
 
         val playerHand = Hand(playerCards = playerCards, tableCards = tableCards)
@@ -541,7 +543,7 @@ abstract class Game: ViewModel() {
         gameSummaryMap.add(gameNumber, gameSummaryList.toList())
 
         mutableStateFlow.update { currentState -> currentState.copy(
-            displayComputerCards = true,
+            displayComputerCards = false,
             displayFlop = false,
             displayTurn = false,
             displayRiver = false,
@@ -550,7 +552,8 @@ abstract class Game: ViewModel() {
             totalPot = 0,
             currentPot = 0,
             winnerText = "",
-            gameSummary = gameSummaryMap
+            gameSummary = gameSummaryMap,
+            showdown = false
         )}
 
         // pre flop bets
