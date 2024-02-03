@@ -14,6 +14,11 @@ const val FOUR = 3
 const val THREE = 2
 const val TWO = 1
 
+const val HEARTS = 0
+const val SPADES = 1
+const val CLUBS = 2
+const val DIAMONDS = 3
+
 class Card(var rank: Int, var suit: Int) {
 
     private val rankArray = arrayOf("ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king")

@@ -198,10 +198,10 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
     /**
      * Is Straight
      */
-    private fun isStraight(cards: MutableList<Card> = allCards): Boolean {
+    private fun isStraight(cards: MutableList<Card> = allCards.distinctBy { it.rank }.toMutableList()): Boolean {
         var currentRank: Int?
         var nextCardRank: Int?
-        var sequentialCardsCount: Int = 1
+        var sequentialCardsCount: Int = 0
         var straight: Int = 1
         var lastSequentialCardRank: Int = -1
         var lastSequentialCardIndex: Int = -1
