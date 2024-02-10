@@ -30,10 +30,10 @@ class Dealer {
         computerCards.add(deck.dealCard())
 
         // debug specific game
-//        playerCards.add(Card(TWO, HEARTS))
 //        playerCards.add(Card(KING, CLUBS))
-//        computerCards.add(Card(EIGHT, CLUBS))
-//        computerCards.add(Card(NINE, HEARTS))
+//        playerCards.add(Card(ACE, CLUBS))
+//        computerCards.add(Card(NINE, DIAMONDS))
+//        computerCards.add(Card(EIGHT, DIAMONDS))
     }
 
     /**
@@ -49,7 +49,7 @@ class Dealer {
         // debug specific game
 //        tableCards.add(Card(QUEEN, DIAMONDS))
 //        tableCards.add(Card(JACK, DIAMONDS))
-//        tableCards.add(Card(TEN, SPADES))
+//        tableCards.add(Card(TEN, DIAMONDS))
     }
 
     /**
@@ -61,7 +61,7 @@ class Dealer {
         tableCards.add(deck.dealCard())
 
         // debug specific game
-//        tableCards.add(Card(SEVEN, SPADES))
+//        tableCards.add(Card(ACE, DIAMONDS))
     }
 
     /**
@@ -73,6 +73,6 @@ class Dealer {
         tableCards.add(deck.dealCard())
 
         // debug specific game
-//        tableCards.add(Card(SIX, SPADES))
+//        tableCards.add(Card(KING, DIAMONDS))
     }
 }

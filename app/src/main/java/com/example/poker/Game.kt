@@ -86,6 +86,86 @@ abstract class Game: ViewModel() {
     abstract fun switchPlayerTurn()
 
     /**
+     * Reset all values before new game
+     */
+    private fun resetValues() {
+        round = PRE_FLOP
+
+        // reset values
+        bet[PLAYER] = 0
+        bet[COMPUTER] = 0
+        totalPotValue = 0
+        checkAvailable = true
+
+        // clear cards
+        playerCards.clear()
+        computerCards.clear()
+        tableCards.clear()
+
+        gameSummaryList.clear()
+    }
+
+    /**
+     * Init values before new game
+     */
+    private fun initValues() {
+
+        gameNumber++
+
+        // init poker chips
+        pokerChips[PLAYER] = uiState.value.playerMoney
+        pokerChips[COMPUTER] = uiState.value.computerMoney
+        pokerChips[POT] = 0
+
+        // Init or change dealer
+        dealer = if (dealer == -1) {
+            Random(System.nanoTime()).nextInt(0, 2)
+        } else {
+            if (dealer == 0) 1 else 0
+        }
+
+        // init blind turn
+        blind = if (dealer == 0) 1 else 0
+
+        // set turns
+        player = dealer
+        opponent = blind
+    }
+
+    /**
+     * Deal players and table cards
+     */
+    private fun dealCards() {
+        cardDealer = Dealer()
+
+        // set player and computer cards
+        cardDealer.setPlayerCards(playerCards, computerCards)
+
+        // set flop
+        cardDealer.setFlopCards(tableCards)
+
+        // set turn
+        cardDealer.setTurnCard(tableCards)
+
+        // set river
+        cardDealer.setRiverCard(tableCards)
+    }
+
+    private fun initOdds() {
+
+        odds = Odds(Combinations(tableCards.subList(0,3)).combinations)
+
+        // calculate flop odds
+        odds.calculateFlopOdds(computerCards, tableCards.subList(0,3))
+
+        // calculate turn odds
+        odds.calculateTurnOdds(computerCards, tableCards.subList(0,4))
+
+        // calculate river odds
+        odds.calculateRiverOdds(computerCards, tableCards)
+    }
+
+    /**
      * Calculate pre flop bets
      */
     private fun preFlopBets() {
@@ -479,65 +559,11 @@ abstract class Game: ViewModel() {
      * Init new game values
      */
     protected fun newGame() {
-        round = PRE_FLOP
 
-        // reset values
-        bet[PLAYER] = 0
-        bet[COMPUTER] = 0
-        totalPotValue = 0
-        checkAvailable = true
-        cardDealer = Dealer()
-
-        gameNumber++
-
-        // init poker chips
-        pokerChips[PLAYER] = uiState.value.playerMoney
-        pokerChips[COMPUTER] = uiState.value.computerMoney
-        pokerChips[POT] = 0
-
-        // Init or change dealer
-        dealer = if (dealer == -1) {
-            Random(System.nanoTime()).nextInt(0, 2)
-        } else {
-            if (dealer == 0) 1 else 0
-        }
-
-        // init blind turn
-        blind = if (dealer == 0) 1 else 0
-
-        // set turns
-        player = dealer
-        opponent = blind
-
-        // clear cards
-        playerCards.clear()
-        computerCards.clear()
-        tableCards.clear()
-
-        // set player and computer cards
-        cardDealer.setPlayerCards(playerCards, computerCards)
-
-        // set flop
-        cardDealer.setFlopCards(tableCards)
-
-        odds = Odds(Combinations(tableCards).combinations)
-
-        // set turn
-        cardDealer.setTurnCard(tableCards)
-
-        // set river
-        cardDealer.setRiverCard(tableCards)
-
-        // calculate flop odds
-        odds.calculateFlopOdds(computerCards, tableCards.subList(0,3))
-
-        // calculate turn odds
-        odds.calculateTurnOdds(computerCards, tableCards.subList(0,4))
-
-        // calculate river odds
-        odds.calculateRiverOdds(computerCards, tableCards)
-
-        gameSummaryList.clear()
+        resetValues()
+        initValues()
+        dealCards()
+        initOdds()
 
         gameSummaryList.add("Game ${gameNumber+1}")
         gameSummaryMap.add(gameNumber, gameSummaryList.toList())
