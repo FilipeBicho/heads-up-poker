@@ -24,16 +24,16 @@ class Dealer {
         playerCards: SnapshotStateList<Card>,
         computerCards: SnapshotStateList<Card>
     ) {
-        playerCards.add(deck.dealCard())
-        computerCards.add(deck.dealCard())
-        playerCards.add(deck.dealCard())
-        computerCards.add(deck.dealCard())
+//        playerCards.add(deck.dealCard())
+//        computerCards.add(deck.dealCard())
+//        playerCards.add(deck.dealCard())
+//        computerCards.add(deck.dealCard())
 
         // debug specific game
-//        playerCards.add(Card(KING, CLUBS))
-//        playerCards.add(Card(ACE, CLUBS))
-//        computerCards.add(Card(NINE, DIAMONDS))
-//        computerCards.add(Card(EIGHT, DIAMONDS))
+        playerCards.add(Card(KING, CLUBS))
+        playerCards.add(Card(ACE, CLUBS))
+        computerCards.add(Card(KING, DIAMONDS))
+        computerCards.add(Card(ACE, DIAMONDS))
     }
 
     /**
@@ -41,15 +41,15 @@ class Dealer {
      */
     fun setFlopCards(tableCards: SnapshotStateList<Card>) {
 
-        deck.dealCard();
-        for (i in 0 until 3) {
-            tableCards.add(deck.dealCard())
-        }
+//        deck.dealCard();
+//        for (i in 0 until 3) {
+//            tableCards.add(deck.dealCard())
+//        }
 
         // debug specific game
-//        tableCards.add(Card(QUEEN, DIAMONDS))
-//        tableCards.add(Card(JACK, DIAMONDS))
-//        tableCards.add(Card(TEN, DIAMONDS))
+        tableCards.add(Card(KING, SPADES))
+        tableCards.add(Card(ACE, SPADES))
+        tableCards.add(Card(TWO, HEARTS))
     }
 
     /**
@@ -57,11 +57,11 @@ class Dealer {
      */
     fun setTurnCard(tableCards: SnapshotStateList<Card>) {
 
-        deck.dealCard();
-        tableCards.add(deck.dealCard())
+//        deck.dealCard();
+//        tableCards.add(deck.dealCard())
 
         // debug specific game
-//        tableCards.add(Card(ACE, DIAMONDS))
+        tableCards.add(Card(THREE, DIAMONDS))
     }
 
     /**
@@ -69,10 +69,10 @@ class Dealer {
      */
     fun setRiverCard(tableCards: SnapshotStateList<Card>) {
 
-        deck.dealCard();
-        tableCards.add(deck.dealCard())
+//        deck.dealCard();
+//        tableCards.add(deck.dealCard())
 
         // debug specific game
-//        tableCards.add(Card(KING, DIAMONDS))
+        tableCards.add(Card(FIVE, DIAMONDS))
     }
 }

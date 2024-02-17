@@ -118,9 +118,10 @@ open class GameViewModel : Game() {
                 }
 
             } else {
-                viewModelScope.launch {
-                    delay(1000)
+                if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
                     nextRound()
+                } else {
+                    showdown()
                 }
             }
         }
@@ -184,7 +185,12 @@ open class GameViewModel : Game() {
                 )}
             } else {
                 betValue = BIG_BLIND
-                bet()
+
+                if (pokerChips[opponent] == 0) {
+                    call()
+                } else {
+                    bet()
+                }
             }
         }
     }
