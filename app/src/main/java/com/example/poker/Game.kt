@@ -1,8 +1,10 @@
 package com.example.poker
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.poker.helper.HandGroup
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +25,7 @@ abstract class Game: ViewModel() {
     protected var bet = intArrayOf(0, 0)
     protected var checkAvailable: Boolean = true
     protected var round = PRE_FLOP
+    protected var computerHandGroup = 9
 
     protected var gameSummaryMap: MutableList<List<String>> = ArrayList()
     protected var gameSummaryList: MutableList<String> = ArrayList()
@@ -149,6 +152,11 @@ abstract class Game: ViewModel() {
 
         // set river
         cardDealer.setRiverCard(tableCards)
+
+        computerHandGroup = HandGroup(computerCards.toList()).group
+
+        Log.d("CARD GROUP: ", computerHandGroup.toString())
+
     }
 
     private fun initOdds() {
