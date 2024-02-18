@@ -42,6 +42,8 @@ abstract class Game: ViewModel() {
 
     private lateinit var cardDealer: Dealer
     private lateinit var odds: Odds
+    private lateinit var computerBot: Bot
+    private var computerBotValidActions = BooleanArray(3){false}
 
     /**
      * Handles fold request
@@ -224,7 +226,11 @@ abstract class Game: ViewModel() {
                         displayBetButton = false
                     )}
                 } else {
-                    call()
+                    computerBotValidActions[FOLD] = true
+                    computerBotValidActions[CHECK] = false
+                    computerBotValidActions[CALL] = true
+                    computerBotValidActions[BET] = false
+                    computerBot.botAction(pokerChips, bet, totalPotValue, round)
                 }
             }
         } else if (pokerChips[dealer] <= SMALL_BLIND) {
@@ -572,6 +578,7 @@ abstract class Game: ViewModel() {
         initValues()
         dealCards()
         initOdds()
+        computerBot = Bot(odds, computerCards.toList(), tableCards.toList(), !isPlayerDealer())
 
         gameSummaryList.add("Game ${gameNumber+1}")
         gameSummaryMap.add(gameNumber, gameSummaryList.toList())

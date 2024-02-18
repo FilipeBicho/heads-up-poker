@@ -32,8 +32,8 @@ class Dealer {
         // debug specific game
         playerCards.add(Card(KING, CLUBS))
         playerCards.add(Card(ACE, CLUBS))
+        computerCards.add(Card(TEN, SPADES))
         computerCards.add(Card(KING, HEARTS))
-        computerCards.add(Card(KING, DIAMONDS))
     }
 
     /**
