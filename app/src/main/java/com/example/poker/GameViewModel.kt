@@ -48,18 +48,26 @@ open class GameViewModel : Game() {
             updateMutableStateValues()
 
             if (isPlayerTurn()) {
-                mutableStateFlow.update { currentState -> currentState.copy(
-                    displayFoldButton = false,
-                    displayCheckButton = true,
-                    displayCallButton = false,
-                    displayBetButton = true
-                )}
+                mutableStateFlow.update { currentState ->
+                    currentState.copy(
+                        displayFoldButton = false,
+                        displayCheckButton = true,
+                        displayCallButton = false,
+                        displayBetButton = true
+                    )
+                }
             } else {
                 computerBotValidActions[FOLD] = false
                 computerBotValidActions[CHECK] = true
                 computerBotValidActions[CALL] = false
                 computerBotValidActions[BET] = true
-                computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
+                when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
+                    CHECK -> check()
+                    BET -> {
+                        betValue = computerBot.betValue
+                        bet()
+                    }
+                }
             }
         } else {
             viewModelScope.launch {
@@ -109,18 +117,26 @@ open class GameViewModel : Game() {
 
             if (checkAvailable && round == PRE_FLOP) {
                 if (isPlayerTurn()) {
-                    mutableStateFlow.update { currentState -> currentState.copy(
-                        displayFoldButton = false,
-                        displayCheckButton = true,
-                        displayCallButton = false,
-                        displayBetButton = true
-                    )}
+                    mutableStateFlow.update { currentState ->
+                        currentState.copy(
+                            displayFoldButton = false,
+                            displayCheckButton = true,
+                            displayCallButton = false,
+                            displayBetButton = true
+                        )
+                    }
                 } else {
                     computerBotValidActions[FOLD] = false
                     computerBotValidActions[CHECK] = true
                     computerBotValidActions[CALL] = false
                     computerBotValidActions[BET] = true
-                    computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
+                    when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
+                        CHECK -> check()
+                        BET -> {
+                            betValue = computerBot.betValue
+                            bet()
+                        }
+                    }
                 }
 
             } else {
@@ -137,6 +153,10 @@ open class GameViewModel : Game() {
      * Handles bet request
      */
     override fun bet() {
+
+        if (betValue == 0) {
+            betValue = BIG_BLIND
+        }
 
         checkAvailable = false
 
@@ -171,28 +191,35 @@ open class GameViewModel : Game() {
         if (pokerChips[player] + bet[player] <= bet[opponent]) {
 
             if (isPlayerTurn()) {
-                mutableStateFlow.update { currentState -> currentState.copy(
-                    displayFoldButton = true,
-                    displayCheckButton = false,
-                    displayCallButton = true,
-                    displayBetButton = false
-                )}
+                mutableStateFlow.update { currentState ->
+                    currentState.copy(
+                        displayFoldButton = true,
+                        displayCheckButton = false,
+                        displayCallButton = true,
+                        displayBetButton = false
+                    )
+                }
             } else {
                 computerBotValidActions[FOLD] = true
                 computerBotValidActions[CHECK] = false
                 computerBotValidActions[CALL] = true
                 computerBotValidActions[BET] = false
-                computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
+                when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
+                    FOLD -> fold()
+                    CALL -> call()
+                }
             }
 
         } else {
             if (isPlayerTurn()) {
-                mutableStateFlow.update { currentState -> currentState.copy(
-                    displayFoldButton = true,
-                    displayCheckButton = false,
-                    displayCallButton = true,
-                    displayBetButton = true
-                )}
+                mutableStateFlow.update { currentState ->
+                    currentState.copy(
+                        displayFoldButton = true,
+                        displayCheckButton = false,
+                        displayCallButton = true,
+                        displayBetButton = true
+                    )
+                }
             } else {
                 betValue = BIG_BLIND
 
@@ -200,7 +227,14 @@ open class GameViewModel : Game() {
                 computerBotValidActions[CHECK] = false
                 computerBotValidActions[CALL] = true
                 computerBotValidActions[BET] = true
-                computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
+                when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
+                    FOLD -> fold()
+                    CALL -> call()
+                    BET -> {
+                        betValue = computerBot.betValue
+                        bet()
+                    }
+                }
             }
         }
     }
@@ -212,16 +246,18 @@ open class GameViewModel : Game() {
 
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
-        mutableStateFlow.update { currentState -> currentState.copy(
-            playerText = "${bet[PLAYER]} €",
-            computerText = "${bet[BOT]} €",
-            playerMoney = pokerChips[PLAYER],
-            computerMoney = pokerChips[BOT],
-            currentPot = pokerChips[POT],
-            playerBetValue = BIG_BLIND,
-            totalPot = totalPotValue,
-            gameSummary = gameSummaryMap
-        )}
+        mutableStateFlow.update { currentState ->
+            currentState.copy(
+                playerText = "${bet[PLAYER]} €",
+                computerText = "${bet[BOT]} €",
+                playerMoney = pokerChips[PLAYER],
+                computerMoney = pokerChips[BOT],
+                currentPot = pokerChips[POT],
+                playerBetValue = BIG_BLIND,
+                totalPot = totalPotValue,
+                gameSummary = gameSummaryMap
+            )
+        }
     }
 
     /**
@@ -253,8 +289,10 @@ open class GameViewModel : Game() {
             value
         }
 
-        mutableStateFlow.update { currentState -> currentState.copy(
-            playerBetValue = betValue
-        ) }
+        mutableStateFlow.update { currentState ->
+            currentState.copy(
+                playerBetValue = betValue
+            )
+        }
     }
 }

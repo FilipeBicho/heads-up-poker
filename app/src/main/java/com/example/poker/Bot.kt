@@ -12,7 +12,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
 
     private var handRank: Int = 0
     private var action: Int = 0
-    private var betValue: Int = 0
+    public var betValue: Int = 0
     private var playerStack: Int = 0
     private var botStack: Int = 0
     private var callValue: Int = 0
@@ -53,18 +53,13 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
     }
 
     private fun preFlopAction(pokerChips: IntArray, bet: IntArray, validActions: BooleanArray): Int {
-
-        val preFlopOdds: Int = PreFlopOdds(cards).getOdds()
         val hasHandPair = cards.first().rank == cards.last().rank
-
 
         if (!isDealer) {
             // player called - check and bet available
             if (bet[PLAYER] == BIG_BLIND) {
-
                 // less than 160 chips
                 if (botStack < 4) {
-
                     if (handRank in 1..4 || (hasHandPair && cards.first().rank >= FIVE)) {
                         betValue = pokerChips[BOT]
                         return BET
@@ -80,14 +75,11 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                         return BET
                     }
 
-                    if (handRank > 6) {
-                        return CHECK
-                    }
+                    return CHECK
                 }
 
                 // between 160 and 320 chips
                 if (botStack in 4..8) {
-
                     if (handRank in 1..3 || (hasHandPair && cards.first().rank >= SIX)) {
                         betValue = pokerChips[BOT]
                         return BET
@@ -103,14 +95,11 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                         return BET
                     }
 
-                    if (handRank > 6) {
-                        return CHECK
-                    }
+                    return CHECK
                 }
 
                 // between 320 and 600 chips
                 if (botStack in 8..15) {
-
                     if (handRank == 1) {
                         betValue = pokerChips[BOT]
                     }
@@ -129,14 +118,11 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                         return BET
                     }
 
-                    if (handRank > 5) {
-                        return CHECK
-                    }
+                    return CHECK
                 }
 
                 // more than 600 chips
-                if (botStack > 15) {
-
+                if (botStack > 16) {
                     if (handRank == 1) {
                         betValue = if (playerStack < 15) {
                             pokerChips[PLAYER]
@@ -169,7 +155,6 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
             if (bet[PLAYER] > BIG_BLIND) {
                 // less than 160 chips
                 if (botStack < 4) {
-
                     if (handRank in 1..4 || (hasHandPair && cards.first().rank >= FIVE)) {
 
                         return if (pokerChips[BOT] - callValue < 0) {
@@ -183,15 +168,11 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                     if (handRank in 5..6) {
                         return CALL
                     }
-
-                    if (handRank > 6) {
-                        return FOLD
-                    }
+                    return FOLD
                 }
 
                 // between 160 and 320 chips
                 if (botStack in 4..8) {
-
                     if (handRank in 1..3 || (hasHandPair && cards.first().rank >= SIX)) {
                         return if (pokerChips[BOT] - callValue < 0) {
                             CALL
@@ -216,10 +197,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                             FOLD
                         }
                     }
-
-                    if (handRank > 7) {
-                        return FOLD
-                    }
+                    return FOLD
                 }
 
                 // between 320 and 600 chips
@@ -277,8 +255,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                 }
 
                 // more than 600 chips
-                if (botStack > 15) {
-
+                if (botStack > 16) {
                     if (handRank in 1..2 || (hasHandPair && cards.first().rank >= EIGHT)) {
                         return if (pokerChips[BOT] - callValue < 0) {
                             CALL
@@ -367,9 +344,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                         return BET
                     }
 
-                    if (handRank > 6) {
-                        return CALL
-                    }
+                    return CALL
                 }
 
                 // between 320 and 600 chips
@@ -592,6 +567,11 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                     return FOLD
                 }
             }
+        }
+        return if (validActions[FOLD]) {
+            FOLD
+        } else {
+            CHECK
         }
     }
 

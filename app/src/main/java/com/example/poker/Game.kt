@@ -227,7 +227,15 @@ abstract class Game: ViewModel() {
                     computerBotValidActions[CHECK] = false
                     computerBotValidActions[CALL] = true
                     computerBotValidActions[BET] = false
-                    computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
+
+                    when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
+                        FOLD -> fold()
+                        CALL -> call()
+                        BET -> {
+                            betValue = computerBot.betValue
+                            bet()
+                        }
+                    }
                 }
             }
         } else if (pokerChips[dealer] <= SMALL_BLIND) {
@@ -279,7 +287,14 @@ abstract class Game: ViewModel() {
                 computerBotValidActions[CHECK] = false
                 computerBotValidActions[CALL] = true
                 computerBotValidActions[BET] = true
-                computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
+                when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
+                    FOLD -> fold()
+                    CALL -> call()
+                    BET -> {
+                        betValue = computerBot.betValue
+                        bet()
+                    }
+                }
             }
         }
     }
@@ -510,7 +525,13 @@ abstract class Game: ViewModel() {
                     computerBotValidActions[CHECK] = true
                     computerBotValidActions[CALL] = false
                     computerBotValidActions[BET] = true
-                    computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
+                    when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
+                        CHECK -> check()
+                        BET -> {
+                            betValue = computerBot.betValue
+                            bet()
+                        }
+                    }
                 }
             }
 
@@ -539,7 +560,13 @@ abstract class Game: ViewModel() {
                     computerBotValidActions[CHECK] = true
                     computerBotValidActions[CALL] = false
                     computerBotValidActions[BET] = true
-                    computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
+                    when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
+                        CHECK -> check()
+                        BET -> {
+                            betValue = computerBot.betValue
+                            bet()
+                        }
+                    }
                 }
             }
 
@@ -569,7 +596,13 @@ abstract class Game: ViewModel() {
                     computerBotValidActions[CHECK] = true
                     computerBotValidActions[CALL] = false
                     computerBotValidActions[BET] = true
-                    computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
+                    when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
+                        CHECK -> check()
+                        BET -> {
+                            betValue = computerBot.betValue
+                            bet()
+                        }
+                    }
                 }
             }
 

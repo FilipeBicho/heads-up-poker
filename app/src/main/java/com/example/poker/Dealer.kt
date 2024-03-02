@@ -10,7 +10,7 @@ const val PRE_FLOP = 0
 const val FLOP = 1
 const val TURN = 2
 const val RIVER = 3
-const val INITIAL_MONEY = 150
+const val INITIAL_MONEY = 320
 
 @SuppressLint("MutableCollectionMutableState")
 class Dealer {
