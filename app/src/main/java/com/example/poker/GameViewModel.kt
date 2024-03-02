@@ -51,12 +51,15 @@ open class GameViewModel : Game() {
                 mutableStateFlow.update { currentState -> currentState.copy(
                     displayFoldButton = false,
                     displayCheckButton = true,
-                    displayCallButton = true,
+                    displayCallButton = false,
                     displayBetButton = true
                 )}
             } else {
-                betValue = BIG_BLIND
-                bet()
+                computerBotValidActions[FOLD] = false
+                computerBotValidActions[CHECK] = true
+                computerBotValidActions[CALL] = false
+                computerBotValidActions[BET] = true
+                computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
             }
         } else {
             viewModelScope.launch {
@@ -113,8 +116,11 @@ open class GameViewModel : Game() {
                         displayBetButton = true
                     )}
                 } else {
-                    betValue = BIG_BLIND
-                    bet()
+                    computerBotValidActions[FOLD] = false
+                    computerBotValidActions[CHECK] = true
+                    computerBotValidActions[CALL] = false
+                    computerBotValidActions[BET] = true
+                    computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
                 }
 
             } else {
@@ -172,7 +178,11 @@ open class GameViewModel : Game() {
                     displayBetButton = false
                 )}
             } else {
-                call()
+                computerBotValidActions[FOLD] = true
+                computerBotValidActions[CHECK] = false
+                computerBotValidActions[CALL] = true
+                computerBotValidActions[BET] = false
+                computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
             }
 
         } else {
@@ -186,11 +196,11 @@ open class GameViewModel : Game() {
             } else {
                 betValue = BIG_BLIND
 
-                if (pokerChips[opponent] == 0) {
-                    call()
-                } else {
-                    bet()
-                }
+                computerBotValidActions[FOLD] = true
+                computerBotValidActions[CHECK] = false
+                computerBotValidActions[CALL] = true
+                computerBotValidActions[BET] = true
+                computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
             }
         }
     }

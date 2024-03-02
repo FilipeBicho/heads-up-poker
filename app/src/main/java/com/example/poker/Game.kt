@@ -25,7 +25,6 @@ abstract class Game: ViewModel() {
     protected var bet = intArrayOf(0, 0)
     protected var checkAvailable: Boolean = true
     protected var round = PRE_FLOP
-    protected var computerHandGroup = 9
 
     protected var gameSummaryMap: MutableList<List<String>> = ArrayList()
     protected var gameSummaryList: MutableList<String> = ArrayList()
@@ -42,8 +41,8 @@ abstract class Game: ViewModel() {
 
     private lateinit var cardDealer: Dealer
     private lateinit var odds: Odds
-    private lateinit var computerBot: Bot
-    private var computerBotValidActions = BooleanArray(3){false}
+    lateinit var computerBot: Bot
+    var computerBotValidActions = BooleanArray(4){false}
 
     /**
      * Handles fold request
@@ -122,7 +121,7 @@ abstract class Game: ViewModel() {
         pokerChips[COMPUTER] = uiState.value.computerMoney
         pokerChips[POT] = 0
 
-        // Init or change dealer
+        // init or change dealer
         dealer = if (dealer == -1) {
             Random(System.nanoTime()).nextInt(0, 2)
         } else {
@@ -154,13 +153,11 @@ abstract class Game: ViewModel() {
 
         // set river
         cardDealer.setRiverCard(tableCards)
-
-        computerHandGroup = HandGroup(computerCards.toList()).group
-
-        Log.d("CARD GROUP: ", computerHandGroup.toString())
-
     }
 
+    /**
+     * Init and calculate odds
+     */
     private fun initOdds() {
 
         odds = Odds(Combinations(tableCards.subList(0,3)).combinations)
@@ -230,7 +227,7 @@ abstract class Game: ViewModel() {
                     computerBotValidActions[CHECK] = false
                     computerBotValidActions[CALL] = true
                     computerBotValidActions[BET] = false
-                    computerBot.botAction(pokerChips, bet, totalPotValue, round)
+                    computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
                 }
             }
         } else if (pokerChips[dealer] <= SMALL_BLIND) {
@@ -278,7 +275,11 @@ abstract class Game: ViewModel() {
                     displayBetButton = true
                 )}
             } else {
-                call()
+                computerBotValidActions[FOLD] = true
+                computerBotValidActions[CHECK] = false
+                computerBotValidActions[CALL] = true
+                computerBotValidActions[BET] = true
+                computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
             }
         }
     }
@@ -505,8 +506,11 @@ abstract class Game: ViewModel() {
                         displayBetButton = true
                     )}
                 } else {
-                    betValue = BIG_BLIND
-                    bet()
+                    computerBotValidActions[FOLD] = false
+                    computerBotValidActions[CHECK] = true
+                    computerBotValidActions[CALL] = false
+                    computerBotValidActions[BET] = true
+                    computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
                 }
             }
 
@@ -531,8 +535,11 @@ abstract class Game: ViewModel() {
                         displayBetButton = true
                     )}
                 } else {
-                    betValue = BIG_BLIND
-                    bet()
+                    computerBotValidActions[FOLD] = false
+                    computerBotValidActions[CHECK] = true
+                    computerBotValidActions[CALL] = false
+                    computerBotValidActions[BET] = true
+                    computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
                 }
             }
 
@@ -558,8 +565,11 @@ abstract class Game: ViewModel() {
                         displayBetButton = true
                     )}
                 } else {
-                    betValue = BIG_BLIND
-                    bet()
+                    computerBotValidActions[FOLD] = false
+                    computerBotValidActions[CHECK] = true
+                    computerBotValidActions[CALL] = false
+                    computerBotValidActions[BET] = true
+                    computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)
                 }
             }
 
