@@ -9,7 +9,7 @@ const val BET = 3
 
 open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card>, isDealer: Boolean) {
 
-    private var cardsRank: Int = 0
+    private var handRank: Int = 0
     private var action: Int = 0
     private var betValue: Int = 0
     private var playerStack: Int = 0
@@ -18,7 +18,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
     private var isDealer: Boolean = false
 
     init {
-        cardsRank = HandGroup(cards).group
+        handRank = HandGroup(cards).group
         this.isDealer = isDealer
     }
 
@@ -31,12 +31,12 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
             playerStack = pokerChips[PLAYER]/BIG_BLIND
         }
 
-        if (pokerChips[COMPUTER] > 0) {
-            botStack = pokerChips[COMPUTER]/ BIG_BLIND
+        if (pokerChips[BOT] > 0) {
+            botStack = pokerChips[BOT]/ BIG_BLIND
         }
 
         if (playerStack > 0 && botStack > 0) {
-            callValue = bet[COMPUTER] - bet[PLAYER]
+            callValue = bet[BOT] - bet[PLAYER]
         }
 
 
@@ -56,57 +56,128 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
         val preFlopOdds: Int = PreFlopOdds(cards).getOdds()
         val hasHandPair = cards.first().rank == cards.last().rank
 
-        // player didn't raised
-        if (bet[PLAYER] <= BIG_BLIND) {
 
-            // if any stack is below 160 chips
-            if (playerStack < 4 || botStack < 4) {
+        if (!isDealer) {
+            // player called - check and bet available
+            if (bet[PLAYER] == BIG_BLIND) {
 
-                if (cardsRank in 1..3 || (hasHandPair && cards.first().rank >= FIVE)) {
-                    action = BET
-                    betValue = pokerChips[COMPUTER]
+                // less than 160 chips
+                if (botStack < 4) {
+
+                    if (handRank in 1..4 || (hasHandPair && cards.first().rank >= FIVE)) {
+                        betValue = pokerChips[BOT]
+                        return BET
+                    }
+
+                    if (handRank == 5) {
+                        betValue = if (botStack > 2) {
+                            2* BIG_BLIND
+                        } else {
+                            pokerChips[BOT]
+                        }
+
+                        return BET
+                    }
+
+                    if (handRank > 6) {
+                        return CHECK
+                    }
                 }
 
+                // between 160 and 320 chips
+                if (botStack in 4..8) {
+
+                    if (handRank in 1..3 || (hasHandPair && cards.first().rank >= SIX)) {
+                        betValue = pokerChips[BOT]
+                        return BET
+                    }
+
+                    if (handRank == 4) {
+                        betValue = 4*BIG_BLIND
+                        return BET
+                    }
+
+                    if (handRank == 5) {
+                        betValue = 2*BIG_BLIND
+                        return BET
+                    }
+
+                    if (handRank > 6) {
+                        return CHECK
+                    }
+                }
+
+                // between 320 and 600 chips
+                if (botStack in 8..15) {
+
+                    if (handRank == 1) {
+                        betValue = pokerChips[BOT]
+                    }
+
+                    if (handRank == 2) {
+                        betValue = 8*BIG_BLIND
+                        return BET
+                    }
+
+                    if (handRank == 3 || (hasHandPair && cards.first().rank >= SEVEN)) {
+                        betValue = 6*BIG_BLIND
+                    }
+
+                    if (handRank == 4) {
+                        betValue = 4*BIG_BLIND
+                        return BET
+                    }
+
+                    if (handRank > 5) {
+                        return CHECK
+                    }
+                }
+
+                // more than 600 chips
+                if (botStack > 15) {
+
+                    if (handRank == 1) {
+                        betValue = if (playerStack < 15) {
+                            pokerChips[PLAYER]
+                        } else {
+                            15* BIG_BLIND
+                        }
+                        return BET
+                    }
+
+                    if (handRank == 2) {
+                        betValue = 8*BIG_BLIND
+                        return BET
+                    }
+
+                    if (handRank in 3..4) {
+                        betValue = 4*BIG_BLIND
+                        return BET
+                    }
+
+                    if (hasHandPair && cards.first().rank >= FOUR) {
+                        betValue = 2*BIG_BLIND
+                        return BET
+                    }
+                }
             }
 
-            // if any stack is between 160 and 320 chips
-            if ((playerStack in 4..8 || botStack in 4..8)) {
-
-            }
-
-            // if any stack is between 320 and 480 chips
-            if ((playerStack in 8..12 || botStack in 8..12)) {
-
-            }
-
-            // if any stack if bigger than 480 chips
-            if (playerStack > 12 || botStack > 12) {
+            // player raised - fold, call, bet available
+            if (bet[PLAYER] > BIG_BLIND) {
 
             }
         } else {
 
-            // if any stack is below 160 chips
-            if (playerStack < 4 || botStack < 4) {
-                //
-            }
-
-            // if any stack is between 160 and 320 chips
-            if ((playerStack in 4..8 || botStack in 4..8)) {
+            // player didn't play yet - fold, call and bet available
+            if (bet[PLAYER] == BIG_BLIND) {
 
             }
 
-            // if any stack is between 320 and 480 chips
-            if ((playerStack in 8..12 || botStack in 8..12)) {
-
-            }
-
-            // if any stack if bigger than 480 chips
-            if (playerStack > 12 || botStack > 12) {
+            // player raised - fold, call and bet available
+            if (bet[PLAYER] > BIG_BLIND) {
 
             }
         }
-
-        return action
     }
 
 

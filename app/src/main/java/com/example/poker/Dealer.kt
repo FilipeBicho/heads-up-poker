@@ -5,7 +5,7 @@ import android.annotation.SuppressLint
 import androidx.compose.runtime.snapshots.SnapshotStateList
 
 const val PLAYER = 0
-const val COMPUTER = 1
+const val BOT = 1
 const val PRE_FLOP = 0
 const val FLOP = 1
 const val TURN = 2

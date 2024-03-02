@@ -97,7 +97,7 @@ abstract class Game: ViewModel() {
 
         // reset values
         bet[PLAYER] = 0
-        bet[COMPUTER] = 0
+        bet[BOT] = 0
         totalPotValue = 0
         checkAvailable = true
 
@@ -118,7 +118,7 @@ abstract class Game: ViewModel() {
 
         // init poker chips
         pokerChips[PLAYER] = uiState.value.playerMoney
-        pokerChips[COMPUTER] = uiState.value.computerMoney
+        pokerChips[BOT] = uiState.value.computerMoney
         pokerChips[POT] = 0
 
         // init or change dealer
@@ -312,7 +312,7 @@ abstract class Game: ViewModel() {
         }
 
         gameSummaryList += "${playerName[PLAYER]} hand:  $playerHandString - ${playerHand.resultText}"
-        gameSummaryList += "${playerName[COMPUTER]} hand:  $computerHandString - ${computerHand.resultText}"
+        gameSummaryList += "${playerName[BOT]} hand:  $computerHandString - ${computerHand.resultText}"
 
         when (winnerCalculator.getWinner()) {
             PLAYER -> {
@@ -325,9 +325,9 @@ abstract class Game: ViewModel() {
                     winnerText = "Player wins $totalPotValue €"
                 )}
             }
-            COMPUTER -> {
-                pokerChips[COMPUTER] += totalPotValue
-                gameSummaryList += "${playerName[COMPUTER]} wins $totalPotValue €"
+            BOT -> {
+                pokerChips[BOT] += totalPotValue
+                gameSummaryList += "${playerName[BOT]} wins $totalPotValue €"
                 mutableStateFlow.update { currentState -> currentState.copy(
                     playerText = "${playerHand.resultText} 0 %",
                     computerText = "${computerHand.resultText} 100 %",
@@ -336,7 +336,7 @@ abstract class Game: ViewModel() {
             }
             else -> {
                 pokerChips[PLAYER] += totalPotValue / 2
-                pokerChips[COMPUTER] += totalPotValue / 2
+                pokerChips[BOT] += totalPotValue / 2
                 gameSummaryList += "Split pot with value $totalPotValue €"
 
                 mutableStateFlow.update { currentState -> currentState.copy(
@@ -351,7 +351,7 @@ abstract class Game: ViewModel() {
 
         mutableStateFlow.update { currentState -> currentState.copy(
             playerMoney = pokerChips[PLAYER],
-            computerMoney = pokerChips[COMPUTER],
+            computerMoney = pokerChips[BOT],
             currentPot = pokerChips[POT],
             playerBetValue = BIG_BLIND,
             totalPot = totalPotValue,
@@ -478,7 +478,7 @@ abstract class Game: ViewModel() {
 
         totalPotValue += pokerChips[POT]
         bet[PLAYER] = 0
-        bet[COMPUTER] = 0
+        bet[BOT] = 0
         checkAvailable = true
 
         updateMutableStateValues()

@@ -214,9 +214,9 @@ open class GameViewModel : Game() {
 
         mutableStateFlow.update { currentState -> currentState.copy(
             playerText = "${bet[PLAYER]} €",
-            computerText = "${bet[COMPUTER]} €",
+            computerText = "${bet[BOT]} €",
             playerMoney = pokerChips[PLAYER],
-            computerMoney = pokerChips[COMPUTER],
+            computerMoney = pokerChips[BOT],
             currentPot = pokerChips[POT],
             playerBetValue = BIG_BLIND,
             totalPot = totalPotValue,
@@ -228,8 +228,8 @@ open class GameViewModel : Game() {
      * Switch player turns
      */
     override fun switchPlayerTurn() {
-        player = if (player == PLAYER) COMPUTER else PLAYER
-        opponent = if (player == COMPUTER) PLAYER else COMPUTER
+        player = if (player == PLAYER) BOT else PLAYER
+        opponent = if (player == BOT) PLAYER else BOT
     }
 
     /**
