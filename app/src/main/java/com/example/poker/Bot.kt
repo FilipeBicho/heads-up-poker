@@ -1,6 +1,7 @@
 package com.example.poker
 
 import com.example.poker.helper.HandGroup
+import kotlin.math.abs
 
 const val FOLD = 0
 const val CHECK = 1
@@ -36,7 +37,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
         }
 
         if (playerStack > 0 && botStack > 0) {
-            callValue = bet[BOT] - bet[PLAYER]
+            callValue = abs(bet[BOT] - bet[PLAYER])
         }
 
 
@@ -164,7 +165,168 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
 
             // player raised - fold, call, bet available
             if (bet[PLAYER] > BIG_BLIND) {
+                // less than 160 chips
+                if (botStack < 4) {
 
+                    if (handRank in 1..4 || (hasHandPair && cards.first().rank >= FIVE)) {
+
+                        return if (pokerChips[BOT] - callValue < 0) {
+                            CALL
+                        } else {
+                            betValue = pokerChips[BOT]
+                            BET
+                        }
+                    }
+
+                    if (handRank in 5..6) {
+                        return CALL
+                    }
+
+                    if (handRank > 6) {
+                        return FOLD
+                    }
+                }
+
+                // between 160 and 320 chips
+                if (botStack in 4..8) {
+
+                    if (handRank in 1..3 || (hasHandPair && cards.first().rank >= SIX)) {
+                        return if (pokerChips[BOT] - callValue < 0) {
+                            CALL
+                        } else {
+                            betValue = pokerChips[BOT]
+                            BET
+                        }
+                    }
+
+                    if (handRank in 4..5) {
+                        return if (callValue < 2* BIG_BLIND) {
+                            CALL
+                        } else {
+                            FOLD
+                        }
+                    }
+
+                    if (handRank in 6..7) {
+                        return if (callValue < BIG_BLIND) {
+                            CALL
+                        } else {
+                            FOLD
+                        }
+                    }
+
+                    if (handRank > 7) {
+                        return FOLD
+                    }
+                }
+
+                // between 320 and 600 chips
+                if (botStack in 8..15) {
+
+                    if (handRank in 1..2 || (hasHandPair && cards.first().rank >= SEVEN)) {
+                        return if (pokerChips[BOT] - callValue < 0) {
+                            CALL
+                        } else {
+                            betValue = pokerChips[BOT]
+                            BET
+                        }
+                    }
+
+                    if (handRank in 3..4) {
+
+                        if (callValue < 3*BIG_BLIND) {
+                            betValue = 5* BIG_BLIND
+                            return BET
+                        }
+
+                        if (callValue in 3*BIG_BLIND..5* BIG_BLIND) {
+                            betValue = 8* BIG_BLIND
+                            return BET
+                        }
+
+                        return CALL
+                    }
+
+                    if (handRank == 5) {
+                        return if (callValue < 3*BIG_BLIND) {
+                            CALL
+                        } else {
+                            FOLD
+                        }
+                    }
+
+                    if (handRank == 6) {
+                        return if (callValue < 2*BIG_BLIND) {
+                            CALL
+                        } else {
+                            FOLD
+                        }
+                    }
+
+                    if (handRank == 7) {
+                        return if (callValue < BIG_BLIND) {
+                            CALL
+                        } else {
+                            FOLD
+                        }
+                    }
+
+                    return FOLD
+                }
+
+                // more than 600 chips
+                if (botStack > 15) {
+
+                    if (handRank in 1..2 || (hasHandPair && cards.first().rank >= EIGHT)) {
+                        return if (pokerChips[BOT] - callValue < 0) {
+                            CALL
+                        } else {
+                            betValue = 3*bet[PLAYER]
+                            BET
+                        }
+                    }
+
+                    if (handRank in 3..4) {
+
+                        if (callValue < 3*BIG_BLIND) {
+                            betValue = 5* BIG_BLIND
+                            return BET
+                        }
+
+                        if (callValue in 3*BIG_BLIND..5* BIG_BLIND) {
+                            betValue = 8* BIG_BLIND
+                            return BET
+                        }
+
+                        return CALL
+                    }
+
+                    if (handRank == 5) {
+                        return if (callValue < 3*BIG_BLIND) {
+                            CALL
+                        } else {
+                            FOLD
+                        }
+                    }
+
+                    if (handRank == 6) {
+                        return if (callValue < 2*BIG_BLIND) {
+                            CALL
+                        } else {
+                            FOLD
+                        }
+                    }
+
+                    if (handRank == 7) {
+                        return if (callValue < BIG_BLIND) {
+                            CALL
+                        } else {
+                            FOLD
+                        }
+                    }
+
+                    return FOLD
+                }
             }
         } else {
 
