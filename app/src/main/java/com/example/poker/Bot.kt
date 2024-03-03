@@ -64,6 +64,14 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
         }
     }
 
+    private fun callUntilOrRaiseBlinds(value: Int, blinds: Int): Int {
+        return if (callValue <= value) {
+            CALL
+        } else {
+            betBlinds(blinds)
+        }
+    }
+
     private fun allIn(): Int {
         return if (totalMoney - callValue < 0) {
             CALL
@@ -71,6 +79,16 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
             betValue = totalMoney
             BET
         }
+    }
+
+    private fun raiseByMultiply(value: Int): Int {
+        betValue = if (value * callValue >= totalMoney) {
+            totalMoney
+        } else {
+            value * callValue
+        }
+
+        return BET
     }
 
     private fun callOrBetValue(value: Int): Int {
@@ -100,15 +118,43 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
         }
     }
 
-    private fun allInPairMinRank(rank: Int): Int {
+    private fun allInPairFromOrFold(rank: Int): Int {
         return if (hasHandPair && pairRank > rank) {
             allIn()
         } else {
-            if (isDealer) {
-                FOLD
-            } else {
-                CHECK
-            }
+            FOLD
+        }
+    }
+
+    private fun allInPairFromOrCheck(rank: Int): Int {
+        return if (hasHandPair && pairRank > rank) {
+            allIn()
+        } else {
+            CHECK
+        }
+    }
+
+    private fun allInPairOrCall(): Int {
+        return if (hasHandPair) {
+            allIn()
+        } else {
+            CALL
+        }
+    }
+
+    private fun allInPairOrCheck(): Int {
+        return if (hasHandPair) {
+            allIn()
+        } else {
+            CALL
+        }
+    }
+
+    private fun allInPairOrFold(): Int {
+        return if (hasHandPair) {
+            allIn()
+        } else {
+            FOLD
         }
     }
 
@@ -124,230 +170,384 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
 
         // Dealer: player called - check and bet available
         // Blind: player didn't play yet - fold, call and bet available
-        if (bet[PLAYER] == BIG_BLIND) {
-            // less than 160 chips
-            if (botStack < 4) {
-                return if (isDealer) {
+
+        return when {
+            bet[PLAYER] == BIG_BLIND -> {
+                // less than 160 chips
+                if (botStack < 4) {
+                    if (isDealer) {
+                        // player didn't play yet - fold, call and bet available
+                        when (handRank) {
+                            in 1..3 -> allIn()
+                            in 4..6 -> if (hasHandPair) { allIn() } else { CALL }
+                            else -> allInPairFromOrFold(THREE)
+                        }
+                    } else {
+                        // player called - check and bet available
+                        when (handRank) {
+                            in 1..3 -> allIn()
+                            in 4..6 -> if (hasHandPair) { allIn() } else { CHECK }
+                            else -> allInPairFromOrCheck(THREE)
+                        }
+                    }
+                }
+
+                // between 160 and 320 chips
+                if (botStack in 4..8) {
+                    if (isDealer) {
+                        // player didn't play yet - fold, call and bet available
+                        when (handRank) {
+                            in 1..2 -> allIn()
+                            3 -> if (hasHandPair) { allIn() } else { betBlinds(4) }
+                            4 -> if (hasHandPair) { allIn() } else { betBlinds(2) }
+                            5 -> if (hasHandPair) { allIn() } else { CALL }
+                            6 -> if (hasHandPair) { allIn() } else { FOLD }
+                            else -> if (hasHandPair) { CALL } else { FOLD }
+                        }
+                    } else {
+                        // player called - check and bet available
+                        when (handRank) {
+                            in 1..2 -> allIn()3 -> if (hasHandPair) { allIn() } else { betBlinds(3) }
+                            4 -> if (hasHandPair) { allIn() } else { betBlinds(2) }
+                            5 -> if (hasHandPair) { betBlinds(4) } else { CHECK }
+                            6 -> if (hasHandPair) { betBlinds(2) } else { CHECK }
+                            else -> if (hasHandPair) { betBlinds(1) } else { CHECK }
+                        }
+                    }
+                }
+
+                // between 320 and 600 chips
+                if (botStack in 8..15) {
+                    if (isDealer) {
+                        // player didn't play yet - fold, call and bet available
+                        when (handRank) {
+                            1 -> allIn()
+                            2 -> if (hasHandPair) { betBlinds(10) } else { betBlinds(8) }
+                            3 -> if (hasHandPair) { betBlinds(8) } else { betBlinds(6) }
+                            4 -> if (hasHandPair) { betBlinds(6) } else { betBlinds(4) }
+                            in 5..6 -> if (hasHandPair) { betBlinds(4) } else { CALL }
+                            else -> if (hasHandPair) { CALL } else { FOLD }
+                        }
+                    } else {
+                        // player called - check and bet available
+                        when (handRank) {
+                            1 -> allIn()
+                            2 -> if (hasHandPair) { betBlinds(8) } else { betBlinds(6) }
+                            3 -> if (hasHandPair) { betBlinds(6) } else { betBlinds(4) }
+                            4 -> if (hasHandPair) { betBlinds(4) } else { betBlinds(2) }
+                            in 5..6 -> if (hasHandPair) { betBlinds(1) } else { CHECK }
+                            else -> CHECK
+                        }
+                    }
+                }
+
+                // more than 600 chips
+
+                if (isDealer) {
                     // player didn't play yet - fold, call and bet available
                     when (handRank) {
-                        in 1..3 -> allIn()
-                        4 -> allInPairOrBetBlinds(4)
-                        5 -> allInPairOrBetBlinds(2)
-                        else -> {
-                            return allInPairMinRank(THREE)
-                        }
+                        1 -> betBlinds(15)
+                        2 -> if (hasHandPair) { betBlinds(10) } else { betBlinds(6) }
+                        3 -> if (hasHandPair) { betBlinds(6) } else { betBlinds(4) }
+                        4 -> if (hasHandPair) { betBlinds(5) } else { betBlinds(3) }
+                        5 -> if (hasHandPair) { betBlinds(4) } else { CALL }
+                        6 -> if (hasHandPair) { betBlinds(2) } else { CALL }
+                        else -> if (hasHandPair) { CALL } else { FOLD }
                     }
                 } else {
                     // player called - check and bet available
                     when (handRank) {
-                        in 1..3 -> allIn()
-                        4 -> allInPairOrBetBlinds(2)
-                        5 -> allInPairOrBetBlinds(1)
-                        else -> {
-                            return allInPairMinRank(THREE)
+                        1 -> betBlinds(13)
+                        2 -> if (hasHandPair) { betBlinds(8) } else { betBlinds(4) }
+                        3 -> if (hasHandPair) { betBlinds(6) } else { betBlinds(2) }
+                        4 -> if (hasHandPair) { betBlinds(4) } else { betBlinds(1) }
+                        5 -> if (hasHandPair) { betBlinds(2) } else { CALL }
+                        6 -> if (hasHandPair) { betBlinds(1) } else { CALL }
+                        else -> CHECK
+                    }
+                }
+            }
+            bet[PLAYER] > BIG_BLIND -> {
+                // less than 160 chips
+                if (botStack < 4) {
+                    if (isDealer) {
+                        when (handRank) {
+                            in 1..4 -> allIn()
+                            5 -> if (hasHandPair) { allIn() } else { CALL }
+                            in 6..7-> if (hasHandPair) { CALL } else { FOLD }
+                            else -> FOLD
+                        }
+                    } else {
+                        when (handRank) {
+                            in 1..4 -> allIn()
+                            5 -> if (hasHandPair) { allIn() } else { CALL }
+                            6 -> if (hasHandPair) { betBlinds(2) } else { FOLD }
+                            7 -> if (hasHandPair) { CALL } else { FOLD }
+                            else -> FOLD
                         }
                     }
                 }
-            }
 
-            // between 160 and 320 chips
-            if (botStack in 4..8) {
-                return if (isDealer) {
-                    // player didn't play yet - fold, call and bet available
-                    when (handRank) {
-                        in 1..3 -> allIn()
-                        4 -> allInPairOrBetBlinds(4)
-                        5 -> allInPairOrBetBlinds(2)
-                        else -> {
-                            return allInPairMinRank(FIVE)
+                // between 160 and 320 chips
+                if (botStack in 4..8) {
+                    if (isDealer) {
+                        when (handRank) {
+                            in 1..3 -> allIn()
+                            4 -> if (hasHandPair) {
+                                callUntilOrRaiseBlinds(4 * BIG_BLIND, 4)
+                            } else {
+                                callUntilOrFold(2 * BIG_BLIND)
+                            }
+                            5 -> if (hasHandPair) {
+                                callUntilOrRaiseBlinds(3 * BIG_BLIND, 3)
+                            } else {
+                                callUntilOrFold(2 * BIG_BLIND)
+                            }
+                            6->  if (hasHandPair) {
+                                callUntilOrRaiseBlinds(2 * BIG_BLIND, 2)
+                            } else {
+                                callUntilOrFold(BIG_BLIND)
+                            }
+                            7->  if (hasHandPair) {
+                                callUntilOrFold(2 * BIG_BLIND)
+                            } else {
+                                callUntilOrFold(BIG_BLIND)
+                            }
+                            else -> FOLD
+
+                        }
+                    } else {
+                        when (handRank) {
+                            in 1..3 -> allIn()
+                            4 -> if (hasHandPair) {
+                                callUntilOrRaiseBlinds(3 * BIG_BLIND, 3)
+                            } else {
+                                callUntilOrFold(2 * BIG_BLIND)
+                            }
+                            5 -> if (hasHandPair) {
+                                callUntilOrRaiseBlinds(2 * BIG_BLIND, 2)
+                            } else {
+                                callUntilOrFold(2 * BIG_BLIND)
+                            }
+                            6->  if (hasHandPair) {
+                                callUntilOrRaiseBlinds(2 * BIG_BLIND, 2)
+                            } else {
+                                callUntilOrFold(BIG_BLIND)
+                            }
+                            7->  if (hasHandPair) {
+                                callUntilOrFold(2 * BIG_BLIND)
+                            } else {
+                                FOLD
+                            }
+                            else -> FOLD
                         }
                     }
-                } else {
-                    // player called - check and bet available
-                    when (handRank) {
-                        in 1..3 -> allIn()
-                        4 -> betBlinds(2)
-                        5 -> betBlinds(1)
-                        else -> {
-                            return allInPairMinRank(FIVE)
+                }
+
+                // between 320 and 600 chips
+                if (botStack in 8..15) {
+                    if (isDealer) {
+                        when (handRank) {
+                            1 -> allIn()
+                            2 -> {
+                                when {
+                                    callValue <= 5 * BIG_BLIND -> betBlinds(10)
+                                    callValue < 8 * BIG_BLIND -> betBlinds(12)
+                                    else -> if (hasHandPair) { allIn() } else { CALL }
+                                }
+                            }
+                            3 -> {
+                                when {
+                                    callValue <= 3 * BIG_BLIND -> betBlinds(6)
+                                    callValue in 3 * BIG_BLIND.. 6 * BIG_BLIND -> betBlinds(8)
+                                    callValue in 6 * BIG_BLIND.. 10 * BIG_BLIND -> CALL
+                                    else -> FOLD
+                                }
+                            }
+                            4 -> {
+                                when {
+                                    callValue < 2 * BIG_BLIND -> betBlinds(2)
+                                    callValue < 10 * BIG_BLIND -> CALL
+                                    else -> FOLD
+                                }
+                            }
+                            5 -> {
+                                when {
+                                    callValue < 2 * BIG_BLIND -> betBlinds(2)
+                                    callValue < 4 * BIG_BLIND -> CALL
+                                    else -> FOLD
+                                }
+                            }
+                            6 -> {
+                                when {
+                                    callValue < 4 * BIG_BLIND -> if (hasHandPair) { CALL } else { FOLD }
+                                    else -> FOLD
+                                }
+                            }
+                            7 -> {
+                                when {
+                                    callValue < 2 * BIG_BLIND -> if (hasHandPair) { CALL } else { FOLD }
+                                    else -> FOLD
+                                }
+                            }
+                            else -> FOLD
+
+                        }
+                    } else {
+                        when (handRank) {
+                            1 -> allIn()
+                            2 -> {
+                                when {
+                                    callValue <= 4 * BIG_BLIND -> betBlinds(8)
+                                    callValue < 8 * BIG_BLIND -> betBlinds(10)
+                                    else -> if (hasHandPair) { allIn() } else { CALL }
+                                }
+                            }
+                            3 -> {
+                                when {
+                                    callValue <= 2 * BIG_BLIND -> betBlinds(4)
+                                    callValue in 2 * BIG_BLIND.. 6 * BIG_BLIND -> betBlinds(6)
+                                    callValue in 6 * BIG_BLIND.. 8 * BIG_BLIND -> CALL
+                                    else -> FOLD
+                                }
+                            }
+                            4 -> {
+                                when {
+                                    callValue <= BIG_BLIND -> betBlinds(2)
+                                    callValue < 6 * BIG_BLIND -> CALL
+                                    else -> FOLD
+                                }
+                            }
+                            5 -> {
+                                when {
+                                    callValue <= BIG_BLIND -> betBlinds(1)
+                                    callValue < 4 * BIG_BLIND -> CALL
+                                    else -> FOLD
+                                }
+                            }
+                            6 -> {
+                                when {
+                                    callValue <= 3 * BIG_BLIND -> if (hasHandPair) { CALL } else { FOLD }
+                                    else -> FOLD
+                                }
+                            }
+                            7 -> {
+                                when {
+                                    callValue <= BIG_BLIND -> if (hasHandPair) { CALL } else { FOLD }
+                                    else -> FOLD
+                                }
+                            }
+                            else -> FOLD
+
                         }
                     }
                 }
-            }
 
-            // between 320 and 600 chips
-            if (botStack in 8..15) {
+                // more than 600 chips
 
-                return if (isDealer) {
-                    // player didn't play yet - fold, call and bet available
+                if (isDealer) {
                     when (handRank) {
-                        1 -> allIn()
-                        2 -> betBlinds(8)
-                        3 -> betBlinds(6)
-                        4 -> betBlinds(4)
-                        else -> {
-                            return allInPairMinRank(SIX)
+                        1 -> {
+                            when {
+                                callValue <= 2 * BIG_BLIND -> betBlinds(6)
+                                callValue <= 4 * BIG_BLIND -> betBlinds(10)
+                                callValue <= 10 * BIG_BLIND -> betBlinds(20)
+                                else -> allIn()
+                            }
                         }
-                    }
-                } else {
-                    // player called - check and bet available
-                    when (handRank) {
-                        1 -> allIn()
-                        2 -> betBlinds(8)
-                        3 -> betBlinds(6)
-                        4 -> betBlinds(4)
-                        else -> {
-                            return allInPairMinRank(SIX)
-                        }
-                    }
-                }
-            }
-
-            // more than 600 chips
-
-            return if (isDealer) {
-                // player didn't play yet - fold, call and bet available
-                when (handRank) {
-                    1 -> betBlinds(15)
-                    2 -> betBlinds(8)
-                    in 3..4 -> betBlinds(4)
-                    else -> {
-                        return allInPairMinRank(SIX)
-                    }
-                }
-            } else {
-                // player called - check and bet available
-                when (handRank) {
-                    1 -> betBlinds(15)
-                    2 -> betBlinds(8)
-                    in 3..4 -> betBlinds(4)
-                    else -> {
-                        return allInPairMinRank(SIX)
-                    }
-                }
-            }
-        }
-
-        // player raised - fold, call, bet available
-        if (bet[PLAYER] > BIG_BLIND) {
-
-
-            // less than 160 chips
-            if (botStack < 4) {
-                return if (isDealer) {
-                    when (handRank) {
-                        in 1..4 -> allIn()
-                        in 5..6 -> CALL
-                        else -> callPairMinRank(FOUR)
-
-                    }
-                } else {
-                    when (handRank) {
-                        in 1..4 -> allIn()
-                        in 5..6 -> CALL
-                        else -> callPairMinRank(THREE)
-                    }
-                }
-            }
-
-            // between 160 and 320 chips
-            if (botStack in 4..8) {
-                return if (isDealer) {
-                    when (handRank) {
-                        in 1..3 -> allIn()
-                        in 4..6 -> callUntilOrFold(2 * BIG_BLIND)
-                        in 7..8 -> callUntilOrFold(BIG_BLIND)
-                        else -> FOLD
-
-                    }
-                } else {
-                    when (handRank) {
-                        in 1..3 -> allIn()
-                        in 4..6 -> callUntilOrFold(2 * BIG_BLIND)
-                        in 7..8 -> callUntilOrFold(BIG_BLIND)
-                        else -> FOLD
-                    }
-                }
-            }
-
-            // between 320 and 600 chips
-            if (botStack in 8..15) {
-                return if (isDealer) {
-                    when (handRank) {
-                        in 1..3 -> allInPairMinRank(SEVEN)
-                        in 4..5 -> {
-                            return when {
-                                callValue < 3 * BIG_BLIND -> betBlinds(6)
-                                callValue in 3 * BIG_BLIND.. 5 * BIG_BLIND -> betBlinds(8)
+                        2 -> {
+                            when {
+                                callValue <= 2 * BIG_BLIND -> betBlinds(4)
+                                callValue <= 4 * BIG_BLIND -> betBlinds(6)
+                                callValue <= 10 * BIG_BLIND -> betBlinds(10)
                                 else -> CALL
                             }
                         }
-                        6 -> callUntilOrFold(3 * BIG_BLIND)
-                        7 -> callUntilOrFold(2 * BIG_BLIND)
-                        8 -> callUntilOrFold(BIG_BLIND)
+                        4 -> {
+                            when {
+                                callValue <= 2 * BIG_BLIND -> betBlinds(2)
+                                callValue <= 4 * BIG_BLIND -> betBlinds(4)
+                                callValue <= 10 * BIG_BLIND -> CALL
+                                hasHandPair -> CALL
+                                else -> FOLD
+                            }
+                        }
+                        5 -> {
+                            when {
+                                callValue <= 2 * BIG_BLIND -> betBlinds(1)
+                                callValue <= 6 * BIG_BLIND -> CALL
+                                hasHandPair -> CALL
+                                else -> FOLD
+                            }
+                        }
+                        6 -> {
+                            when {
+                                callValue <= 4 * BIG_BLIND -> CALL
+                                callValue <= 6 * BIG_BLIND && hasHandPair -> CALL
+                                else -> FOLD
+                            }
+                        }
+                        7 -> {
+                            when {
+                                callValue <= 2 * BIG_BLIND -> CALL
+                                callValue <= 4 * BIG_BLIND && hasHandPair -> CALL
+                                else -> FOLD
+                            }
+                        }
                         else -> FOLD
 
                     }
                 } else {
-                    // player called - check and bet available
                     when (handRank) {
-                        in 1..2 -> allInPairMinRank(SEVEN)
-                        in 3..4 -> {
-                            return when {
-                                callValue < 3 * BIG_BLIND -> betBlinds(5)
-                                callValue in 3 * BIG_BLIND.. 5 * BIG_BLIND -> betBlinds(8)
+                        1 -> {
+                            when {
+                                callValue <= 2 * BIG_BLIND -> betBlinds(4)
+                                callValue <= 4 * BIG_BLIND -> betBlinds(8)
+                                callValue <= 10 * BIG_BLIND -> betBlinds(15)
+                                else -> allIn()
+                            }
+                        }
+                        2 -> {
+                            when {
+                                callValue <= 2 * BIG_BLIND -> betBlinds(2)
+                                callValue <= 4 * BIG_BLIND -> betBlinds(4)
+                                callValue <= 8 * BIG_BLIND -> betBlinds(8)
                                 else -> CALL
                             }
                         }
-                        5 -> callUntilOrFold(3 * BIG_BLIND)
-                        6 -> callUntilOrFold(2 * BIG_BLIND)
-                        7 -> callUntilOrFold(BIG_BLIND)
+                        4 -> {
+                            when {
+                                callValue <= 2 * BIG_BLIND -> betBlinds(1)
+                                callValue <= 4 * BIG_BLIND -> betBlinds(2)
+                                callValue <= 8 * BIG_BLIND && hasHandPair -> CALL
+                                else -> FOLD
+                            }
+                        }
+                        5 -> {
+                            when {
+                                callValue <= 4 * BIG_BLIND -> CALL
+                                callValue <= 6 * BIG_BLIND && hasHandPair-> CALL
+                                else -> FOLD
+                            }
+                        }
+                        6 -> {
+                            when {
+                                callValue <= 4 * BIG_BLIND && hasHandPair -> CALL
+                                else -> FOLD
+                            }
+                        }
+                        7 -> {
+                            when {
+                                callValue <=  BIG_BLIND -> CALL
+                                callValue <=  2 * BIG_BLIND && hasHandPair -> CALL
+                                else -> FOLD
+                            }
+                        }
                         else -> FOLD
                     }
                 }
             }
-
-            // more than 600 chips
-
-            return if (isDealer) {
-                when (handRank) {
-                    in 1..2 -> allInPairMinRank(EIGHT)
-                    in 3..5 -> {
-                        return when {
-                            callValue < 3 * BIG_BLIND -> betBlinds(8)
-                            callValue in 3 * BIG_BLIND.. 5 * BIG_BLIND -> betBlinds(10)
-                            else -> CALL
-                        }
-                    }
-                    6 -> callUntilOrFold(3 * BIG_BLIND)
-                    7 -> callUntilOrFold(2 * BIG_BLIND)
-                    8 -> callUntilOrFold(BIG_BLIND)
-                    else -> FOLD
-
-                }
-            } else {
-                // player called - check and bet available
-                when (handRank) {
-                    in 1..2 -> allInPairMinRank(EIGHT)
-                    in 3..4 -> {
-                        return when {
-                            callValue < 3 * BIG_BLIND -> betBlinds(5)
-                            callValue in 3 * BIG_BLIND.. 5 * BIG_BLIND -> betBlinds(8)
-                            else -> CALL
-                        }
-                    }
-                    5 -> callUntilOrFold(3 * BIG_BLIND)
-                    6 -> callUntilOrFold(2 * BIG_BLIND)
-                    7 -> callUntilOrFold(BIG_BLIND)
-                    else -> FOLD
-                }
-            }
-        }
-
-        return if (validActions[CHECK]) {
-            CHECK
-        } else {
-            FOLD
+            else -> if (validActions[CHECK]) { CHECK } else { FOLD }
         }
     }
 
