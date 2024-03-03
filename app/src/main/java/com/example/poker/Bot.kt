@@ -12,11 +12,14 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
 
     private var handRank: Int = 0
     private var action: Int = 0
-    public var betValue: Int = 0
+    var betValue: Int = 0
     private var playerStack: Int = 0
     private var botStack: Int = 0
     private var callValue: Int = 0
+    private var totalMoney: Int = 0
     private var isDealer: Boolean = false
+    private val hasHandPair = cards.first().rank == cards.last().rank
+    private val pairRank = cards.first().rank
 
     init {
         handRank = HandGroup(cards).group
@@ -28,19 +31,19 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
      */
     private fun initValues(pokerChips: IntArray, bet:IntArray) {
 
+        totalMoney = pokerChips[BOT]
+
         if (pokerChips[PLAYER] > 0) {
             playerStack = pokerChips[PLAYER]/BIG_BLIND
         }
 
-        if (pokerChips[BOT] > 0) {
+        if (totalMoney > 0) {
             botStack = pokerChips[BOT]/ BIG_BLIND
         }
 
         if (playerStack > 0 && botStack > 0) {
             callValue = abs(bet[BOT] - bet[PLAYER])
         }
-
-
     }
 
     /**
@@ -50,528 +53,287 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
         playerStack = 0
         botStack = 0
         callValue = 0
+        totalMoney = 0
+    }
+
+    private fun callUntilOrFold(value: Int): Int {
+        return if (callValue < value) {
+            CALL
+        } else {
+            FOLD
+        }
+    }
+
+    private fun allIn(): Int {
+        return if (totalMoney - callValue < 0) {
+            CALL
+        } else {
+            betValue = totalMoney
+            BET
+        }
+    }
+
+    private fun callOrBetValue(value: Int): Int {
+        return if (totalMoney - callValue < 0) {
+            CALL
+        } else {
+            betValue = value
+            BET
+        }
+    }
+
+    private fun betBlinds(blinds: Int): Int {
+        betValue = if (blinds * BIG_BLIND >= totalMoney) {
+            totalMoney
+        } else {
+            blinds * BIG_BLIND
+        }
+
+        return BET
+    }
+
+    private fun allInPairOrBetBlinds(blinds: Int): Int {
+       return if (hasHandPair) {
+            allIn()
+        } else {
+            betBlinds(blinds)
+        }
+    }
+
+    private fun allInPairMinRank(rank: Int): Int {
+        return if (hasHandPair && pairRank > rank) {
+            allIn()
+        } else {
+            if (isDealer) {
+                FOLD
+            } else {
+                CHECK
+            }
+        }
     }
 
     private fun preFlopAction(pokerChips: IntArray, bet: IntArray, validActions: BooleanArray): Int {
-        val hasHandPair = cards.first().rank == cards.last().rank
 
-        if (!isDealer) {
-            // player called - check and bet available
-            if (bet[PLAYER] == BIG_BLIND) {
-                // less than 160 chips
-                if (botStack < 4) {
-                    if (handRank in 1..4 || (hasHandPair && cards.first().rank >= FIVE)) {
-                        betValue = pokerChips[BOT]
-                        return BET
-                    }
-
-                    if (handRank == 5) {
-                        betValue = if (botStack > 2) {
-                            2* BIG_BLIND
-                        } else {
-                            pokerChips[BOT]
+        // Dealer: player called - check and bet available
+        // Blind: player didn't play yet - fold, call and bet available
+        if (bet[PLAYER] == BIG_BLIND) {
+            // less than 160 chips
+            if (botStack < 4) {
+                return if (isDealer) {
+                    // player didn't play yet - fold, call and bet available
+                    when (handRank) {
+                        in 1..3 -> allIn()
+                        4 -> allInPairOrBetBlinds(4)
+                        5 -> allInPairOrBetBlinds(2)
+                        else -> {
+                            return allInPairMinRank(THREE)
                         }
-
-                        return BET
                     }
-
-                    return CHECK
-                }
-
-                // between 160 and 320 chips
-                if (botStack in 4..8) {
-                    if (handRank in 1..3 || (hasHandPair && cards.first().rank >= SIX)) {
-                        betValue = pokerChips[BOT]
-                        return BET
-                    }
-
-                    if (handRank == 4) {
-                        betValue = 4*BIG_BLIND
-                        return BET
-                    }
-
-                    if (handRank == 5) {
-                        betValue = 2*BIG_BLIND
-                        return BET
-                    }
-
-                    return CHECK
-                }
-
-                // between 320 and 600 chips
-                if (botStack in 8..15) {
-                    if (handRank == 1) {
-                        betValue = pokerChips[BOT]
-                    }
-
-                    if (handRank == 2) {
-                        betValue = 8*BIG_BLIND
-                        return BET
-                    }
-
-                    if (handRank == 3 || (hasHandPair && cards.first().rank >= SEVEN)) {
-                        betValue = 6*BIG_BLIND
-                    }
-
-                    if (handRank == 4) {
-                        betValue = 4*BIG_BLIND
-                        return BET
-                    }
-
-                    return CHECK
-                }
-
-                // more than 600 chips
-                if (botStack > 16) {
-                    if (handRank == 1) {
-                        betValue = if (playerStack < 15) {
-                            pokerChips[PLAYER]
-                        } else {
-                            15* BIG_BLIND
+                } else {
+                    // player called - check and bet available
+                    when (handRank) {
+                        in 1..3 -> allIn()
+                        4 -> allInPairOrBetBlinds(2)
+                        5 -> allInPairOrBetBlinds(1)
+                        else -> {
+                            return allInPairMinRank(THREE)
                         }
-                        return BET
                     }
-
-                    if (handRank == 2) {
-                        betValue = 8*BIG_BLIND
-                        return BET
-                    }
-
-                    if (handRank in 3..4) {
-                        betValue = 4*BIG_BLIND
-                        return BET
-                    }
-
-                    if (hasHandPair && cards.first().rank >= FOUR) {
-                        betValue = 2*BIG_BLIND
-                        return BET
-                    }
-
-                    return CHECK
                 }
             }
 
-            // player raised - fold, call, bet available
-            if (bet[PLAYER] > BIG_BLIND) {
-                // less than 160 chips
-                if (botStack < 4) {
-                    if (handRank in 1..4 || (hasHandPair && cards.first().rank >= FIVE)) {
-
-                        return if (pokerChips[BOT] - callValue < 0) {
-                            CALL
-                        } else {
-                            betValue = pokerChips[BOT]
-                            BET
+            // between 160 and 320 chips
+            if (botStack in 4..8) {
+                return if (isDealer) {
+                    // player didn't play yet - fold, call and bet available
+                    when (handRank) {
+                        in 1..3 -> allIn()
+                        4 -> allInPairOrBetBlinds(4)
+                        5 -> allInPairOrBetBlinds(2)
+                        else -> {
+                            return allInPairMinRank(FIVE)
                         }
                     }
-
-                    if (handRank in 5..6) {
-                        return CALL
-                    }
-                    return FOLD
-                }
-
-                // between 160 and 320 chips
-                if (botStack in 4..8) {
-                    if (handRank in 1..3 || (hasHandPair && cards.first().rank >= SIX)) {
-                        return if (pokerChips[BOT] - callValue < 0) {
-                            CALL
-                        } else {
-                            betValue = pokerChips[BOT]
-                            BET
+                } else {
+                    // player called - check and bet available
+                    when (handRank) {
+                        in 1..3 -> allIn()
+                        4 -> betBlinds(2)
+                        5 -> betBlinds(1)
+                        else -> {
+                            return allInPairMinRank(FIVE)
                         }
                     }
-
-                    if (handRank in 4..5) {
-                        return if (callValue < 2* BIG_BLIND) {
-                            CALL
-                        } else {
-                            FOLD
-                        }
-                    }
-
-                    if (handRank in 6..7) {
-                        return if (callValue < BIG_BLIND) {
-                            CALL
-                        } else {
-                            FOLD
-                        }
-                    }
-                    return FOLD
-                }
-
-                // between 320 and 600 chips
-                if (botStack in 8..15) {
-
-                    if (handRank in 1..2 || (hasHandPair && cards.first().rank >= SEVEN)) {
-                        return if (pokerChips[BOT] - callValue < 0) {
-                            CALL
-                        } else {
-                            betValue = pokerChips[BOT]
-                            BET
-                        }
-                    }
-
-                    if (handRank in 3..4) {
-
-                        if (callValue < 3*BIG_BLIND) {
-                            betValue = 5* BIG_BLIND
-                            return BET
-                        }
-
-                        if (callValue in 3*BIG_BLIND..5* BIG_BLIND) {
-                            betValue = 8* BIG_BLIND
-                            return BET
-                        }
-
-                        return CALL
-                    }
-
-                    if (handRank == 5) {
-                        return if (callValue < 3*BIG_BLIND) {
-                            CALL
-                        } else {
-                            FOLD
-                        }
-                    }
-
-                    if (handRank == 6) {
-                        return if (callValue < 2*BIG_BLIND) {
-                            CALL
-                        } else {
-                            FOLD
-                        }
-                    }
-
-                    if (handRank == 7) {
-                        return if (callValue < BIG_BLIND) {
-                            CALL
-                        } else {
-                            FOLD
-                        }
-                    }
-
-                    return FOLD
-                }
-
-                // more than 600 chips
-                if (botStack > 16) {
-                    if (handRank in 1..2 || (hasHandPair && cards.first().rank >= EIGHT)) {
-                        return if (pokerChips[BOT] - callValue < 0) {
-                            CALL
-                        } else {
-                            betValue = 3*bet[PLAYER]
-                            BET
-                        }
-                    }
-
-                    if (handRank in 3..4) {
-
-                        if (callValue < 3*BIG_BLIND) {
-                            betValue = 5* BIG_BLIND
-                            return BET
-                        }
-
-                        if (callValue in 3*BIG_BLIND..5* BIG_BLIND) {
-                            betValue = 8* BIG_BLIND
-                            return BET
-                        }
-
-                        return CALL
-                    }
-
-                    if (handRank == 5) {
-                        return if (callValue < 3*BIG_BLIND) {
-                            CALL
-                        } else {
-                            FOLD
-                        }
-                    }
-
-                    if (handRank == 6) {
-                        return if (callValue < 2*BIG_BLIND) {
-                            CALL
-                        } else {
-                            FOLD
-                        }
-                    }
-
-                    if (handRank == 7) {
-                        return if (callValue < BIG_BLIND) {
-                            CALL
-                        } else {
-                            FOLD
-                        }
-                    }
-
-                    return FOLD
-                }
-            }
-        } else {
-
-            // player didn't play yet - fold, call and bet available
-            if (bet[PLAYER] == BIG_BLIND) {
-                // less than 160 chips
-                if (botStack < 4) {
-
-                    if (handRank in 1..4 || (hasHandPair && cards.first().rank >= FIVE)) {
-                        betValue = pokerChips[BOT]
-                        return BET
-                    }
-
-                    if (handRank in 5..6) {
-                        return CALL
-                    }
-
-                    return FOLD
-                }
-
-                // between 160 and 320 chips
-                if (botStack in 4..8) {
-
-                    if (handRank in 1..3 || (hasHandPair && cards.first().rank >= SIX)) {
-                        betValue = pokerChips[BOT]
-                        return BET
-                    }
-
-                    if (handRank == 4) {
-                        betValue = 4*BIG_BLIND
-                        return BET
-                    }
-
-                    if (handRank == 5) {
-                        betValue = 2*BIG_BLIND
-                        return BET
-                    }
-
-                    return CALL
-                }
-
-                // between 320 and 600 chips
-                if (botStack in 8..15) {
-
-                    if (handRank == 1) {
-                        betValue = pokerChips[BOT]
-                    }
-
-                    if (handRank == 2) {
-                        betValue = 8*BIG_BLIND
-                        return BET
-                    }
-
-                    if (handRank == 3 || (hasHandPair && cards.first().rank >= SEVEN)) {
-                        betValue = 6*BIG_BLIND
-                    }
-
-                    if (handRank == 4) {
-                        betValue = 4*BIG_BLIND
-                        return BET
-                    }
-
-                    if (handRank > 5) {
-                        return CALL
-                    }
-                }
-
-                // more than 600 chips
-                if (botStack > 15) {
-
-                    if (handRank == 1) {
-                        betValue = if (playerStack < 15) {
-                            pokerChips[PLAYER]
-                        } else {
-                            15* BIG_BLIND
-                        }
-                        return BET
-                    }
-
-                    if (handRank == 2) {
-                        betValue = 8*BIG_BLIND
-                        return BET
-                    }
-
-                    if (handRank in 3..4) {
-                        betValue = 4*BIG_BLIND
-                        return BET
-                    }
-
-                    if (hasHandPair && cards.first().rank >= FOUR) {
-                        betValue = 2*BIG_BLIND
-                        return BET
-                    }
-
-                    return CALL
                 }
             }
 
-            // player raised - fold, call and bet available
-            if (bet[PLAYER] > BIG_BLIND) {
-                // less than 160 chips
-                if (botStack < 4) {
+            // between 320 and 600 chips
+            if (botStack in 8..15) {
 
-                    if (handRank in 1..4 || (hasHandPair && cards.first().rank >= FIVE)) {
-
-                        return if (pokerChips[BOT] - callValue < 0) {
-                            CALL
-                        } else {
-                            betValue = pokerChips[BOT]
-                            BET
+                return if (isDealer) {
+                    // player didn't play yet - fold, call and bet available
+                    when (handRank) {
+                        1 -> allIn()
+                        2 -> betBlinds(8)
+                        3 -> betBlinds(6)
+                        4 -> betBlinds(4)
+                        else -> {
+                            return allInPairMinRank(SIX)
                         }
                     }
-
-                    if (handRank in 5..6) {
-                        return CALL
-                    }
-
-                    if (handRank > 6) {
-                        return FOLD
+                } else {
+                    // player called - check and bet available
+                    when (handRank) {
+                        1 -> allIn()
+                        2 -> betBlinds(8)
+                        3 -> betBlinds(6)
+                        4 -> betBlinds(4)
+                        else -> {
+                            return allInPairMinRank(SIX)
+                        }
                     }
                 }
+            }
 
-                // between 160 and 320 chips
-                if (botStack in 4..8) {
+            // more than 600 chips
 
-                    if (handRank in 1..3 || (hasHandPair && cards.first().rank >= SIX)) {
-                        return if (pokerChips[BOT] - callValue < 0) {
-                            CALL
-                        } else {
-                            betValue = pokerChips[BOT]
-                            BET
-                        }
+            return if (isDealer) {
+                // player didn't play yet - fold, call and bet available
+                when (handRank) {
+                    1 -> betBlinds(15)
+                    2 -> betBlinds(8)
+                    in 3..4 -> betBlinds(4)
+                    else -> {
+                        return allInPairMinRank(SIX)
                     }
-
-                    if (handRank in 4..6) {
-                        return if (callValue < 2* BIG_BLIND) {
-                            CALL
-                        } else {
-                            FOLD
-                        }
-                    }
-
-                    if (handRank in 7..8) {
-                        return if (callValue < BIG_BLIND) {
-                            CALL
-                        } else {
-                            FOLD
-                        }
-                    }
-
-                    return FOLD
                 }
-
-                // between 320 and 600 chips
-                if (botStack in 8..15) {
-
-                    if (handRank in 1..3 || (hasHandPair && cards.first().rank >= SEVEN)) {
-                        return if (pokerChips[BOT] - callValue < 0) {
-                            CALL
-                        } else {
-                            betValue = pokerChips[BOT]
-                            BET
-                        }
+            } else {
+                // player called - check and bet available
+                when (handRank) {
+                    1 -> betBlinds(15)
+                    2 -> betBlinds(8)
+                    in 3..4 -> betBlinds(4)
+                    else -> {
+                        return allInPairMinRank(SIX)
                     }
-
-                    if (handRank in 4..5) {
-
-                        if (callValue < 3*BIG_BLIND) {
-                            betValue = 6* BIG_BLIND
-                            return BET
-                        }
-
-                        if (callValue in 3*BIG_BLIND..5* BIG_BLIND) {
-                            betValue = 8* BIG_BLIND
-                            return BET
-                        }
-
-                        return CALL
-                    }
-
-                    if (handRank == 6) {
-                        return if (callValue < 3*BIG_BLIND) {
-                            CALL
-                        } else {
-                            FOLD
-                        }
-                    }
-
-                    if (handRank == 7) {
-                        return if (callValue < 2*BIG_BLIND) {
-                            CALL
-                        } else {
-                            FOLD
-                        }
-                    }
-
-                    if (handRank == 8) {
-                        return if (callValue < BIG_BLIND) {
-                            CALL
-                        } else {
-                            FOLD
-                        }
-                    }
-
-                    return FOLD
-                }
-
-                // more than 600 chips
-                if (botStack > 15) {
-
-                    if (handRank in 1..2 || (hasHandPair && cards.first().rank >= EIGHT)) {
-                        return if (pokerChips[BOT] - callValue < 0) {
-                            CALL
-                        } else {
-                            betValue = 3*bet[PLAYER]
-                            BET
-                        }
-                    }
-
-                    if (handRank in 3..5) {
-
-                        if (callValue < 3*BIG_BLIND) {
-                            betValue = 8* BIG_BLIND
-                            return BET
-                        }
-
-                        if (callValue in 3*BIG_BLIND..5* BIG_BLIND) {
-                            betValue = 10* BIG_BLIND
-                            return BET
-                        }
-
-                        return CALL
-                    }
-
-                    if (handRank == 6) {
-                        return if (callValue < 3*BIG_BLIND) {
-                            CALL
-                        } else {
-                            FOLD
-                        }
-                    }
-
-                    if (handRank == 7) {
-                        return if (callValue < 2*BIG_BLIND) {
-                            CALL
-                        } else {
-                            FOLD
-                        }
-                    }
-
-                    if (handRank == 8) {
-                        return if (callValue < BIG_BLIND) {
-                            CALL
-                        } else {
-                            FOLD
-                        }
-                    }
-
-                    return FOLD
                 }
             }
         }
-        return if (validActions[FOLD]) {
-            FOLD
-        } else {
+
+        // player raised - fold, call, bet available
+        if (bet[PLAYER] > BIG_BLIND) {
+
+
+            // less than 160 chips
+            if (botStack < 4) {
+                if (handRank in 1..4 || (hasHandPair && cards.first().rank >= FIVE)) {
+                    return allIn()
+                }
+
+                return if (handRank in 5..6) {
+                    CALL
+                } else {
+                    FOLD
+                }
+            }
+
+            // between 160 and 320 chips
+            if (botStack in 4..8) {
+                if (handRank in 1..3 || (hasHandPair && cards.first().rank >= SIX)) {
+                    return allIn()
+                }
+
+                return if (isDealer) {
+                    when (handRank) {
+                        in 1..3 -> allIn()
+                        in 4..6 -> callUntilOrFold(2*BIG_BLIND)
+                        in 7..8 -> callUntilOrFold(BIG_BLIND)
+                        else -> FOLD
+                    }
+                } else {
+                    when (handRank) {
+                        in 4..5 -> callUntilOrFold(2*BIG_BLIND)
+                        in 6..7 -> callUntilOrFold(BIG_BLIND)
+                        else -> FOLD
+                    }
+                }
+            }
+
+            // between 320 and 600 chips
+            if (botStack in 8..15) {
+
+                if (handRank in 1..2 || (hasHandPair && cards.first().rank >= SEVEN)) {
+                    return allIn()
+                }
+
+                if (handRank in 3..4) {
+
+                    if (callValue < 3 * BIG_BLIND) {
+                        return betBlinds(5)
+                    }
+
+                    if (callValue in 3 * BIG_BLIND..5 * BIG_BLIND) {
+                        return betBlinds(8)
+                    }
+
+                    return CALL
+                }
+
+                if (handRank == 5) {
+                    return callUntilOrFold(3 * BIG_BLIND)
+                }
+
+                if (handRank == 6) {
+                    return callUntilOrFold(2 * BIG_BLIND)
+                }
+
+                if (handRank == 7) {
+                    return callUntilOrFold(BIG_BLIND)
+                }
+
+                return FOLD
+            }
+
+            // more than 600 chips
+
+            if (handRank in 1..2 || (hasHandPair && cards.first().rank >= EIGHT)) {
+                return allIn()
+            }
+
+            if (handRank in 3..4) {
+
+                if (callValue < 3 * BIG_BLIND) {
+                    return betBlinds(5)
+                }
+
+                if (callValue in 3 * BIG_BLIND..5 * BIG_BLIND) {
+                    return betBlinds(8)
+                }
+
+                return CALL
+            }
+
+            if (handRank == 5) {
+                return callUntilOrFold(3 * BIG_BLIND)
+
+            }
+
+            if (handRank == 6) {
+                return callUntilOrFold(2 * BIG_BLIND)
+            }
+
+            if (handRank == 7) {
+                return callUntilOrFold(BIG_BLIND)
+            }
+
+            return FOLD
+
+        }
+
+        return if (validActions[CHECK]) {
             CHECK
+        } else {
+            FOLD
         }
     }
 
