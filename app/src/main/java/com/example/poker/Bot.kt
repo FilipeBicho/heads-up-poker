@@ -134,48 +134,16 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
         }
     }
 
-    private fun allInPairOrCall(): Int {
-        return if (hasHandPair) {
-            allIn()
-        } else {
-            CALL
-        }
-    }
-
-    private fun allInPairOrCheck(): Int {
-        return if (hasHandPair) {
-            allIn()
-        } else {
-            CALL
-        }
-    }
-
-    private fun allInPairOrFold(): Int {
-        return if (hasHandPair) {
-            allIn()
-        } else {
-            FOLD
-        }
-    }
-
-    private fun callPairMinRank(rank: Int): Int {
-        return if (hasHandPair && pairRank > rank) {
-            CALL
-        } else {
-            FOLD
-        }
-    }
-
     private fun preFlopAction(pokerChips: IntArray, bet: IntArray, validActions: BooleanArray): Int {
 
         // Dealer: player called - check and bet available
         // Blind: player didn't play yet - fold, call and bet available
 
-        return when {
+        when {
             bet[PLAYER] == BIG_BLIND -> {
                 // less than 160 chips
                 if (botStack < 4) {
-                    if (isDealer) {
+                    return if (isDealer) {
                         // player didn't play yet - fold, call and bet available
                         when (handRank) {
                             in 1..3 -> allIn()
@@ -196,7 +164,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                 if (botStack in 4..8) {
                     if (isDealer) {
                         // player didn't play yet - fold, call and bet available
-                        when (handRank) {
+                        return when (handRank) {
                             in 1..2 -> allIn()
                             3 -> if (hasHandPair) { allIn() } else { betBlinds(4) }
                             4 -> if (hasHandPair) { allIn() } else { betBlinds(2) }
@@ -206,8 +174,9 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                         }
                     } else {
                         // player called - check and bet available
-                        when (handRank) {
-                            in 1..2 -> allIn()3 -> if (hasHandPair) { allIn() } else { betBlinds(3) }
+                        return when (handRank) {
+                            in 1..2 -> allIn()
+                            3 -> if (hasHandPair) { allIn() } else { betBlinds(3) }
                             4 -> if (hasHandPair) { allIn() } else { betBlinds(2) }
                             5 -> if (hasHandPair) { betBlinds(4) } else { CHECK }
                             6 -> if (hasHandPair) { betBlinds(2) } else { CHECK }
@@ -220,7 +189,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                 if (botStack in 8..15) {
                     if (isDealer) {
                         // player didn't play yet - fold, call and bet available
-                        when (handRank) {
+                        return when (handRank) {
                             1 -> allIn()
                             2 -> if (hasHandPair) { betBlinds(10) } else { betBlinds(8) }
                             3 -> if (hasHandPair) { betBlinds(8) } else { betBlinds(6) }
@@ -230,7 +199,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                         }
                     } else {
                         // player called - check and bet available
-                        when (handRank) {
+                        return when (handRank) {
                             1 -> allIn()
                             2 -> if (hasHandPair) { betBlinds(8) } else { betBlinds(6) }
                             3 -> if (hasHandPair) { betBlinds(6) } else { betBlinds(4) }
@@ -245,7 +214,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
 
                 if (isDealer) {
                     // player didn't play yet - fold, call and bet available
-                    when (handRank) {
+                    return when (handRank) {
                         1 -> betBlinds(15)
                         2 -> if (hasHandPair) { betBlinds(10) } else { betBlinds(6) }
                         3 -> if (hasHandPair) { betBlinds(6) } else { betBlinds(4) }
@@ -256,7 +225,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                     }
                 } else {
                     // player called - check and bet available
-                    when (handRank) {
+                    return when (handRank) {
                         1 -> betBlinds(13)
                         2 -> if (hasHandPair) { betBlinds(8) } else { betBlinds(4) }
                         3 -> if (hasHandPair) { betBlinds(6) } else { betBlinds(2) }
@@ -271,14 +240,14 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                 // less than 160 chips
                 if (botStack < 4) {
                     if (isDealer) {
-                        when (handRank) {
+                        return when (handRank) {
                             in 1..4 -> allIn()
                             5 -> if (hasHandPair) { allIn() } else { CALL }
                             in 6..7-> if (hasHandPair) { CALL } else { FOLD }
                             else -> FOLD
                         }
                     } else {
-                        when (handRank) {
+                        return when (handRank) {
                             in 1..4 -> allIn()
                             5 -> if (hasHandPair) { allIn() } else { CALL }
                             6 -> if (hasHandPair) { betBlinds(2) } else { FOLD }
@@ -292,54 +261,54 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                 if (botStack in 4..8) {
                     if (isDealer) {
                         when (handRank) {
-                            in 1..3 -> allIn()
-                            4 -> if (hasHandPair) {
+                            in 1..3 -> return allIn()
+                            4 -> return if (hasHandPair) {
                                 callUntilOrRaiseBlinds(4 * BIG_BLIND, 4)
                             } else {
                                 callUntilOrFold(2 * BIG_BLIND)
                             }
-                            5 -> if (hasHandPair) {
+                            5 -> return if (hasHandPair) {
                                 callUntilOrRaiseBlinds(3 * BIG_BLIND, 3)
                             } else {
                                 callUntilOrFold(2 * BIG_BLIND)
                             }
-                            6->  if (hasHandPair) {
+                            6-> return  if (hasHandPair) {
                                 callUntilOrRaiseBlinds(2 * BIG_BLIND, 2)
                             } else {
                                 callUntilOrFold(BIG_BLIND)
                             }
-                            7->  if (hasHandPair) {
+                            7-> return  if (hasHandPair) {
                                 callUntilOrFold(2 * BIG_BLIND)
                             } else {
                                 callUntilOrFold(BIG_BLIND)
                             }
-                            else -> FOLD
+                            else -> return FOLD
 
                         }
                     } else {
                         when (handRank) {
-                            in 1..3 -> allIn()
-                            4 -> if (hasHandPair) {
+                            in 1..3 -> return allIn()
+                            4 -> return if (hasHandPair) {
                                 callUntilOrRaiseBlinds(3 * BIG_BLIND, 3)
                             } else {
                                 callUntilOrFold(2 * BIG_BLIND)
                             }
-                            5 -> if (hasHandPair) {
+                            5 -> return if (hasHandPair) {
                                 callUntilOrRaiseBlinds(2 * BIG_BLIND, 2)
                             } else {
                                 callUntilOrFold(2 * BIG_BLIND)
                             }
-                            6->  if (hasHandPair) {
+                            6-> return  if (hasHandPair) {
                                 callUntilOrRaiseBlinds(2 * BIG_BLIND, 2)
                             } else {
                                 callUntilOrFold(BIG_BLIND)
                             }
-                            7->  if (hasHandPair) {
+                            7-> return  if (hasHandPair) {
                                 callUntilOrFold(2 * BIG_BLIND)
                             } else {
                                 FOLD
                             }
-                            else -> FOLD
+                            else -> return FOLD
                         }
                     }
                 }
@@ -348,16 +317,16 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                 if (botStack in 8..15) {
                     if (isDealer) {
                         when (handRank) {
-                            1 -> allIn()
+                            1 -> return allIn()
                             2 -> {
-                                when {
+                                return when {
                                     callValue <= 5 * BIG_BLIND -> betBlinds(10)
                                     callValue < 8 * BIG_BLIND -> betBlinds(12)
                                     else -> if (hasHandPair) { allIn() } else { CALL }
                                 }
                             }
                             3 -> {
-                                when {
+                                return when {
                                     callValue <= 3 * BIG_BLIND -> betBlinds(6)
                                     callValue in 3 * BIG_BLIND.. 6 * BIG_BLIND -> betBlinds(8)
                                     callValue in 6 * BIG_BLIND.. 10 * BIG_BLIND -> CALL
@@ -365,46 +334,46 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                                 }
                             }
                             4 -> {
-                                when {
+                                return when {
                                     callValue < 2 * BIG_BLIND -> betBlinds(2)
                                     callValue < 10 * BIG_BLIND -> CALL
                                     else -> FOLD
                                 }
                             }
                             5 -> {
-                                when {
+                                return when {
                                     callValue < 2 * BIG_BLIND -> betBlinds(2)
                                     callValue < 4 * BIG_BLIND -> CALL
                                     else -> FOLD
                                 }
                             }
                             6 -> {
-                                when {
+                                return when {
                                     callValue < 4 * BIG_BLIND -> if (hasHandPair) { CALL } else { FOLD }
                                     else -> FOLD
                                 }
                             }
                             7 -> {
-                                when {
+                                return when {
                                     callValue < 2 * BIG_BLIND -> if (hasHandPair) { CALL } else { FOLD }
                                     else -> FOLD
                                 }
                             }
-                            else -> FOLD
+                            else -> return FOLD
 
                         }
                     } else {
                         when (handRank) {
-                            1 -> allIn()
+                            1 -> return allIn()
                             2 -> {
-                                when {
+                                return when {
                                     callValue <= 4 * BIG_BLIND -> betBlinds(8)
                                     callValue < 8 * BIG_BLIND -> betBlinds(10)
                                     else -> if (hasHandPair) { allIn() } else { CALL }
                                 }
                             }
                             3 -> {
-                                when {
+                                return when {
                                     callValue <= 2 * BIG_BLIND -> betBlinds(4)
                                     callValue in 2 * BIG_BLIND.. 6 * BIG_BLIND -> betBlinds(6)
                                     callValue in 6 * BIG_BLIND.. 8 * BIG_BLIND -> CALL
@@ -412,32 +381,32 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                                 }
                             }
                             4 -> {
-                                when {
+                                return when {
                                     callValue <= BIG_BLIND -> betBlinds(2)
                                     callValue < 6 * BIG_BLIND -> CALL
                                     else -> FOLD
                                 }
                             }
                             5 -> {
-                                when {
+                                return when {
                                     callValue <= BIG_BLIND -> betBlinds(1)
                                     callValue < 4 * BIG_BLIND -> CALL
                                     else -> FOLD
                                 }
                             }
                             6 -> {
-                                when {
+                                return when {
                                     callValue <= 3 * BIG_BLIND -> if (hasHandPair) { CALL } else { FOLD }
                                     else -> FOLD
                                 }
                             }
                             7 -> {
-                                when {
+                                return when {
                                     callValue <= BIG_BLIND -> if (hasHandPair) { CALL } else { FOLD }
                                     else -> FOLD
                                 }
                             }
-                            else -> FOLD
+                            else -> return FOLD
 
                         }
                     }
@@ -448,7 +417,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                 if (isDealer) {
                     when (handRank) {
                         1 -> {
-                            when {
+                            return when {
                                 callValue <= 2 * BIG_BLIND -> betBlinds(6)
                                 callValue <= 4 * BIG_BLIND -> betBlinds(10)
                                 callValue <= 10 * BIG_BLIND -> betBlinds(20)
@@ -456,7 +425,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                             }
                         }
                         2 -> {
-                            when {
+                            return when {
                                 callValue <= 2 * BIG_BLIND -> betBlinds(4)
                                 callValue <= 4 * BIG_BLIND -> betBlinds(6)
                                 callValue <= 10 * BIG_BLIND -> betBlinds(10)
@@ -464,7 +433,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                             }
                         }
                         4 -> {
-                            when {
+                            return when {
                                 callValue <= 2 * BIG_BLIND -> betBlinds(2)
                                 callValue <= 4 * BIG_BLIND -> betBlinds(4)
                                 callValue <= 10 * BIG_BLIND -> CALL
@@ -473,7 +442,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                             }
                         }
                         5 -> {
-                            when {
+                            return when {
                                 callValue <= 2 * BIG_BLIND -> betBlinds(1)
                                 callValue <= 6 * BIG_BLIND -> CALL
                                 hasHandPair -> CALL
@@ -481,26 +450,26 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                             }
                         }
                         6 -> {
-                            when {
+                            return when {
                                 callValue <= 4 * BIG_BLIND -> CALL
                                 callValue <= 6 * BIG_BLIND && hasHandPair -> CALL
                                 else -> FOLD
                             }
                         }
                         7 -> {
-                            when {
+                            return when {
                                 callValue <= 2 * BIG_BLIND -> CALL
                                 callValue <= 4 * BIG_BLIND && hasHandPair -> CALL
                                 else -> FOLD
                             }
                         }
-                        else -> FOLD
+                        else -> return FOLD
 
                     }
                 } else {
                     when (handRank) {
                         1 -> {
-                            when {
+                            return when {
                                 callValue <= 2 * BIG_BLIND -> betBlinds(4)
                                 callValue <= 4 * BIG_BLIND -> betBlinds(8)
                                 callValue <= 10 * BIG_BLIND -> betBlinds(15)
@@ -508,7 +477,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                             }
                         }
                         2 -> {
-                            when {
+                            return when {
                                 callValue <= 2 * BIG_BLIND -> betBlinds(2)
                                 callValue <= 4 * BIG_BLIND -> betBlinds(4)
                                 callValue <= 8 * BIG_BLIND -> betBlinds(8)
@@ -516,7 +485,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                             }
                         }
                         4 -> {
-                            when {
+                            return when {
                                 callValue <= 2 * BIG_BLIND -> betBlinds(1)
                                 callValue <= 4 * BIG_BLIND -> betBlinds(2)
                                 callValue <= 8 * BIG_BLIND && hasHandPair -> CALL
@@ -524,30 +493,30 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                             }
                         }
                         5 -> {
-                            when {
+                            return when {
                                 callValue <= 4 * BIG_BLIND -> CALL
                                 callValue <= 6 * BIG_BLIND && hasHandPair-> CALL
                                 else -> FOLD
                             }
                         }
                         6 -> {
-                            when {
+                            return when {
                                 callValue <= 4 * BIG_BLIND && hasHandPair -> CALL
                                 else -> FOLD
                             }
                         }
                         7 -> {
-                            when {
+                            return when {
                                 callValue <=  BIG_BLIND -> CALL
                                 callValue <=  2 * BIG_BLIND && hasHandPair -> CALL
                                 else -> FOLD
                             }
                         }
-                        else -> FOLD
+                        else -> return FOLD
                     }
                 }
             }
-            else -> if (validActions[CHECK]) { CHECK } else { FOLD }
+            else -> return if (validActions[CHECK]) { CHECK } else { FOLD }
         }
     }
 
