@@ -1,10 +1,8 @@
 package com.example.poker
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.poker.helper.HandGroup
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,6 +40,7 @@ abstract class Game: ViewModel() {
     private lateinit var cardDealer: Dealer
     private lateinit var odds: Odds
     lateinit var computerBot: Bot
+    lateinit var computerPreFlopBot: Bot
     var computerBotValidActions = BooleanArray(4){false}
 
     /**
