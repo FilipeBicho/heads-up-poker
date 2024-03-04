@@ -19,7 +19,6 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
     private var totalMoney: Int = 0
     private var isDealer: Boolean = false
     private val hasHandPair = cards.first().rank == cards.last().rank
-    private val pairRank = cards.first().rank
 
     init {
         handRank = HandGroup(cards).group
@@ -56,22 +55,6 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
         totalMoney = 0
     }
 
-    private fun callUntilOrFold(value: Int): Int {
-        return if (callValue <= value) {
-            CALL
-        } else {
-            FOLD
-        }
-    }
-
-    private fun callUntilOrRaiseBlinds(value: Int, blinds: Int): Int {
-        return if (callValue <= value) {
-            CALL
-        } else {
-            betBlinds(blinds)
-        }
-    }
-
     private fun allIn(): Int {
         return if (totalMoney - callValue < 0) {
             CALL
@@ -101,9 +84,9 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
         if (bet[PLAYER] == BIG_BLIND) {
             // less than 160 chips
             if (botStack < 4) {
-                return if (isDealer) {
+                if (isDealer) {
                     // player didn't play yet - fold, call and bet available
-                    when (handRank) {
+                    return when (handRank) {
                         in 1..2 -> allIn()
                         3 -> betBlinds(2)
                         in 4..6 -> if (hasHandPair) { betBlinds(2) } else { CALL }
@@ -112,7 +95,7 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                     }
                 } else {
                     // player called - check and bet available
-                    when (handRank) {
+                    return when (handRank) {
                         in 1..2 -> allIn()
                         3 -> betBlinds(2)
                         in 4..5 -> if (hasHandPair) { betBlinds(2) } else { CHECK }
@@ -203,17 +186,20 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
             if (botStack < 4) {
                 if (isDealer) {
                     return when (handRank) {
-                        in 1..4 -> allIn()
+                        in 1..2 -> allIn()
+                        3 -> if (hasHandPair) { allIn() } else { betBlinds(1) }
                         5 -> if (hasHandPair) { allIn() } else { CALL }
+                        in 5..6 -> if (hasHandPair) { allIn() } else { FOLD }
                         in 6..7-> if (hasHandPair) { CALL } else { FOLD }
                         else -> FOLD
                     }
                 } else {
                     return when (handRank) {
-                        in 1..4 -> allIn()
+                        in 1..2 -> allIn()
+                        3 -> if (hasHandPair) { allIn() } else { betBlinds(1) }
                         5 -> if (hasHandPair) { allIn() } else { CALL }
-                        6 -> if (hasHandPair) { betBlinds(2) } else { FOLD }
-                        7 -> if (hasHandPair) { CALL } else { FOLD }
+                        in 5..6 -> if (hasHandPair) { allIn() } else { FOLD }
+                        in 6..7-> if (hasHandPair) { CALL } else { FOLD }
                         else -> FOLD
                     }
                 }
@@ -223,52 +209,70 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
             if (botStack in 4..8) {
                 if (isDealer) {
                     when (handRank) {
-                        in 1..3 -> return allIn()
-                        4 -> return if (hasHandPair) {
-                            callUntilOrRaiseBlinds(4 * BIG_BLIND, 4)
-                        } else {
-                            callUntilOrFold(2 * BIG_BLIND)
+                        in 1..2 -> return allIn()
+                        3 -> return when {
+                            hasHandPair -> betBlinds(6)
+                            callValue <= 2 * BIG_BLIND -> betBlinds(4)
+                            callValue <= 6 * BIG_BLIND -> CALL
+                            else -> FOLD
                         }
-                        5 -> return if (hasHandPair) {
-                            callUntilOrRaiseBlinds(3 * BIG_BLIND, 3)
-                        } else {
-                            callUntilOrFold(2 * BIG_BLIND)
+                        4 -> return when {
+                            hasHandPair -> betBlinds(4)
+                            callValue <= 2 * BIG_BLIND -> betBlinds(2)
+                            callValue <= 6 * BIG_BLIND -> CALL
+                            else -> FOLD
                         }
-                        6-> return  if (hasHandPair) {
-                            callUntilOrRaiseBlinds(2 * BIG_BLIND, 2)
-                        } else {
-                            callUntilOrFold(BIG_BLIND)
+                        5 -> return when {
+                            hasHandPair -> betBlinds(2)
+                            callValue <= 2 * BIG_BLIND -> betBlinds(1)
+                            callValue <= 4 * BIG_BLIND -> CALL
+                            else -> FOLD
                         }
-                        7-> return  if (hasHandPair) {
-                            callUntilOrFold(2 * BIG_BLIND)
-                        } else {
-                            callUntilOrFold(BIG_BLIND)
+                        6 -> return when {
+                            hasHandPair -> betBlinds(1)
+                            callValue <= 2 * BIG_BLIND -> CALL
+                            else -> FOLD
+                        }
+                        7 -> return when {
+                            hasHandPair -> betBlinds(1)
+                            callValue <= BIG_BLIND -> CALL
+                            else -> FOLD
+                        }
+                        8 -> return when {
+                            callValue <= BIG_BLIND -> CALL
+                            else -> FOLD
                         }
                         else -> return FOLD
-
                     }
                 } else {
                     when (handRank) {
-                        in 1..3 -> return allIn()
-                        4 -> return if (hasHandPair) {
-                            callUntilOrRaiseBlinds(3 * BIG_BLIND, 3)
-                        } else {
-                            callUntilOrFold(2 * BIG_BLIND)
+                        in 1..2 -> return allIn()
+                        3 -> return when {
+                            hasHandPair -> betBlinds(4)
+                            callValue <= 2 * BIG_BLIND -> betBlinds(2)
+                            callValue <= 5 * BIG_BLIND -> CALL
+                            else -> FOLD
                         }
-                        5 -> return if (hasHandPair) {
-                            callUntilOrRaiseBlinds(2 * BIG_BLIND, 2)
-                        } else {
-                            callUntilOrFold(2 * BIG_BLIND)
+                        4 -> return when {
+                            hasHandPair -> betBlinds(2)
+                            callValue <= 2 * BIG_BLIND -> betBlinds(1)
+                            callValue <= 4 * BIG_BLIND -> CALL
+                            else -> FOLD
                         }
-                        6-> return  if (hasHandPair) {
-                            callUntilOrRaiseBlinds(2 * BIG_BLIND, 2)
-                        } else {
-                            callUntilOrFold(BIG_BLIND)
+                        5 -> return when {
+                            hasHandPair -> betBlinds(1)
+                            callValue <= 2 * BIG_BLIND -> betBlinds(1)
+                            callValue <= 4 * BIG_BLIND -> CALL
+                            else -> FOLD
                         }
-                        7-> return  if (hasHandPair) {
-                            callUntilOrFold(2 * BIG_BLIND)
-                        } else {
-                            FOLD
+                        in 6..7 -> return when {
+                            hasHandPair -> betBlinds(1)
+                            callValue <= BIG_BLIND -> CALL
+                            else -> FOLD
+                        }
+                        8 -> return when {
+                            callValue <= BIG_BLIND -> CALL
+                            else -> FOLD
                         }
                         else -> return FOLD
                     }
@@ -280,199 +284,183 @@ open class Bot (odds: Odds, private val cards: List<Card>, tableCards: List<Card
                 if (isDealer) {
                     when (handRank) {
                         1 -> return allIn()
-                        2 -> {
-                            return when {
-                                callValue <= 5 * BIG_BLIND -> betBlinds(10)
-                                callValue < 8 * BIG_BLIND -> betBlinds(12)
-                                else -> if (hasHandPair) { allIn() } else { CALL }
-                            }
+                        2 -> return when {
+                            hasHandPair -> betBlinds(10)
+                            callValue <= 4 * BIG_BLIND -> betBlinds(6)
+                            callValue <= 8 * BIG_BLIND -> betBlinds(1)
+                            else -> CALL
                         }
-                        3 -> {
-                            return when {
-                                callValue <= 3 * BIG_BLIND -> betBlinds(6)
-                                callValue in 3 * BIG_BLIND.. 6 * BIG_BLIND -> betBlinds(8)
-                                callValue in 6 * BIG_BLIND.. 10 * BIG_BLIND -> CALL
-                                else -> FOLD
-                            }
+                        3 -> return when {
+                            hasHandPair -> betBlinds(8)
+                            callValue <= 2 * BIG_BLIND -> betBlinds(2)
+                            callValue <= 4 * BIG_BLIND -> betBlinds(1)
+                            callValue <= 8 * BIG_BLIND -> CALL
+                            else -> FOLD
                         }
-                        4 -> {
-                            return when {
-                                callValue < 2 * BIG_BLIND -> betBlinds(2)
-                                callValue < 10 * BIG_BLIND -> CALL
-                                else -> FOLD
-                            }
+                        4 -> return when {
+                            hasHandPair -> betBlinds(4)
+                            callValue <= 2 * BIG_BLIND -> betBlinds(2)
+                            callValue <= 6 * BIG_BLIND -> CALL
+                            else -> FOLD
                         }
-                        5 -> {
-                            return when {
-                                callValue < 2 * BIG_BLIND -> betBlinds(2)
-                                callValue < 4 * BIG_BLIND -> CALL
-                                else -> FOLD
-                            }
+                        5 -> return when {
+                            hasHandPair -> betBlinds(2)
+                            callValue <= 2 * BIG_BLIND -> betBlinds(1)
+                            callValue <= 4 * BIG_BLIND -> CALL
+                            else -> FOLD
                         }
-                        6 -> {
-                            return when {
-                                callValue < 4 * BIG_BLIND -> if (hasHandPair) { CALL } else { FOLD }
-                                else -> FOLD
-                            }
+                        6 -> return when {
+                            hasHandPair -> betBlinds(1)
+                            callValue <= 2 * BIG_BLIND -> CALL
+                            else -> FOLD
                         }
-                        7 -> {
-                            return when {
-                                callValue < 2 * BIG_BLIND -> if (hasHandPair) { CALL } else { FOLD }
-                                else -> FOLD
-                            }
+                        7 -> return when {
+                            hasHandPair -> betBlinds(1)
+                            callValue <= BIG_BLIND -> CALL
+                            else -> FOLD
+                        }
+                        8 -> return when {
+                            callValue <= BIG_BLIND -> CALL
+                            else -> FOLD
                         }
                         else -> return FOLD
-
                     }
                 } else {
                     when (handRank) {
                         1 -> return allIn()
-                        2 -> {
-                            return when {
-                                callValue <= 4 * BIG_BLIND -> betBlinds(8)
-                                callValue < 8 * BIG_BLIND -> betBlinds(10)
-                                else -> if (hasHandPair) { allIn() } else { CALL }
-                            }
+                        2 -> return when {
+                            hasHandPair -> betBlinds(8)
+                            callValue <= 4 * BIG_BLIND -> betBlinds(4)
+                            callValue <= 8 * BIG_BLIND -> betBlinds(1)
+                            else -> CALL
                         }
-                        3 -> {
-                            return when {
-                                callValue <= 2 * BIG_BLIND -> betBlinds(4)
-                                callValue in 2 * BIG_BLIND.. 6 * BIG_BLIND -> betBlinds(6)
-                                callValue in 6 * BIG_BLIND.. 8 * BIG_BLIND -> CALL
-                                else -> FOLD
-                            }
+                        3 -> return when {
+                            hasHandPair -> betBlinds(6)
+                            callValue <= 2 * BIG_BLIND -> betBlinds(2)
+                            callValue <= 4 * BIG_BLIND -> betBlinds(1)
+                            callValue <= 8 * BIG_BLIND -> CALL
+                            else -> FOLD
                         }
-                        4 -> {
-                            return when {
-                                callValue <= BIG_BLIND -> betBlinds(2)
-                                callValue < 6 * BIG_BLIND -> CALL
-                                else -> FOLD
-                            }
+                        4 -> return when {
+                            hasHandPair -> betBlinds(4)
+                            callValue <= 2 * BIG_BLIND -> betBlinds(2)
+                            callValue <= 5 * BIG_BLIND -> CALL
+                            else -> FOLD
                         }
-                        5 -> {
-                            return when {
-                                callValue <= BIG_BLIND -> betBlinds(1)
-                                callValue < 4 * BIG_BLIND -> CALL
-                                else -> FOLD
-                            }
+                        5 -> return when {
+                            hasHandPair -> betBlinds(2)
+                            callValue <= 2 * BIG_BLIND -> betBlinds(1)
+                            callValue <= 3 * BIG_BLIND -> CALL
+                            else -> FOLD
                         }
-                        6 -> {
-                            return when {
-                                callValue <= 3 * BIG_BLIND -> if (hasHandPair) { CALL } else { FOLD }
-                                else -> FOLD
-                            }
+                        in 6..7 -> return when {
+                            hasHandPair -> betBlinds(1)
+                            callValue <= 2 * BIG_BLIND -> CALL
+                            else -> FOLD
                         }
-                        7 -> {
-                            return when {
-                                callValue <= BIG_BLIND -> if (hasHandPair) { CALL } else { FOLD }
-                                else -> FOLD
-                            }
+                        8 -> return when {
+                            callValue <= BIG_BLIND -> CALL
+                            else -> FOLD
                         }
                         else -> return FOLD
-
                     }
                 }
             }
 
             // more than 600 chips
-
             if (isDealer) {
                 when (handRank) {
-                    1 -> {
-                        return when {
-                            callValue <= 2 * BIG_BLIND -> betBlinds(6)
-                            callValue <= 4 * BIG_BLIND -> betBlinds(10)
-                            callValue <= 10 * BIG_BLIND -> betBlinds(20)
-                            else -> allIn()
-                        }
+                    1 -> return when {
+                        callValue <= 2 * BIG_BLIND -> betBlinds(8)
+                        callValue <= 4 * BIG_BLIND -> betBlinds(12)
+                        callValue <= 8 * BIG_BLIND -> betBlinds(15)
+                        else -> allIn()
                     }
-                    2 -> {
-                        return when {
-                            callValue <= 2 * BIG_BLIND -> betBlinds(4)
-                            callValue <= 4 * BIG_BLIND -> betBlinds(6)
-                            callValue <= 10 * BIG_BLIND -> betBlinds(10)
-                            else -> CALL
-                        }
+                    2 -> return when {
+                        hasHandPair -> betBlinds(10)
+                        callValue <= 4 * BIG_BLIND -> betBlinds(6)
+                        callValue <= 8 * BIG_BLIND -> betBlinds(1)
+                        else -> CALL
                     }
-                    4 -> {
-                        return when {
-                            callValue <= 2 * BIG_BLIND -> betBlinds(2)
-                            callValue <= 4 * BIG_BLIND -> betBlinds(4)
-                            callValue <= 10 * BIG_BLIND -> CALL
-                            hasHandPair -> CALL
-                            else -> FOLD
-                        }
+                    3 -> return when {
+                        hasHandPair -> betBlinds(8)
+                        callValue <= 2 * BIG_BLIND -> betBlinds(2)
+                        callValue <= 4 * BIG_BLIND -> betBlinds(1)
+                        callValue <= 8 * BIG_BLIND -> CALL
+                        else -> FOLD
                     }
-                    5 -> {
-                        return when {
-                            callValue <= 2 * BIG_BLIND -> betBlinds(1)
-                            callValue <= 6 * BIG_BLIND -> CALL
-                            hasHandPair -> CALL
-                            else -> FOLD
-                        }
+                    4 -> return when {
+                        hasHandPair -> betBlinds(4)
+                        callValue <= 2 * BIG_BLIND -> betBlinds(2)
+                        callValue <= 6 * BIG_BLIND -> CALL
+                        else -> FOLD
                     }
-                    6 -> {
-                        return when {
-                            callValue <= 4 * BIG_BLIND -> CALL
-                            callValue <= 6 * BIG_BLIND && hasHandPair -> CALL
-                            else -> FOLD
-                        }
+                    5 -> return when {
+                        hasHandPair -> betBlinds(2)
+                        callValue <= 2 * BIG_BLIND -> betBlinds(1)
+                        callValue <= 4 * BIG_BLIND -> CALL
+                        else -> FOLD
                     }
-                    7 -> {
-                        return when {
-                            callValue <= 2 * BIG_BLIND -> CALL
-                            callValue <= 4 * BIG_BLIND && hasHandPair -> CALL
-                            else -> FOLD
-                        }
+                    6 -> return when {
+                        hasHandPair -> betBlinds(1)
+                        callValue <= 2 * BIG_BLIND -> CALL
+                        else -> FOLD
+                    }
+                    7 -> return when {
+                        hasHandPair -> betBlinds(1)
+                        callValue <= BIG_BLIND -> CALL
+                        else -> FOLD
+                    }
+                    8 -> return when {
+                        callValue <= BIG_BLIND -> CALL
+                        else -> FOLD
                     }
                     else -> return FOLD
-
                 }
             } else {
                 when (handRank) {
-                    1 -> {
-                        return when {
-                            callValue <= 2 * BIG_BLIND -> betBlinds(4)
-                            callValue <= 4 * BIG_BLIND -> betBlinds(8)
-                            callValue <= 10 * BIG_BLIND -> betBlinds(15)
-                            else -> allIn()
-                        }
+                    1 -> return when {
+                        callValue <= 2 * BIG_BLIND -> betBlinds(8)
+                        callValue <= 4 * BIG_BLIND -> betBlinds(10)
+                        callValue <= 8 * BIG_BLIND -> betBlinds(13)
+                        else -> allIn()
                     }
-                    2 -> {
-                        return when {
-                            callValue <= 2 * BIG_BLIND -> betBlinds(2)
-                            callValue <= 4 * BIG_BLIND -> betBlinds(4)
-                            callValue <= 8 * BIG_BLIND -> betBlinds(8)
-                            else -> CALL
-                        }
+                    2 -> return when {
+                        hasHandPair -> betBlinds(8)
+                        callValue <= 4 * BIG_BLIND -> betBlinds(4)
+                        callValue <= 8 * BIG_BLIND -> betBlinds(1)
+                        else -> CALL
                     }
-                    4 -> {
-                        return when {
-                            callValue <= 2 * BIG_BLIND -> betBlinds(1)
-                            callValue <= 4 * BIG_BLIND -> betBlinds(2)
-                            callValue <= 8 * BIG_BLIND && hasHandPair -> CALL
-                            else -> FOLD
-                        }
+                    3 -> return when {
+                        hasHandPair -> betBlinds(6)
+                        callValue <= 2 * BIG_BLIND -> betBlinds(1)
+                        callValue <= 6 * BIG_BLIND -> CALL
+                        else -> FOLD
                     }
-                    5 -> {
-                        return when {
-                            callValue <= 4 * BIG_BLIND -> CALL
-                            callValue <= 6 * BIG_BLIND && hasHandPair-> CALL
-                            else -> FOLD
-                        }
+                    4 -> return when {
+                        hasHandPair -> betBlinds(2)
+                        callValue <= 2 * BIG_BLIND -> betBlinds(1)
+                        callValue <= 5 * BIG_BLIND -> CALL
+                        else -> FOLD
                     }
-                    6 -> {
-                        return when {
-                            callValue <= 4 * BIG_BLIND && hasHandPair -> CALL
-                            else -> FOLD
-                        }
+                    5 -> return when {
+                        hasHandPair -> betBlinds(1)
+                        callValue <= 4 * BIG_BLIND -> CALL
+                        else -> FOLD
                     }
-                    7 -> {
-                        return when {
-                            callValue <=  BIG_BLIND -> CALL
-                            callValue <=  2 * BIG_BLIND && hasHandPair -> CALL
-                            else -> FOLD
-                        }
+                    6 -> return when {
+                        hasHandPair -> betBlinds(1)
+                        callValue <= 2 * BIG_BLIND -> CALL
+                        else -> FOLD
+                    }
+                    7 -> return when {
+                        hasHandPair -> betBlinds(1)
+                        callValue <= BIG_BLIND -> CALL
+                        else -> FOLD
+                    }
+                    8 -> return when {
+                        callValue <= BIG_BLIND -> CALL
+                        else -> FOLD
                     }
                     else -> return FOLD
                 }
