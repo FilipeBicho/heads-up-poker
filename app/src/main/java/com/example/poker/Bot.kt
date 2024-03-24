@@ -17,6 +17,7 @@ open class Bot(odds: Odds?, private val cards: List<Card>, tableCards: List<Card
     protected var botStack: Int = 0
     protected var callValue: Int = 0
     protected var totalMoney: Int = 0
+    protected var pot: Int = 0
     protected var isDealer: Boolean = false
     protected val hasHandPair = cards.first().rank == cards.last().rank
 
@@ -27,7 +28,7 @@ open class Bot(odds: Odds?, private val cards: List<Card>, tableCards: List<Card
     /**
      * Init stack and call value
      */
-    fun initValues(pokerChips: IntArray, bet:IntArray) {
+    fun initValues(pokerChips: IntArray, bet:IntArray, pot: Int) {
 
         totalMoney = pokerChips[BOT]
 
@@ -77,10 +78,10 @@ open class Bot(odds: Odds?, private val cards: List<Card>, tableCards: List<Card
     open fun botAction(pokerChips: IntArray, bet: IntArray, totalPot: Int, round: Int, validActions: BooleanArray): Int {
 
         resetValues()
-        initValues(pokerChips, bet)
+        initValues(pokerChips, bet, totalPot)
 
         when (round) {
-            PRE_FLOP -> return PreFlopBot(cards, isDealer).botAction(pokerChips, bet, validActions)
+            PRE_FLOP -> return PreFlopBot(cards, isDealer).botAction(pokerChips, bet, totalPot, validActions)
         }
 
         return action

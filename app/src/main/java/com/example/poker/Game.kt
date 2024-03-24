@@ -499,6 +499,9 @@ abstract class Game: ViewModel() {
 
         when (round) {
             PRE_FLOP -> {
+
+                newGame()
+                return
                 round = FLOP
 
                 mutableStateFlow.update { currentState -> currentState.copy(
@@ -626,7 +629,7 @@ abstract class Game: ViewModel() {
         gameSummaryMap.add(gameNumber, gameSummaryList.toList())
 
         mutableStateFlow.update { currentState -> currentState.copy(
-            displayComputerCards = false,
+            displayComputerCards = true,
             displayFlop = false,
             displayTurn = false,
             displayRiver = false,

@@ -28,7 +28,7 @@ data class GameUiState(
 
     val displayRiver: Boolean = false,
 
-    val displayComputerCards: Boolean = false,
+    val displayComputerCards: Boolean = true,
 
     val displayFoldButton: Boolean = false,
 

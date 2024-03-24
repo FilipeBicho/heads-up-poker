@@ -13,12 +13,12 @@ class PreFlopBot(cards: List<Card>, isDealer: Boolean):
     Bot(null, cards, null, isDealer) {
 
     private var handRank: Int = 0
-        
+
     init {
         handRank = HandGroup(cards).group
         this.isDealer = isDealer
     }
-        
+
     private fun calculateAction(pokerChips: IntArray, bet: IntArray, validActions: BooleanArray): Int {
 
         // Dealer: player called - check and bet available
@@ -30,7 +30,7 @@ class PreFlopBot(cards: List<Card>, isDealer: Boolean):
                     // player didn't play yet - fold, call and bet available
                     return when (handRank) {
                         in 1..2 -> allIn()
-                        3 -> betBlinds(2)
+                        3 -> if (hasHandPair) { allIn() } else { betBlinds(2) }
                         in 4..6 -> if (hasHandPair) { betBlinds(2) } else { CALL }
                         7 -> if (hasHandPair) { CALL } else { FOLD }
                         else -> FOLD
@@ -130,18 +130,16 @@ class PreFlopBot(cards: List<Card>, isDealer: Boolean):
                     return when (handRank) {
                         in 1..2 -> allIn()
                         3 -> if (hasHandPair) { allIn() } else { betBlinds(1) }
-                        5 -> if (hasHandPair) { allIn() } else { CALL }
-                        in 5..6 -> if (hasHandPair) { allIn() } else { FOLD }
-                        in 6..7-> if (hasHandPair) { CALL } else { FOLD }
+                        in 4..6 -> if (hasHandPair) { allIn() } else { CALL }
+                        7-> if (hasHandPair) { CALL } else { FOLD }
                         else -> FOLD
                     }
                 } else {
                     return when (handRank) {
                         in 1..2 -> allIn()
-                        3 -> if (hasHandPair) { allIn() } else { betBlinds(1) }
-                        5 -> if (hasHandPair) { allIn() } else { CALL }
-                        in 5..6 -> if (hasHandPair) { allIn() } else { FOLD }
-                        in 6..7-> if (hasHandPair) { CALL } else { FOLD }
+                        3 -> if (hasHandPair) { allIn() } else { betBlinds(2) }
+                        in 4..6 -> if (hasHandPair) { allIn() } else { CALL }
+                        7-> if (hasHandPair) { CALL } else { FOLD }
                         else -> FOLD
                     }
                 }
@@ -153,30 +151,30 @@ class PreFlopBot(cards: List<Card>, isDealer: Boolean):
                     when (handRank) {
                         in 1..2 -> return allIn()
                         3 -> return when {
-                            hasHandPair -> betBlinds(6)
-                            callValue <= 2 * BIG_BLIND -> betBlinds(4)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(6) else CALL
+                            callValue <= 2 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(4) else CALL
                             callValue <= 6 * BIG_BLIND -> CALL
                             else -> FOLD
                         }
                         4 -> return when {
-                            hasHandPair -> betBlinds(4)
-                            callValue <= 2 * BIG_BLIND -> betBlinds(2)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(4) else CALL
+                            callValue <= 2 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(2) else CALL
                             callValue <= 6 * BIG_BLIND -> CALL
                             else -> FOLD
                         }
                         5 -> return when {
-                            hasHandPair -> betBlinds(2)
-                            callValue <= 2 * BIG_BLIND -> betBlinds(1)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(2) else CALL
+                            callValue <= 2 * BIG_BLIND -> if (pot < 5 * BIG_BLIND) betBlinds(1) else CALL
                             callValue <= 4 * BIG_BLIND -> CALL
                             else -> FOLD
                         }
                         6 -> return when {
-                            hasHandPair -> betBlinds(1)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                             callValue <= 2 * BIG_BLIND -> CALL
                             else -> FOLD
                         }
                         7 -> return when {
-                            hasHandPair -> betBlinds(1)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                             callValue <= BIG_BLIND -> CALL
                             else -> FOLD
                         }
@@ -190,25 +188,25 @@ class PreFlopBot(cards: List<Card>, isDealer: Boolean):
                     when (handRank) {
                         in 1..2 -> return allIn()
                         3 -> return when {
-                            hasHandPair -> betBlinds(4)
-                            callValue <= 2 * BIG_BLIND -> betBlinds(2)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(4) else CALL
+                            callValue <= 2 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(2) else CALL
                             callValue <= 5 * BIG_BLIND -> CALL
                             else -> FOLD
                         }
                         4 -> return when {
-                            hasHandPair -> betBlinds(2)
-                            callValue <= 2 * BIG_BLIND -> betBlinds(1)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(2) else CALL
+                            callValue <= 2 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                             callValue <= 4 * BIG_BLIND -> CALL
                             else -> FOLD
                         }
                         5 -> return when {
-                            hasHandPair -> betBlinds(1)
-                            callValue <= 2 * BIG_BLIND -> betBlinds(1)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
+                            callValue <= 2 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                             callValue <= 4 * BIG_BLIND -> CALL
                             else -> FOLD
                         }
                         in 6..7 -> return when {
-                            hasHandPair -> betBlinds(1)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                             callValue <= BIG_BLIND -> CALL
                             else -> FOLD
                         }
@@ -227,37 +225,37 @@ class PreFlopBot(cards: List<Card>, isDealer: Boolean):
                     when (handRank) {
                         1 -> return allIn()
                         2 -> return when {
-                            hasHandPair -> betBlinds(10)
-                            callValue <= 4 * BIG_BLIND -> betBlinds(6)
-                            callValue <= 8 * BIG_BLIND -> betBlinds(1)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(10) else allIn()
+                            callValue <= 4 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(6) else CALL
+                            callValue <= 8 * BIG_BLIND -> if (pot < 10 * BIG_BLIND) betBlinds(4) else CALL
                             else -> CALL
                         }
                         3 -> return when {
-                            hasHandPair -> betBlinds(8)
-                            callValue <= 2 * BIG_BLIND -> betBlinds(2)
-                            callValue <= 4 * BIG_BLIND -> betBlinds(1)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(8) else allIn()
+                            callValue <= 2 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(2) else CALL
+                            callValue <= 4 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                             callValue <= 8 * BIG_BLIND -> CALL
                             else -> FOLD
                         }
                         4 -> return when {
-                            hasHandPair -> betBlinds(4)
-                            callValue <= 2 * BIG_BLIND -> betBlinds(2)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(4) else CALL
+                            callValue <= 2 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(2) else CALL
                             callValue <= 6 * BIG_BLIND -> CALL
                             else -> FOLD
                         }
                         5 -> return when {
-                            hasHandPair -> betBlinds(2)
-                            callValue <= 2 * BIG_BLIND -> betBlinds(1)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(2) else CALL
+                            callValue <= 2 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                             callValue <= 4 * BIG_BLIND -> CALL
                             else -> FOLD
                         }
                         6 -> return when {
-                            hasHandPair -> betBlinds(1)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                             callValue <= 2 * BIG_BLIND -> CALL
                             else -> FOLD
                         }
                         7 -> return when {
-                            hasHandPair -> betBlinds(1)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                             callValue <= BIG_BLIND -> CALL
                             else -> FOLD
                         }
@@ -271,32 +269,32 @@ class PreFlopBot(cards: List<Card>, isDealer: Boolean):
                     when (handRank) {
                         1 -> return allIn()
                         2 -> return when {
-                            hasHandPair -> betBlinds(8)
-                            callValue <= 4 * BIG_BLIND -> betBlinds(4)
-                            callValue <= 8 * BIG_BLIND -> betBlinds(1)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(8) else CALL
+                            callValue <= 4 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(4) else CALL
+                            callValue <= 8 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                             else -> CALL
                         }
                         3 -> return when {
-                            hasHandPair -> betBlinds(6)
-                            callValue <= 2 * BIG_BLIND -> betBlinds(2)
-                            callValue <= 4 * BIG_BLIND -> betBlinds(1)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(6) else CALL
+                            callValue <= 2 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(2) else CALL
+                            callValue <= 4 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                             callValue <= 8 * BIG_BLIND -> CALL
                             else -> FOLD
                         }
                         4 -> return when {
-                            hasHandPair -> betBlinds(4)
-                            callValue <= 2 * BIG_BLIND -> betBlinds(2)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(4) else CALL
+                            callValue <= 2 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(2) else CALL
                             callValue <= 5 * BIG_BLIND -> CALL
                             else -> FOLD
                         }
                         5 -> return when {
-                            hasHandPair -> betBlinds(2)
-                            callValue <= 2 * BIG_BLIND -> betBlinds(1)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(2) else CALL
+                            callValue <= 2 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                             callValue <= 3 * BIG_BLIND -> CALL
                             else -> FOLD
                         }
                         in 6..7 -> return when {
-                            hasHandPair -> betBlinds(1)
+                            hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                             callValue <= 2 * BIG_BLIND -> CALL
                             else -> FOLD
                         }
@@ -313,43 +311,42 @@ class PreFlopBot(cards: List<Card>, isDealer: Boolean):
             if (isDealer) {
                 when (handRank) {
                     1 -> return when {
-                        callValue <= 2 * BIG_BLIND -> betBlinds(8)
-                        callValue <= 4 * BIG_BLIND -> betBlinds(12)
-                        callValue <= 8 * BIG_BLIND -> betBlinds(15)
+                        callValue <= 2 * BIG_BLIND -> if (pot < 10 * BIG_BLIND) betBlinds(8) else allIn()
+                        callValue <= 4 * BIG_BLIND -> if (pot < 10 * BIG_BLIND) betBlinds(12) else betBlinds(4)
                         else -> allIn()
                     }
                     2 -> return when {
-                        hasHandPair -> betBlinds(10)
-                        callValue <= 4 * BIG_BLIND -> betBlinds(6)
-                        callValue <= 8 * BIG_BLIND -> betBlinds(1)
+                        hasHandPair -> if (pot < 10 * BIG_BLIND) betBlinds(10) else betBlinds(4)
+                        callValue <= 4 * BIG_BLIND -> if (pot < 10 * BIG_BLIND) betBlinds(4) else CALL
+                        callValue <= 8 * BIG_BLIND -> if (pot < 8 * BIG_BLIND) betBlinds(1) else CALL
                         else -> CALL
                     }
                     3 -> return when {
-                        hasHandPair -> betBlinds(8)
-                        callValue <= 2 * BIG_BLIND -> betBlinds(2)
-                        callValue <= 4 * BIG_BLIND -> betBlinds(1)
+                        hasHandPair -> if (pot < 10 * BIG_BLIND) betBlinds(8) else allIn()
+                        callValue <= 2 * BIG_BLIND -> if (pot < 10 * BIG_BLIND) betBlinds(2) else CALL
+                        callValue <= 4 * BIG_BLIND -> if (pot < 10 * BIG_BLIND) betBlinds(1) else CALL
                         callValue <= 8 * BIG_BLIND -> CALL
                         else -> FOLD
                     }
                     4 -> return when {
-                        hasHandPair -> betBlinds(4)
-                        callValue <= 2 * BIG_BLIND -> betBlinds(2)
+                        hasHandPair -> if (pot < 10 * BIG_BLIND) betBlinds(4) else CALL
+                        callValue <= 2 * BIG_BLIND -> if (pot < 10 * BIG_BLIND) betBlinds(2) else CALL
                         callValue <= 6 * BIG_BLIND -> CALL
                         else -> FOLD
                     }
                     5 -> return when {
-                        hasHandPair -> betBlinds(2)
-                        callValue <= 2 * BIG_BLIND -> betBlinds(1)
+                        hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(2) else CALL
+                        callValue <= 2 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                         callValue <= 4 * BIG_BLIND -> CALL
                         else -> FOLD
                     }
                     6 -> return when {
-                        hasHandPair -> betBlinds(1)
+                        hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                         callValue <= 2 * BIG_BLIND -> CALL
                         else -> FOLD
                     }
                     7 -> return when {
-                        hasHandPair -> betBlinds(1)
+                        hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                         callValue <= BIG_BLIND -> CALL
                         else -> FOLD
                     }
@@ -362,41 +359,42 @@ class PreFlopBot(cards: List<Card>, isDealer: Boolean):
             } else {
                 when (handRank) {
                     1 -> return when {
-                        callValue <= 2 * BIG_BLIND -> betBlinds(8)
-                        callValue <= 4 * BIG_BLIND -> betBlinds(10)
-                        callValue <= 8 * BIG_BLIND -> betBlinds(13)
+                        callValue <= 2 * BIG_BLIND -> if (pot < 9 * BIG_BLIND) betBlinds(7) else allIn()
+                        callValue <= 4 * BIG_BLIND -> if (pot < 9 * BIG_BLIND) betBlinds(10) else betBlinds(2)
                         else -> allIn()
                     }
                     2 -> return when {
-                        hasHandPair -> betBlinds(8)
-                        callValue <= 4 * BIG_BLIND -> betBlinds(4)
-                        callValue <= 8 * BIG_BLIND -> betBlinds(1)
+                        hasHandPair -> if (pot < 9 * BIG_BLIND) betBlinds(8) else betBlinds(2)
+                        callValue <= 4 * BIG_BLIND -> if (pot < 9 * BIG_BLIND) betBlinds(3) else CALL
+                        callValue <= 8 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                         else -> CALL
                     }
                     3 -> return when {
-                        hasHandPair -> betBlinds(6)
-                        callValue <= 2 * BIG_BLIND -> betBlinds(1)
-                        callValue <= 6 * BIG_BLIND -> CALL
+                        hasHandPair -> if (pot < 9 * BIG_BLIND) betBlinds(6) else allIn()
+                        callValue <= 2 * BIG_BLIND -> if (pot < 9 * BIG_BLIND) betBlinds(1) else CALL
+                        callValue <= 4 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
+                        callValue <= 8 * BIG_BLIND -> CALL
                         else -> FOLD
                     }
                     4 -> return when {
-                        hasHandPair -> betBlinds(2)
-                        callValue <= 2 * BIG_BLIND -> betBlinds(1)
-                        callValue <= 5 * BIG_BLIND -> CALL
+                        hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(3) else CALL
+                        callValue <= 2 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(2) else CALL
+                        callValue <= 6 * BIG_BLIND -> CALL
                         else -> FOLD
                     }
                     5 -> return when {
-                        hasHandPair -> betBlinds(1)
+                        hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
+                        callValue <= 2 * BIG_BLIND -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                         callValue <= 4 * BIG_BLIND -> CALL
                         else -> FOLD
                     }
                     6 -> return when {
-                        hasHandPair -> betBlinds(1)
+                        hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                         callValue <= 2 * BIG_BLIND -> CALL
                         else -> FOLD
                     }
                     7 -> return when {
-                        hasHandPair -> betBlinds(1)
+                        hasHandPair -> if (pot < 6 * BIG_BLIND) betBlinds(1) else CALL
                         callValue <= BIG_BLIND -> CALL
                         else -> FOLD
                     }
@@ -413,10 +411,10 @@ class PreFlopBot(cards: List<Card>, isDealer: Boolean):
         }
     }
 
-     fun botAction(pokerChips: IntArray, bet: IntArray, validActions: BooleanArray): Int {
+     fun botAction(pokerChips: IntArray, bet: IntArray, pot: Int, validActions: BooleanArray): Int {
 
         resetValues()
-        initValues(pokerChips, bet)
+        initValues(pokerChips, bet, pot)
 
         return calculateAction(pokerChips, bet, validActions)
     }
