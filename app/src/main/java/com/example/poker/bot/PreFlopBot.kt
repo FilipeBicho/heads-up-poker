@@ -1,5 +1,6 @@
 package com.example.poker.bot
 
+import com.example.poker.BET
 import com.example.poker.BIG_BLIND
 import com.example.poker.Bot
 import com.example.poker.CALL
@@ -19,8 +20,7 @@ class PreFlopBot(cards: List<Card>, isDealer: Boolean):
         this.isDealer = isDealer
     }
 
-    private fun calculateAction(pokerChips: IntArray, bet: IntArray, validActions: BooleanArray): Int {
-
+    private fun calculateAction(bet: IntArray, validActions: BooleanArray): Int {
         // Dealer: player called - check and bet available
         // Blind: player didn't play yet - fold, call and bet available
         if (bet[PLAYER] == BIG_BLIND) {
@@ -416,6 +416,6 @@ class PreFlopBot(cards: List<Card>, isDealer: Boolean):
         resetValues()
         initValues(pokerChips, bet, pot)
 
-        return calculateAction(pokerChips, bet, validActions)
+        return calculateAction(bet, validActions)
     }
 }

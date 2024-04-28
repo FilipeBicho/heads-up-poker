@@ -4,11 +4,11 @@ data class GameUiState(
 
     val playerName: String = "Filipe",
 
-    val computerName: String = "Computer",
+    val computerName: String = "Bot",
 
-    val playerMoney: Int = INITIAL_MONEY,
+    val playerMoney: Int = 200,
 
-    val computerMoney: Int = INITIAL_MONEY,
+    val computerMoney: Int = 200,
 
     val playerText: String = "",
 

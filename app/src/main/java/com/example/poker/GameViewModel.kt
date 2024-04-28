@@ -82,7 +82,7 @@ open class GameViewModel : Game() {
      */
     override fun call() {
 
-        val currentPlayerBet: Int = bet[player]
+        val currentPlayerBet: Int = bet[opponent]
 
         if (pokerChips[player] <= bet[opponent]) {
 
@@ -90,12 +90,16 @@ open class GameViewModel : Game() {
             bet[player] += pokerChips[player]
             pokerChips[player] = 0
 
-            // opponent equals player all in
-            bet[opponent] = bet[player]
-            pokerChips[opponent] = pokerChips[opponent] + bet[opponent] - bet[player]
+            if (pokerChips[opponent] > 0) {
+                // opponent equals player all in
+                pokerChips[opponent] = pokerChips[opponent] + bet[opponent] // reset opponent poker chips
+                bet[opponent] = bet[player]
+                pokerChips[opponent] -= bet[opponent]
+            }
 
             // calculate pot
             pokerChips[POT] = bet[blind] + bet[dealer]
+            totalPotValue += pokerChips[POT]
 
             gameSummaryList += "${playerName[player]} calls ${bet[player]} €"
 
@@ -103,47 +107,54 @@ open class GameViewModel : Game() {
             showdown()
         } else {
 
+            val callValue = abs(currentPlayerBet - bet[blind])
+
             // player equals opponent bet
             bet[player] = bet[opponent]
-            pokerChips[player] -= abs(currentPlayerBet - bet[player])
+            pokerChips[player] -= callValue
 
             // calculate pot
             pokerChips[POT] = bet[blind] + bet[dealer]
 
-            gameSummaryList += "${playerName[player]} calls ${bet[player]} €"
+            gameSummaryList += "${playerName[player]} calls $callValue €"
 
             updateMutableStateValues()
             switchPlayerTurn()
 
-            if (checkAvailable && round == PRE_FLOP) {
-                if (isPlayerTurn()) {
-                    mutableStateFlow.update { currentState ->
-                        currentState.copy(
-                            displayFoldButton = false,
-                            displayCheckButton = true,
-                            displayCallButton = false,
-                            displayBetButton = true
-                        )
-                    }
-                } else {
-                    computerBotValidActions[FOLD] = false
-                    computerBotValidActions[CHECK] = true
-                    computerBotValidActions[CALL] = false
-                    computerBotValidActions[BET] = true
-                    when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
-                        CHECK -> check()
-                        BET -> {
-                            betValue = computerBot.betValue
-                            bet()
+            if (pokerChips[player] == 0 || pokerChips[opponent] == 0) {
+                totalPotValue += pokerChips[POT]
+                showdown()
+            } else {
+                if (checkAvailable && round == PRE_FLOP) {
+                    if (isPlayerTurn()) {
+                        mutableStateFlow.update { currentState ->
+                            currentState.copy(
+                                displayFoldButton = false,
+                                displayCheckButton = true,
+                                displayCallButton = false,
+                                displayBetButton = true
+                            )
+                        }
+                    } else {
+                        computerBotValidActions[FOLD] = false
+                        computerBotValidActions[CHECK] = true
+                        computerBotValidActions[CALL] = false
+                        computerBotValidActions[BET] = true
+                        when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
+                            CHECK -> check()
+                            BET -> {
+                                betValue = computerBot.betValue
+                                bet()
+                            }
                         }
                     }
-                }
-
-            } else {
-                if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
-                    nextRound()
                 } else {
-                    showdown()
+                    if (round == RIVER) {
+                        totalPotValue += pokerChips[POT]
+                        showdown()
+                    } else {
+                        nextRound()
+                    }
                 }
             }
         }
@@ -169,8 +180,8 @@ open class GameViewModel : Game() {
             bet[player] = betValue + bet[opponent]
         }
 
-        if (bet[player] > pokerChips[player]) {
-            bet[player] = pokerChips[player] + oldBet
+        if (bet[player] >= pokerChips[player] + oldBet) {
+            bet[player] = oldBet + pokerChips[player]
         }
 
         // if all in add old bet
@@ -252,8 +263,8 @@ open class GameViewModel : Game() {
                 computerText = "${bet[BOT]} €",
                 playerMoney = pokerChips[PLAYER],
                 computerMoney = pokerChips[BOT],
-                currentPot = pokerChips[POT],
                 playerBetValue = BIG_BLIND,
+                currentPot = pokerChips[POT],
                 totalPot = totalPotValue,
                 gameSummary = gameSummaryMap
             )

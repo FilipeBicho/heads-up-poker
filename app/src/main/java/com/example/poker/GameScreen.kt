@@ -240,7 +240,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                             .height(25.dp),
                         horizontalArrangement = Arrangement.spacedBy(1.dp)
                     ) {
-                        if (gameViewModel.isPlayerTurn() && !gameUiState.showdown) {
+                        if (gameViewModel.isPlayerTurn() && !gameUiState.showdown && gameUiState.displayBetButton) {
                             if (BIG_BLIND * 2 > gameUiState.totalPot) {
                                 BetButton(text = "2 BB") { gameViewModel.updatePlayerBet(BIG_BLIND * 2) }
                             }
@@ -327,7 +327,9 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                                     .fillMaxWidth()
                                     .weight(0.4f)
                             ) {
-                                BetSlider(gameUiState, gameViewModel)
+                                if (gameUiState.displayBetButton) {
+                                    BetSlider(gameUiState, gameViewModel)
+                                }
                             }
 
                             Row(

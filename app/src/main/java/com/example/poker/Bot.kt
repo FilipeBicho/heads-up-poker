@@ -82,6 +82,10 @@ open class Bot(odds: Odds?, private val cards: List<Card>, tableCards: List<Card
 
         when (round) {
             PRE_FLOP -> return PreFlopBot(cards, isDealer).botAction(pokerChips, bet, totalPot, validActions)
+            else -> {
+                betValue = BIG_BLIND
+                action = BET
+            }
         }
 
         return action

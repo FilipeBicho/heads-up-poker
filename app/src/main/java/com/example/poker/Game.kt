@@ -171,9 +171,6 @@ abstract class Game: ViewModel() {
         odds.calculateRiverOdds(computerCards, tableCards)
     }
 
-    /**
-     * Calculate pre flop bets
-     */
     private fun preFlopBets() {
 
         if (pokerChips[blind] <= BIG_BLIND) {
@@ -193,6 +190,7 @@ abstract class Game: ViewModel() {
                 gameSummaryList += "${playerName[blind]} makes all in ${bet[blind]} €"
                 gameSummaryList += "${playerName[dealer]} pays all in ${bet[dealer]} €"
 
+                totalPotValue += pokerChips[POT]
                 updateMutableStateValues()
                 showdown()
             } else {
@@ -244,11 +242,12 @@ abstract class Game: ViewModel() {
             pokerChips[dealer] = 0
 
             // blind pays all in
-            bet[blind] = pokerChips[blind]
+            bet[blind] = bet[player]
             pokerChips[blind] -= bet[blind]
 
             // calculate pot
             pokerChips[POT] = bet[blind] + bet[dealer]
+            totalPotValue += pokerChips[POT]
 
             gameSummaryList += "${playerName[blind]} makes all in ${bet[blind]} €"
             gameSummaryList += "${playerName[dealer]} pays all in ${bet[dealer]} €"
@@ -279,13 +278,14 @@ abstract class Game: ViewModel() {
                     displayFoldButton = true,
                     displayCheckButton = false,
                     displayCallButton = true,
-                    displayBetButton = true
+                    displayBetButton = pokerChips[player] + bet[player] >= BIG_BLIND
                 )}
             } else {
                 computerBotValidActions[FOLD] = true
                 computerBotValidActions[CHECK] = false
                 computerBotValidActions[CALL] = true
-                computerBotValidActions[BET] = true
+                computerBotValidActions[BET] = pokerChips[player] + bet[player] >= BIG_BLIND
+
                 when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
                     FOLD -> fold()
                     CALL -> call()
@@ -442,9 +442,6 @@ abstract class Game: ViewModel() {
      * Show all cards and calculate winner
      */
     protected fun showdown() {
-
-        totalPotValue = pokerChips[POT]
-
         mutableStateFlow.update { currentState -> currentState.copy(
             displayComputerCards = true,
             showdown = true,
@@ -499,9 +496,6 @@ abstract class Game: ViewModel() {
 
         when (round) {
             PRE_FLOP -> {
-
-                newGame()
-                return
                 round = FLOP
 
                 mutableStateFlow.update { currentState -> currentState.copy(
@@ -520,13 +514,13 @@ abstract class Game: ViewModel() {
                         displayFoldButton = false,
                         displayCheckButton = true,
                         displayCallButton = false,
-                        displayBetButton = true
+                        displayBetButton = pokerChips[player] + bet[player] >= BIG_BLIND
                     )}
                 } else {
                     computerBotValidActions[FOLD] = false
                     computerBotValidActions[CHECK] = true
                     computerBotValidActions[CALL] = false
-                    computerBotValidActions[BET] = true
+                    computerBotValidActions[BET] = pokerChips[player] + bet[player] >= BIG_BLIND
                     when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
                         CHECK -> check()
                         BET -> {
@@ -555,13 +549,13 @@ abstract class Game: ViewModel() {
                         displayFoldButton = false,
                         displayCheckButton = true,
                         displayCallButton = false,
-                        displayBetButton = true
+                        displayBetButton = pokerChips[player] + bet[player] >= BIG_BLIND
                     )}
                 } else {
                     computerBotValidActions[FOLD] = false
                     computerBotValidActions[CHECK] = true
                     computerBotValidActions[CALL] = false
-                    computerBotValidActions[BET] = true
+                    computerBotValidActions[BET] = pokerChips[player] + bet[player] >= BIG_BLIND
                     when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
                         CHECK -> check()
                         BET -> {
@@ -591,13 +585,13 @@ abstract class Game: ViewModel() {
                         displayFoldButton = false,
                         displayCheckButton = true,
                         displayCallButton = false,
-                        displayBetButton = true
+                        displayBetButton = pokerChips[player] + bet[player] >= BIG_BLIND
                     )}
                 } else {
                     computerBotValidActions[FOLD] = false
                     computerBotValidActions[CHECK] = true
                     computerBotValidActions[CALL] = false
-                    computerBotValidActions[BET] = true
+                    computerBotValidActions[BET] = pokerChips[player] + bet[player] >= BIG_BLIND
                     when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
                         CHECK -> check()
                         BET -> {
@@ -614,9 +608,6 @@ abstract class Game: ViewModel() {
         }
     }
 
-    /**
-     * Init new game values
-     */
     protected fun newGame() {
 
         resetValues()
@@ -642,7 +633,6 @@ abstract class Game: ViewModel() {
             showdown = false
         )}
 
-        // pre flop bets
         preFlopBets()
     }
 }
