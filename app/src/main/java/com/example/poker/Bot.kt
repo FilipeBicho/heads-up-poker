@@ -7,6 +7,8 @@ const val FOLD = 0
 const val CHECK = 1
 const val CALL = 2
 const val BET = 3
+const val RAISE = 4
+const val ALLIN = 5
 
 open class Bot(odds: Odds?, private val cards: List<Card>, tableCards: List<Card>?, isDealer: Boolean) {
 
@@ -80,13 +82,28 @@ open class Bot(odds: Odds?, private val cards: List<Card>, tableCards: List<Card
         resetValues()
         initValues(pokerChips, bet, totalPot)
 
-        when (round) {
-            PRE_FLOP -> return PreFlopBot(cards, isDealer).botAction(pokerChips, bet, totalPot, validActions)
-            else -> {
-                betValue = BIG_BLIND
-                action = BET
+        if (validActions[BET]) {
+            betValue = BIG_BLIND
+            action = BET
+        } else if (validActions[RAISE]) {
+            betValue = if (bet[PLAYER] >= BIG_BLIND) {
+                2 * bet[PLAYER]
+            } else {
+                2 * BIG_BLIND
             }
+            action = RAISE
+        } else if (validActions[ALLIN]) {
+            betValue = pokerChips[BOT]
+            action = ALLIN
         }
+
+//        when (round) {
+//            PRE_FLOP -> return PreFlopBot(cards, isDealer).botAction(pokerChips, bet, totalPot, validActions)
+//            else -> {
+//                betValue = BIG_BLIND
+//                action = BET
+//            }
+//        }
 
         return action
     }

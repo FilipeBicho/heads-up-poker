@@ -18,6 +18,8 @@ data class GameUiState(
 
     val computerBetValue: Int = 0,
 
+    val minBetValue: Int = 0,
+
     val totalPot: Int = 0,
 
     val currentPot: Int = 0,
@@ -37,6 +39,10 @@ data class GameUiState(
     val displayCheckButton: Boolean = false,
 
     val displayBetButton: Boolean = false,
+
+    val displayRaiseButton: Boolean = false,
+
+    val displayAllInButton: Boolean = false,
 
     val turnDelayTime: Int = 1000,
 

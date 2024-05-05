@@ -165,31 +165,11 @@ open class GameViewModel : Game() {
      */
     override fun bet() {
 
-        if (betValue == 0) {
-            betValue = BIG_BLIND
-        }
-
         checkAvailable = false
 
-        val oldBet: Int = bet[player]
+        bet[player] = betValue
 
-        // player makes a bet
-        if (betValue > bet[opponent] + BIG_BLIND) {
-            bet[player] = betValue
-        } else {
-            bet[player] = betValue + bet[opponent]
-        }
-
-        if (bet[player] >= pokerChips[player] + oldBet) {
-            bet[player] = oldBet + pokerChips[player]
-        }
-
-        // if all in add old bet
-        if (pokerChips[player] == bet[player]) {
-            bet[player] += oldBet
-        }
-
-        pokerChips[player] = pokerChips[player] - bet[player] + oldBet
+        pokerChips[player] -= bet[player]
 
         // calculate pot
         pokerChips[POT] = bet[player] + bet[opponent]
@@ -228,7 +208,9 @@ open class GameViewModel : Game() {
                         displayFoldButton = true,
                         displayCheckButton = false,
                         displayCallButton = true,
-                        displayBetButton = true
+                        displayBetButton = isBetAvailable(),
+                        displayRaiseButton = isRaiseAvailable(),
+                        displayAllInButton = isAllInAvailable()
                     )
                 }
             } else {
@@ -237,7 +219,9 @@ open class GameViewModel : Game() {
                 computerBotValidActions[FOLD] = true
                 computerBotValidActions[CHECK] = false
                 computerBotValidActions[CALL] = true
-                computerBotValidActions[BET] = true
+                computerBotValidActions[BET] = isBetAvailable()
+                computerBotValidActions[RAISE] = isRaiseAvailable()
+                computerBotValidActions[ALLIN] = isAllInAvailable()
                 when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
                     FOLD -> fold()
                     CALL -> call()
@@ -248,6 +232,84 @@ open class GameViewModel : Game() {
                 }
             }
         }
+    }
+
+    override fun raise() {
+
+        checkAvailable = false
+
+        // Add old bet to chips and subtract the new bet
+        pokerChips[player] += bet[player] - betValue
+
+        // Update bet
+        bet[player] = betValue
+
+        // calculate pot
+        pokerChips[POT] = bet[player] + bet[opponent]
+
+        gameSummaryList += "${playerName[player]} raises to ${bet[player]} €"
+
+        updateMutableStateValues()
+        switchPlayerTurn()
+
+        if (pokerChips[player] + bet[player] <= bet[opponent]) {
+
+            if (isPlayerTurn()) {
+                mutableStateFlow.update { currentState ->
+                    currentState.copy(
+                        displayFoldButton = true,
+                        displayCheckButton = false,
+                        displayCallButton = true,
+                        displayBetButton = false
+                    )
+                }
+            } else {
+                computerBotValidActions[FOLD] = true
+                computerBotValidActions[CHECK] = false
+                computerBotValidActions[CALL] = true
+                computerBotValidActions[BET] = false
+                when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
+                    FOLD -> fold()
+                    CALL -> call()
+                }
+            }
+
+        } else {
+            if (isPlayerTurn()) {
+                mutableStateFlow.update { currentState ->
+                    currentState.copy(
+                        displayFoldButton = true,
+                        displayCheckButton = false,
+                        displayCallButton = true,
+                        displayBetButton = isBetAvailable(),
+                        displayRaiseButton = isRaiseAvailable(),
+                        displayAllInButton = isAllInAvailable()
+                    )
+                }
+            } else {
+                betValue = BIG_BLIND
+
+                computerBotValidActions[FOLD] = true
+                computerBotValidActions[CHECK] = false
+                computerBotValidActions[CALL] = true
+                computerBotValidActions[BET] = isBetAvailable()
+                computerBotValidActions[RAISE] = isRaiseAvailable()
+                computerBotValidActions[ALLIN] = isAllInAvailable()
+                when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
+                    FOLD -> fold()
+                    CALL -> call()
+                    BET -> {
+                        betValue = computerBot.betValue
+                        bet()
+                    }
+                }
+            }
+        }
+
+    }
+
+    override fun allIn() {
+        TODO("Not yet implemented")
     }
 
     /**
@@ -263,7 +325,7 @@ open class GameViewModel : Game() {
                 computerText = "${bet[BOT]} €",
                 playerMoney = pokerChips[PLAYER],
                 computerMoney = pokerChips[BOT],
-                playerBetValue = BIG_BLIND,
+                playerBetValue = getMinBetValue(),
                 currentPot = pokerChips[POT],
                 totalPot = totalPotValue,
                 gameSummary = gameSummaryMap

@@ -327,7 +327,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                                     .fillMaxWidth()
                                     .weight(0.4f)
                             ) {
-                                if (gameUiState.displayBetButton) {
+                                if (gameUiState.displayBetButton || gameUiState.displayRaiseButton) {
                                     BetSlider(gameUiState, gameViewModel)
                                 }
                             }
@@ -352,6 +352,14 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
 
                                 if (gameUiState.displayBetButton) {
                                     GameActionButton("Bet") { gameViewModel.bet() }
+                                }
+
+                                if (gameUiState.displayRaiseButton) {
+                                    GameActionButton("Raise") { gameViewModel.raise()}
+                                }
+
+                                if (gameUiState.displayAllInButton) {
+                                    GameActionButton("ALL In") { gameViewModel.allIn() }
                                 }
                             }
                         }
@@ -525,7 +533,7 @@ private fun BetSlider(gameUiState: GameUiState, gameViewModel: GameViewModel) {
                 onValueChange = { betValue = it.roundToInt() },
                 onValueChangeFinished = { gameViewModel.updatePlayerBet(betValue) },
                 modifier = Modifier.padding(end = 10.dp),
-                valueRange = BIG_BLIND.toFloat()..gameUiState.playerMoney.toFloat(),
+                valueRange = betValue.toFloat()..gameUiState.playerMoney.toFloat(),
                 colors = SliderDefaults.colors(
                     thumbColor = Color.LightGray,
                     activeTrackColor = colorResource(id = R.color.button_red),

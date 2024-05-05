@@ -41,7 +41,7 @@ abstract class Game: ViewModel() {
     private lateinit var odds: Odds
     lateinit var computerBot: Bot
     lateinit var computerPreFlopBot: Bot
-    var computerBotValidActions = BooleanArray(4){false}
+    var computerBotValidActions = BooleanArray(6){false}
 
     /**
      * Handles fold request
@@ -62,6 +62,10 @@ abstract class Game: ViewModel() {
      * Handles bet request
      */
     abstract fun bet()
+
+    abstract fun raise()
+
+    abstract fun allIn()
 
     /**
      * check if is player turn
@@ -121,11 +125,7 @@ abstract class Game: ViewModel() {
         pokerChips[POT] = 0
 
         // init or change dealer
-        dealer = if (dealer == -1) {
-            Random(System.nanoTime()).nextInt(0, 2)
-        } else {
-            if (dealer == 0) 1 else 0
-        }
+        dealer = BOT
 
         // init blind turn
         blind = if (dealer == 0) 1 else 0
@@ -169,6 +169,54 @@ abstract class Game: ViewModel() {
 
         // calculate river odds
         odds.calculateRiverOdds(computerCards, tableCards)
+    }
+
+    /**
+     * bet is available if:
+     *  - there is no previous bet
+     *  - player chips value is bigger then big bling
+     */
+    fun isBetAvailable(): Boolean {
+        return bet[opponent] == 0 && pokerChips[player] > BIG_BLIND
+    }
+
+    /**
+     * raise is available if:
+     *  - there is a previous bet
+     *  - player chips and player bet (if any) is bigger than 2 times opponent bet
+     */
+    fun isRaiseAvailable(): Boolean {
+        return bet[opponent] > 0 && pokerChips[player] + bet[player] > bet[opponent] * 2
+    }
+
+    /**
+     * all in is available if:
+     *  - there is a previous bet:
+     *      - player chips and player bet is equal or small than 2 times opponent bet
+     *  - there is no previous bet:
+     *      - player chips are smaller or equal to big bling
+     */
+    fun isAllInAvailable(): Boolean {
+        return if (bet[opponent] > 0) {
+            pokerChips[player] + bet[player] <= bet[opponent] * 2
+        } else {
+            pokerChips[player] <= BIG_BLIND
+        }
+    }
+
+    /**
+     * Get min bet value
+     *  - there is a previous bet:
+     *      - 2 times opponent bet
+     *  - there is no previous bet:
+     *      - Big blind
+     */
+    fun getMinBetValue(): Int {
+        return if (bet[opponent] > 0) {
+            bet[opponent] * 2
+        } else {
+            BIG_BLIND
+        }
     }
 
     private fun preFlopBets() {
@@ -217,13 +265,17 @@ abstract class Game: ViewModel() {
                         displayFoldButton = true,
                         displayCheckButton = false,
                         displayCallButton = true,
-                        displayBetButton = false
+                        displayBetButton = false,
+                        displayRaiseButton = false,
+                        displayAllInButton = false
                     )}
                 } else {
                     computerBotValidActions[FOLD] = true
                     computerBotValidActions[CHECK] = false
                     computerBotValidActions[CALL] = true
                     computerBotValidActions[BET] = false
+                    computerBotValidActions[RAISE] = false
+                    computerBotValidActions[ALLIN] = false
 
                     when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
                         FOLD -> fold()
@@ -278,13 +330,17 @@ abstract class Game: ViewModel() {
                     displayFoldButton = true,
                     displayCheckButton = false,
                     displayCallButton = true,
-                    displayBetButton = pokerChips[player] + bet[player] >= BIG_BLIND
+                    displayBetButton = isBetAvailable(),
+                    displayRaiseButton = isRaiseAvailable(),
+                    displayAllInButton = isAllInAvailable()
                 )}
             } else {
                 computerBotValidActions[FOLD] = true
                 computerBotValidActions[CHECK] = false
                 computerBotValidActions[CALL] = true
-                computerBotValidActions[BET] = pokerChips[player] + bet[player] >= BIG_BLIND
+                computerBotValidActions[BET] = isBetAvailable()
+                computerBotValidActions[RAISE] = isRaiseAvailable()
+                computerBotValidActions[ALLIN] = isAllInAvailable()
 
                 when (computerBot.botAction(pokerChips, bet, totalPotValue, round, computerBotValidActions)) {
                     FOLD -> fold()
@@ -292,6 +348,10 @@ abstract class Game: ViewModel() {
                     BET -> {
                         betValue = computerBot.betValue
                         bet()
+                    }
+                    RAISE -> {
+                        betValue = computerBot.betValue
+                        raise()
                     }
                 }
             }
@@ -514,7 +574,9 @@ abstract class Game: ViewModel() {
                         displayFoldButton = false,
                         displayCheckButton = true,
                         displayCallButton = false,
-                        displayBetButton = pokerChips[player] + bet[player] >= BIG_BLIND
+                        displayBetButton = isBetAvailable(),
+                        displayRaiseButton = isRaiseAvailable(),
+                        displayAllInButton = isAllInAvailable()
                     )}
                 } else {
                     computerBotValidActions[FOLD] = false
