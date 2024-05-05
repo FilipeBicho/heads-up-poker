@@ -1,6 +1,11 @@
-package com.example.poker
+package com.example.poker.odds
 
 import android.util.Log
+import com.example.poker.cards.Card
+import com.example.poker.cards.Deck
+import com.example.poker.hand.Hand
+import com.example.poker.hand.HandWinnerCalculator
+import com.example.poker.hand.RESULT
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -71,7 +76,7 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
                 }
 
                 if (count >= MAX_COMBINATIONS) {
-                    break;
+                    break
                 }
 
                 // remove temporarily table cards
@@ -151,7 +156,7 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
                 }
 
                 if (count >= MAX_COMBINATIONS) {
-                    break;
+                    break
                 }
 
                 tempTableCards.removeLast()

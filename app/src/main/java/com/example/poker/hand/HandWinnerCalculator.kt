@@ -1,4 +1,8 @@
-package com.example.poker
+package com.example.poker.hand
+
+import com.example.poker.cards.ACE
+import com.example.poker.cards.BOT
+import com.example.poker.cards.PLAYER
 
 class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
 

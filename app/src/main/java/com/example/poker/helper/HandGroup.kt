@@ -1,24 +1,23 @@
 package com.example.poker.helper
 
-import androidx.compose.animation.core.tween
-import com.example.poker.ACE
-import com.example.poker.Card
-import com.example.poker.EIGHT
-import com.example.poker.FIVE
-import com.example.poker.FOUR
-import com.example.poker.JACK
-import com.example.poker.KING
-import com.example.poker.NINE
-import com.example.poker.QUEEN
-import com.example.poker.SEVEN
-import com.example.poker.SIX
-import com.example.poker.TEN
-import com.example.poker.THREE
-import com.example.poker.TWO
+import com.example.poker.cards.ACE
+import com.example.poker.cards.Card
+import com.example.poker.cards.EIGHT
+import com.example.poker.cards.FIVE
+import com.example.poker.cards.FOUR
+import com.example.poker.cards.JACK
+import com.example.poker.cards.KING
+import com.example.poker.cards.NINE
+import com.example.poker.cards.QUEEN
+import com.example.poker.cards.SEVEN
+import com.example.poker.cards.SIX
+import com.example.poker.cards.TEN
+import com.example.poker.cards.THREE
+import com.example.poker.cards.TWO
 
 /**
  * Slansky hand groups
- * @see https://en.wikipedia.org/wiki/Texas_hold_%27em_starting_hands
+ * see https://en.wikipedia.org/wiki/Texas_hold_%27em_starting_hands
  *
  */
 data class HandGroup(val playerCards: List<Card>) {

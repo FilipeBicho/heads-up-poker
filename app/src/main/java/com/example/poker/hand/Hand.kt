@@ -1,4 +1,8 @@
-package com.example.poker
+package com.example.poker.hand
+
+import com.example.poker.cards.ACE
+import com.example.poker.cards.Card
+import com.example.poker.cards.KING
 
 const val ROYAL_STRAIGHT_FLUSH: Int = 10
 const val STRAIGHT_FLUSH: Int = 9
@@ -201,8 +205,8 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
     private fun isStraight(cards: MutableList<Card> = allCards.distinctBy { it.rank }.toMutableList()): Boolean {
         var currentRank: Int?
         var nextCardRank: Int?
-        var sequentialCardsCount: Int = 0
-        var straight: Int = 1
+        var sequentialCardsCount = 0
+        var straight = 1
         var lastSequentialCardRank: Int = -1
         var lastSequentialCardIndex: Int = -1
 
@@ -217,7 +221,7 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
 
             // next card has the same rank
             if (currentRank == nextCardRank) {
-                continue;
+                continue
             }
 
             // is a sequential card
@@ -374,5 +378,5 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
     /**
      * Return player hand
      */
-    fun getHand() = hand;
+    fun getHand() = hand
 }

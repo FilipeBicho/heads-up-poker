@@ -1,17 +1,12 @@
 package com.example.poker.bot
 
-import com.example.poker.BET
 import com.example.poker.BIG_BLIND
-import com.example.poker.Bot
-import com.example.poker.CALL
-import com.example.poker.CHECK
-import com.example.poker.Card
-import com.example.poker.FOLD
-import com.example.poker.PLAYER
+import com.example.poker.cards.Card
+import com.example.poker.cards.PLAYER
 import com.example.poker.helper.HandGroup
 
 class PreFlopBot(cards: List<Card>, isDealer: Boolean):
-    Bot(null, cards, null, isDealer) {
+    Bot(cards, isDealer) {
 
     private var handRank: Int = 0
 
@@ -414,7 +409,7 @@ class PreFlopBot(cards: List<Card>, isDealer: Boolean):
      fun botAction(pokerChips: IntArray, bet: IntArray, pot: Int, validActions: BooleanArray): Int {
 
         resetValues()
-        initValues(pokerChips, bet, pot)
+        initValues(pokerChips, bet)
 
         return calculateAction(bet, validActions)
     }

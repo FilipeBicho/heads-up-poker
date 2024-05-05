@@ -1,6 +1,9 @@
-package com.example.poker
+package com.example.poker.bot
 
-import com.example.poker.bot.PreFlopBot
+import com.example.poker.BIG_BLIND
+import com.example.poker.cards.BOT
+import com.example.poker.cards.Card
+import com.example.poker.cards.PLAYER
 import kotlin.math.abs
 
 const val FOLD = 0
@@ -10,15 +13,15 @@ const val BET = 3
 const val RAISE = 4
 const val ALLIN = 5
 
-open class Bot(odds: Odds?, private val cards: List<Card>, tableCards: List<Card>?, isDealer: Boolean) {
+open class Bot(cards: List<Card>, isDealer: Boolean) {
 
-   
     private var action: Int = 0
+    private var playerStack: Int = 0
+    private var totalMoney: Int = 0
+
     var betValue: Int = 0
-    protected var playerStack: Int = 0
     protected var botStack: Int = 0
     protected var callValue: Int = 0
-    protected var totalMoney: Int = 0
     protected var pot: Int = 0
     protected var isDealer: Boolean = false
     protected val hasHandPair = cards.first().rank == cards.last().rank
@@ -30,12 +33,12 @@ open class Bot(odds: Odds?, private val cards: List<Card>, tableCards: List<Card
     /**
      * Init stack and call value
      */
-    fun initValues(pokerChips: IntArray, bet:IntArray, pot: Int) {
+    fun initValues(pokerChips: IntArray, bet:IntArray) {
 
         totalMoney = pokerChips[BOT]
 
         if (pokerChips[PLAYER] > 0) {
-            playerStack = pokerChips[PLAYER]/BIG_BLIND
+            playerStack = pokerChips[PLAYER]/ BIG_BLIND
         }
 
         if (totalMoney > 0) {
@@ -80,7 +83,7 @@ open class Bot(odds: Odds?, private val cards: List<Card>, tableCards: List<Card
     open fun botAction(pokerChips: IntArray, bet: IntArray, totalPot: Int, round: Int, validActions: BooleanArray): Int {
 
         resetValues()
-        initValues(pokerChips, bet, totalPot)
+        initValues(pokerChips, bet)
 
         if (validActions[BET]) {
             betValue = BIG_BLIND

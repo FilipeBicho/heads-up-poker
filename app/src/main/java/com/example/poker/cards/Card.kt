@@ -1,4 +1,4 @@
-package com.example.poker
+package com.example.poker.cards
 
 const val ACE = 0
 const val KING = 12
@@ -13,11 +13,6 @@ const val FIVE = 4
 const val FOUR = 3
 const val THREE = 2
 const val TWO = 1
-
-const val HEARTS = 0
-const val SPADES = 1
-const val CLUBS = 2
-const val DIAMONDS = 3
 
 class Card(var rank: Int, var suit: Int) {
 

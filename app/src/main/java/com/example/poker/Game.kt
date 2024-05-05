@@ -3,13 +3,32 @@ package com.example.poker
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.poker.bot.ALLIN
+import com.example.poker.bot.BET
+import com.example.poker.bot.Bot
+import com.example.poker.bot.CALL
+import com.example.poker.bot.CHECK
+import com.example.poker.bot.FOLD
+import com.example.poker.bot.RAISE
+import com.example.poker.cards.BOT
+import com.example.poker.cards.Card
+import com.example.poker.cards.Dealer
+import com.example.poker.cards.FLOP
+import com.example.poker.cards.PLAYER
+import com.example.poker.cards.PRE_FLOP
+import com.example.poker.cards.RIVER
+import com.example.poker.cards.TURN
+import com.example.poker.hand.Hand
+import com.example.poker.hand.HandWinnerCalculator
+import com.example.poker.odds.Combinations
+import com.example.poker.odds.Odds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.random.Random
+
 
 abstract class Game: ViewModel() {
 
@@ -676,7 +695,7 @@ abstract class Game: ViewModel() {
         initValues()
         dealCards()
         initOdds()
-        computerBot = Bot(odds, computerCards.toList(), tableCards.toList(), !isPlayerDealer())
+        computerBot = Bot(computerCards.toList(), !isPlayerDealer())
 
         gameSummaryList.add("Game ${gameNumber+1}")
         gameSummaryMap.add(gameNumber, gameSummaryList.toList())

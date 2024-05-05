@@ -1,4 +1,4 @@
-package com.example.poker
+package com.example.poker.cards
 
 import android.annotation.SuppressLint
 
@@ -41,7 +41,7 @@ class Dealer {
      */
     fun setFlopCards(tableCards: SnapshotStateList<Card>) {
 
-        deck.dealCard();
+        deck.dealCard()
         for (i in 0 until 3) {
             tableCards.add(deck.dealCard())
         }
@@ -57,7 +57,7 @@ class Dealer {
      */
     fun setTurnCard(tableCards: SnapshotStateList<Card>) {
 
-        deck.dealCard();
+        deck.dealCard()
         tableCards.add(deck.dealCard())
 
         // debug specific game
@@ -69,7 +69,7 @@ class Dealer {
      */
     fun setRiverCard(tableCards: SnapshotStateList<Card>) {
 
-        deck.dealCard();
+        deck.dealCard()
         tableCards.add(deck.dealCard())
 
         // debug specific game
