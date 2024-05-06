@@ -1,20 +1,18 @@
 package com.example.poker.gameplay
 
 import androidx.lifecycle.viewModelScope
-import com.example.poker.Game
 import com.example.poker.GameUiState
+import com.example.poker.GameViewModel
 import com.example.poker.cards.FLOP
 import com.example.poker.cards.PRE_FLOP
 import com.example.poker.cards.RIVER
 import com.example.poker.cards.TURN
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class Showdown(private var game: Game) {
+class Showdown(private var game: GameViewModel) {
 
     private val mutableStateFlow = MutableStateFlow(GameUiState())
     private fun showdownFlop() {

@@ -1,7 +1,7 @@
 package com.example.poker.gameplay
 
-import com.example.poker.Game
 import com.example.poker.GameUiState
+import com.example.poker.GameViewModel
 import com.example.poker.POT
 import com.example.poker.bot.Bot
 import com.example.poker.cards.BOT
@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 @SuppressWarnings("LeakingThisInConstructor")
-class NewGame(private var game: Game) {
+class NewGame(private var game: GameViewModel) {
 
     private val mutableStateFlow = MutableStateFlow(GameUiState())
     private val uiState: StateFlow<GameUiState> = mutableStateFlow.asStateFlow()
