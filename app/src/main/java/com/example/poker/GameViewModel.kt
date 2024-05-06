@@ -20,10 +20,10 @@ const val POT = 2
 const val SMALL_BLIND = 20
 const val BIG_BLIND = 40
 
-open class GameViewModel : Game() {
+class GameViewModel : Game() {
 
     init {
-        newGame()
+        newGame.start()
     }
 
     /**
@@ -40,7 +40,7 @@ open class GameViewModel : Game() {
         updateMutableStateValues()
 
         // new game
-        newGame()
+        newGame.start()
     }
 
     /**
@@ -114,7 +114,7 @@ open class GameViewModel : Game() {
             gameSummaryList += "${playerName[player]} calls ${bet[player]} €"
 
             updateMutableStateValues()
-            showdown()
+            showdown.showdown()
         } else {
 
             val callValue = abs(currentPlayerBet - bet[blind])
@@ -133,7 +133,7 @@ open class GameViewModel : Game() {
 
             if (pokerChips[player] == 0 || pokerChips[opponent] == 0) {
                 totalPotValue += pokerChips[POT]
-                showdown()
+                showdown.showdown()
             } else {
                 if (checkAvailable && round == PRE_FLOP) {
                     if (isPlayerTurn()) {
@@ -161,7 +161,7 @@ open class GameViewModel : Game() {
                 } else {
                     if (round == RIVER) {
                         totalPotValue += pokerChips[POT]
-                        showdown()
+                        showdown.showdown()
                     } else {
                         nextRound()
                     }
@@ -322,34 +322,6 @@ open class GameViewModel : Game() {
         TODO("Not yet implemented")
     }
 
-    /**
-     * update game screen
-     */
-    override fun updateMutableStateValues() {
-
-        gameSummaryMap[gameNumber] = gameSummaryList.toList()
-
-        mutableStateFlow.update { currentState ->
-            currentState.copy(
-                playerText = "${bet[PLAYER]} €",
-                computerText = "${bet[BOT]} €",
-                playerMoney = pokerChips[PLAYER],
-                computerMoney = pokerChips[BOT],
-                playerBetValue = getMinBetValue(),
-                currentPot = pokerChips[POT],
-                totalPot = totalPotValue,
-                gameSummary = gameSummaryMap
-            )
-        }
-    }
-
-    /**
-     * Switch player turns
-     */
-    override fun switchPlayerTurn() {
-        player = if (player == PLAYER) BOT else PLAYER
-        opponent = if (player == BOT) PLAYER else BOT
-    }
 
     /**
      * check if is player turn

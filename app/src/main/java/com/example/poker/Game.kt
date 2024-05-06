@@ -18,6 +18,8 @@ import com.example.poker.cards.PLAYER
 import com.example.poker.cards.PRE_FLOP
 import com.example.poker.cards.RIVER
 import com.example.poker.cards.TURN
+import com.example.poker.gameplay.NewGame
+import com.example.poker.gameplay.Showdown
 import com.example.poker.hand.Hand
 import com.example.poker.hand.HandWinnerCalculator
 import com.example.poker.odds.Combinations
@@ -32,20 +34,20 @@ import kotlinx.coroutines.launch
 
 abstract class Game: ViewModel() {
 
-    protected var player: Int = -1
-    protected var opponent: Int = -1
-    protected var dealer: Int = -1
-    protected var blind: Int = -1
-    protected var totalPotValue: Int = 0
+    var player: Int = -1
+    var opponent: Int = -1
+    var dealer: Int = -1
+    var blind: Int = -1
+    var totalPotValue: Int = 0
     protected var betValue: Int = 0
-    protected var pokerChips = intArrayOf(0, 0, 0)
-    protected var bet = intArrayOf(0, 0)
-    protected var checkAvailable: Boolean = true
-    protected var round = PRE_FLOP
+    var pokerChips = intArrayOf(0, 0, 0)
+    var bet = intArrayOf(0, 0)
+    var checkAvailable: Boolean = true
+    var round = PRE_FLOP
 
-    protected var gameSummaryMap: MutableList<List<String>> = ArrayList()
-    protected var gameSummaryList: MutableList<String> = ArrayList()
-    protected var gameNumber: Int = -1
+    var gameSummaryMap: MutableList<List<String>> = ArrayList()
+    var gameSummaryList: MutableList<String> = ArrayList()
+    var gameNumber: Int = -1
     protected var playerName = arrayOf("Player", "Computer")
 
     var playerCards = mutableStateListOf<Card>()
@@ -53,14 +55,17 @@ abstract class Game: ViewModel() {
     var tableCards = mutableStateListOf<Card>()
 
     // Game UI state
-    protected val mutableStateFlow = MutableStateFlow(GameUiState())
+    val mutableStateFlow = MutableStateFlow(GameUiState())
     val uiState: StateFlow<GameUiState> = mutableStateFlow.asStateFlow()
 
-    private lateinit var cardDealer: Dealer
-    private lateinit var odds: Odds
+    lateinit var cardDealer: Dealer
+    lateinit var odds: Odds
     lateinit var computerBot: Bot
     lateinit var computerPreFlopBot: Bot
     var computerBotValidActions = BooleanArray(6){false}
+
+    val newGame: NewGame = NewGame(this)
+    val showdown: Showdown = Showdown(this)
 
     /**
      * Handles fold request
@@ -100,95 +105,6 @@ abstract class Game: ViewModel() {
      * Update player bet via button interaction
      */
     abstract fun updatePlayerBet(value: Int)
-
-    /**
-     * update game screen
-     */
-    abstract fun updateMutableStateValues()
-
-    /**
-     * Switch player turns
-     */
-    abstract fun switchPlayerTurn()
-
-    /**
-     * Reset all values before new game
-     */
-    private fun resetValues() {
-        round = PRE_FLOP
-
-        // reset values
-        bet[PLAYER] = 0
-        bet[BOT] = 0
-        totalPotValue = 0
-        checkAvailable = true
-
-        // clear cards
-        playerCards.clear()
-        computerCards.clear()
-        tableCards.clear()
-
-        gameSummaryList.clear()
-    }
-
-    /**
-     * Init values before new game
-     */
-    private fun initValues() {
-
-        gameNumber++
-
-        // init poker chips
-        pokerChips[PLAYER] = uiState.value.playerMoney
-        pokerChips[BOT] = uiState.value.computerMoney
-        pokerChips[POT] = 0
-
-        // init or change dealer
-        dealer = BOT
-
-        // init blind turn
-        blind = if (dealer == 0) 1 else 0
-
-        // set turns
-        player = dealer
-        opponent = blind
-    }
-
-    /**
-     * Deal players and table cards
-     */
-    private fun dealCards() {
-        cardDealer = Dealer()
-
-        // set player and computer cards
-        cardDealer.setPlayerCards(playerCards, computerCards)
-
-        // set flop
-        cardDealer.setFlopCards(tableCards)
-
-        // set turn
-        cardDealer.setTurnCard(tableCards)
-
-        // set river
-        cardDealer.setRiverCard(tableCards)
-    }
-
-    /**
-     * Init and calculate odds
-     */
-    private fun initOdds() {
-
-        odds = Odds(Combinations(tableCards.subList(0,3)).combinations)
-
-        // calculate flop odds
-        odds.calculateFlopOdds(computerCards, tableCards.subList(0,3))
-
-        // calculate turn odds
-        odds.calculateTurnOdds(computerCards, tableCards.subList(0,4))
-
-        // calculate river odds
-        odds.calculateRiverOdds(computerCards, tableCards)
-    }
 
     /**
      * bet is available if:
@@ -238,7 +154,36 @@ abstract class Game: ViewModel() {
         }
     }
 
-    private fun preFlopBets() {
+    /**
+     * update game screen
+     */
+    fun updateMutableStateValues() {
+
+        gameSummaryMap[gameNumber] = gameSummaryList.toList()
+
+        mutableStateFlow.update { currentState ->
+            currentState.copy(
+                playerText = "${bet[PLAYER]} €",
+                computerText = "${bet[BOT]} €",
+                playerMoney = pokerChips[PLAYER],
+                computerMoney = pokerChips[BOT],
+                playerBetValue = getMinBetValue(),
+                currentPot = pokerChips[POT],
+                totalPot = totalPotValue,
+                gameSummary = gameSummaryMap
+            )
+        }
+    }
+
+    /**
+     * Switch player turns
+     */
+    fun switchPlayerTurn() {
+        player = if (player == PLAYER) BOT else PLAYER
+        opponent = if (player == BOT) PLAYER else BOT
+    }
+
+    fun preFlopBets() {
 
         if (pokerChips[blind] <= BIG_BLIND) {
             if (pokerChips[blind] <= SMALL_BLIND) {
@@ -259,7 +204,7 @@ abstract class Game: ViewModel() {
 
                 totalPotValue += pokerChips[POT]
                 updateMutableStateValues()
-                showdown()
+                showdown.showdown()
             } else {
 
                 // blind makes all in
@@ -324,7 +269,7 @@ abstract class Game: ViewModel() {
             gameSummaryList += "${playerName[dealer]} pays all in ${bet[dealer]} €"
 
             updateMutableStateValues()
-            showdown()
+            showdown.showdown()
         } else {
 
             // dealer pay small blind
@@ -380,7 +325,7 @@ abstract class Game: ViewModel() {
     /**
      * Calculate winner
      */
-    private fun calculateWinner() {
+    fun calculateWinner() {
         mutableStateFlow.update { currentState -> currentState.copy(
             displayFoldButton = false,
             displayCheckButton = false,
@@ -454,105 +399,7 @@ abstract class Game: ViewModel() {
         viewModelScope.launch {
             delay(2000)
             if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
-                newGame()
-            }
-        }
-    }
-
-    private fun showdownFlop() {
-        round = FLOP
-
-        odds.calculateShowdownFlopOdds(
-            playerCards = playerCards,
-            opponentCards = computerCards,
-            tableCards = tableCards.subList(0, 3)
-        )
-
-        var flopString = ""
-        tableCards.subList(0,3).forEach { flopString += it.cardString()+" " }
-        gameSummaryList.add("---- $flopString ----")
-        gameSummaryMap[gameNumber] = gameSummaryList.toList()
-
-        mutableStateFlow.update { currentState -> currentState.copy(
-            displayFlop = true,
-            playerText = "${odds.getShowdownPlayerOdds()} %",
-            computerText = "${odds.getShowdownOpponentOdds()} %",
-            gameSummary = gameSummaryMap
-        )}
-    }
-
-    private fun showdownTurn() {
-        round = TURN
-
-        odds.calculateShowdownTurnOdds(
-            playerCards = playerCards,
-            opponentCards = computerCards,
-            tableCards = tableCards.subList(0, 4)
-        )
-
-        var turnString = ""
-        tableCards.subList(0,4).forEach { turnString += it.cardString()+" " }
-        gameSummaryList.add("---- $turnString ----")
-        gameSummaryMap[gameNumber] = gameSummaryList.toList()
-
-        mutableStateFlow.update { currentState -> currentState.copy(
-            displayTurn = true,
-            playerText = "${odds.getShowdownPlayerOdds()} %",
-            computerText = "${odds.getShowdownOpponentOdds()} %",
-            gameSummary = gameSummaryMap
-        )}
-    }
-
-    private fun showdownRiver() {
-        round = RIVER
-
-        var riverString = ""
-        tableCards.forEach { riverString += it.cardString()+" " }
-        gameSummaryList.add("---- $riverString ----")
-        gameSummaryMap[gameNumber] = gameSummaryList.toList()
-
-        mutableStateFlow.update { currentState -> currentState.copy(
-            displayRiver = true,
-            gameSummary = gameSummaryMap
-        )}
-    }
-
-    /**
-     * Show all cards and calculate winner
-     */
-    protected fun showdown() {
-        mutableStateFlow.update { currentState -> currentState.copy(
-            displayComputerCards = true,
-            showdown = true,
-            totalPot = totalPotValue
-        )}
-
-        when (round) {
-            PRE_FLOP -> {
-                showdownFlop()
-                showdown()
-            }
-
-            FLOP -> {
-                viewModelScope.launch {
-                    delay(2000)
-                    showdownTurn()
-                    showdown()
-                }
-            }
-
-            TURN -> {
-                viewModelScope.launch {
-                    delay(1000)
-                    showdownRiver()
-                    showdown()
-                }
-            }
-
-            RIVER -> {
-                viewModelScope.launch {
-                    calculateWinner()
-                }
+                newGame.start()
             }
         }
     }
@@ -687,33 +534,5 @@ abstract class Game: ViewModel() {
                 calculateWinner()
             }
         }
-    }
-
-    protected fun newGame() {
-
-        resetValues()
-        initValues()
-        dealCards()
-        initOdds()
-        computerBot = Bot(computerCards.toList(), !isPlayerDealer())
-
-        gameSummaryList.add("Game ${gameNumber+1}")
-        gameSummaryMap.add(gameNumber, gameSummaryList.toList())
-
-        mutableStateFlow.update { currentState -> currentState.copy(
-            displayComputerCards = true,
-            displayFlop = false,
-            displayTurn = false,
-            displayRiver = false,
-            playerBetValue = 0,
-            computerBetValue = 0,
-            totalPot = 0,
-            currentPot = 0,
-            winnerText = "",
-            gameSummary = gameSummaryMap,
-            showdown = false
-        )}
-
-        preFlopBets()
     }
 }
