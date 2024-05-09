@@ -1,6 +1,7 @@
 package com.example.poker
 
 import com.example.poker.gameplay.Betting
+import com.example.poker.gameplay.Dealer
 import com.example.poker.gameplay.Game
 import com.example.poker.gameplay.Showdown
 import kotlinx.coroutines.flow.update
@@ -14,8 +15,12 @@ class GameViewModel : Betting() {
     override val game: Game = Game(this)
     override val showdown: Showdown = Showdown(this)
 
+    val dealer1: Dealer = Dealer()
+
     init {
-        game.newGame()
+       // game.newGame()
+        dealer1.newGame()
+        dealer1.newGame()
     }
 
     /**

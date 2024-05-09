@@ -29,6 +29,7 @@ abstract class Main : ViewModel() {
     var blind: Int = -1
     var totalPotValue: Int = 0
     protected var betValue: Int = 0
+
     var pokerChips = intArrayOf(0, 0, 0)
     var bet = intArrayOf(0, 0)
     var checkAvailable: Boolean = true
