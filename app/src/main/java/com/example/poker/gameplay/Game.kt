@@ -16,10 +16,42 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 @SuppressWarnings("LeakingThisInConstructor")
-class NewGame(private var game: GameViewModel) {
+class Game(private var game: GameViewModel) {
 
     private val mutableStateFlow = MutableStateFlow(GameUiState())
     private val uiState: StateFlow<GameUiState> = mutableStateFlow.asStateFlow()
+
+    private var cardDealer: Dealer = Dealer()
+    private lateinit var odds: Odds
+
+    private fun dealCards() {
+
+        // set player and computer cards
+        cardDealer.setPlayerCards(game.playerCards, game.computerCards)
+
+        // set flop
+        cardDealer.setFlopCards(game.tableCards)
+
+        // set turn
+        cardDealer.setTurnCard(game.tableCards)
+
+        // set river
+        cardDealer.setRiverCard(game.tableCards)
+    }
+
+    private fun initOdds() {
+
+        odds = Odds(Combinations(game.tableCards.subList(0,3)).combinations)
+
+        // calculate flop odds
+        odds.calculateFlopOdds(game.computerCards, game.tableCards.subList(0,3))
+
+        // calculate turn odds
+        odds.calculateTurnOdds(game.computerCards, game.tableCards.subList(0,4))
+
+        // calculate river odds
+        odds.calculateRiverOdds(game.computerCards, game.tableCards)
+    }
 
     private fun initValues() {
 
@@ -42,6 +74,7 @@ class NewGame(private var game: GameViewModel) {
     }
 
     private fun resetValues() {
+
         game.round = PRE_FLOP
 
         // reset values
@@ -56,46 +89,9 @@ class NewGame(private var game: GameViewModel) {
         game.tableCards.clear()
 
         game.gameSummaryList.clear()
-
     }
 
-    /**
-     * Deal players and table cards
-     */
-    private fun dealCards() {
-        game.cardDealer = Dealer()
-
-        // set player and computer cards
-        game.cardDealer.setPlayerCards(game.playerCards, game.computerCards)
-
-        // set flop
-        game.cardDealer.setFlopCards(game.tableCards)
-
-        // set turn
-        game.cardDealer.setTurnCard(game.tableCards)
-
-        // set river
-        game.cardDealer.setRiverCard(game.tableCards)
-    }
-
-    /**
-     * Init and calculate odds
-     */
-    private fun initOdds() {
-
-        game.odds = Odds(Combinations(game.tableCards.subList(0,3)).combinations)
-
-        // calculate flop odds
-        game.odds.calculateFlopOdds(game.computerCards, game.tableCards.subList(0,3))
-
-        // calculate turn odds
-        game.odds.calculateTurnOdds(game.computerCards, game.tableCards.subList(0,4))
-
-        // calculate river odds
-        game.odds.calculateRiverOdds(game.computerCards, game.tableCards)
-    }
-
-    fun start() {
+    fun newGame() {
         resetValues()
         initValues()
         dealCards()

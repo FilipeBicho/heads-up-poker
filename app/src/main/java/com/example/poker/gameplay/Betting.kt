@@ -2,6 +2,7 @@ package com.example.poker.gameplay
 
 import androidx.lifecycle.viewModelScope
 import com.example.poker.BIG_BLIND
+import com.example.poker.GameViewModel
 import com.example.poker.POT
 import com.example.poker.SMALL_BLIND
 import com.example.poker.bot.ALLIN
@@ -116,7 +117,6 @@ abstract class Betting: Main() {
             TURN -> {
 
                 round = RIVER
-                cardDealer.setRiverCard(tableCards)
 
                 mutableStateFlow.update { currentState -> currentState.copy(
                     displayRiver = true,
@@ -150,7 +150,7 @@ abstract class Betting: Main() {
             }
 
             RIVER -> {
-                calculateWinner()
+                showdown.calculateWinner()
             }
         }
     }
@@ -309,7 +309,7 @@ abstract class Betting: Main() {
         updateMutableStateValues()
 
         // new game
-        newGame.start()
+        game.newGame()
     }
 
     /**
