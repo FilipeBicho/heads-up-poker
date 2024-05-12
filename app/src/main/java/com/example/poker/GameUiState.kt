@@ -4,7 +4,7 @@ data class GameUiState(
 
     val playerName: String = "Filipe",
 
-    val computerName: String = "Bot",
+    val botName: String = "Bot",
 
     val playerMoney: Int = 200,
 

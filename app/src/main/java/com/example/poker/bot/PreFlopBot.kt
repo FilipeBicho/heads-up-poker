@@ -409,7 +409,7 @@ class PreFlopBot(cards: List<Card>, isDealer: Boolean):
      fun botAction(pokerChips: IntArray, bet: IntArray, pot: Int, validActions: BooleanArray): Int {
 
         resetValues()
-        initValues(pokerChips, bet)
+        initValues()
 
         return calculateAction(bet, validActions)
     }

@@ -4,6 +4,9 @@ import com.example.poker.BIG_BLIND
 import com.example.poker.cards.BOT
 import com.example.poker.cards.Card
 import com.example.poker.cards.PLAYER
+import com.example.poker.game.Data.bet
+import com.example.poker.game.Data.botValidActions
+import com.example.poker.game.Data.pokerChips
 import kotlin.math.abs
 
 const val FOLD = 0
@@ -33,7 +36,7 @@ open class Bot(cards: List<Card>, isDealer: Boolean) {
     /**
      * Init stack and call value
      */
-    fun initValues(pokerChips: IntArray, bet:IntArray) {
+    fun initValues() {
 
         totalMoney = pokerChips[BOT]
 
@@ -80,22 +83,22 @@ open class Bot(cards: List<Card>, isDealer: Boolean) {
     }
 
 
-    open fun botAction(pokerChips: IntArray, bet: IntArray, totalPot: Int, round: Int, validActions: BooleanArray): Int {
+    open fun botAction(): Int {
 
         resetValues()
-        initValues(pokerChips, bet)
+        initValues()
 
-        if (validActions[BET]) {
+        if (botValidActions[BET]) {
             betValue = BIG_BLIND
             action = BET
-        } else if (validActions[RAISE]) {
+        } else if (botValidActions[RAISE]) {
             betValue = if (bet[PLAYER] >= BIG_BLIND) {
                 2 * bet[PLAYER]
             } else {
                 2 * BIG_BLIND
             }
             action = RAISE
-        } else if (validActions[ALLIN]) {
+        } else if (botValidActions[ALLIN]) {
             betValue = pokerChips[BOT]
             action = ALLIN
         }
