@@ -6,7 +6,7 @@ import com.example.poker.cards.PLAYER
 import com.example.poker.helper.HandGroup
 
 class PreFlopBot(cards: List<Card>, isDealer: Boolean):
-    Bot(cards, isDealer) {
+    Bot() {
 
     private var handRank: Int = 0
 

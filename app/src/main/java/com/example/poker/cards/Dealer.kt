@@ -22,18 +22,18 @@ class Dealer {
      */
     fun setPlayerCards(
         playerCards: SnapshotStateList<Card>,
-        computerCards: SnapshotStateList<Card>
+        botCards: SnapshotStateList<Card>
     ) {
         playerCards.add(deck.dealCard())
-        computerCards.add(deck.dealCard())
+        botCards.add(deck.dealCard())
         playerCards.add(deck.dealCard())
-        computerCards.add(deck.dealCard())
+        botCards.add(deck.dealCard())
 
         // debug specific game
 //        playerCards.add(Card(KING, CLUBS))
 //        playerCards.add(Card(ACE, CLUBS))
-//        computerCards.add(Card(TEN, SPADES))
-//        computerCards.add(Card(KING, HEARTS))
+//        botCards.add(Card(TEN, SPADES))
+//        botCards.add(Card(KING, HEARTS))
     }
 
     /**

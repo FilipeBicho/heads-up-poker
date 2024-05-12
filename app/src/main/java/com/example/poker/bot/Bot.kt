@@ -6,6 +6,7 @@ import com.example.poker.cards.Card
 import com.example.poker.cards.PLAYER
 import com.example.poker.game.Data.bet
 import com.example.poker.game.Data.botValidActions
+import com.example.poker.game.Data.botCards
 import com.example.poker.game.Data.pokerChips
 import kotlin.math.abs
 
@@ -16,7 +17,7 @@ const val BET = 3
 const val RAISE = 4
 const val ALLIN = 5
 
-open class Bot(cards: List<Card>, isDealer: Boolean) {
+open class Bot {
 
     private var action: Int = 0
     private var playerStack: Int = 0
@@ -27,11 +28,7 @@ open class Bot(cards: List<Card>, isDealer: Boolean) {
     protected var callValue: Int = 0
     protected var pot: Int = 0
     protected var isDealer: Boolean = false
-    protected val hasHandPair = cards.first().rank == cards.last().rank
-
-    init {
-        this.isDealer = isDealer
-    }
+    protected var hasHandPair = false
 
     /**
      * Init stack and call value
@@ -51,6 +48,8 @@ open class Bot(cards: List<Card>, isDealer: Boolean) {
         if (playerStack > 0 && botStack > 0) {
             callValue = abs(bet[BOT] - bet[PLAYER])
         }
+
+        hasHandPair = botCards.first().rank == botCards.last().rank
     }
 
     /**
@@ -84,7 +83,6 @@ open class Bot(cards: List<Card>, isDealer: Boolean) {
 
 
     open fun botAction(): Int {
-
         resetValues()
         initValues()
 

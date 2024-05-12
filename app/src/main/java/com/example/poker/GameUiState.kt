@@ -14,9 +14,9 @@ data class GameUiState(
 
     val playerBetValue: Int = 0,
 
-    val computerText: String = "",
+    val botText: String = "",
 
-    val computerBetValue: Int = 0,
+    val botBetValue: Int = 0,
 
     val minBetValue: Int = 0,
 
@@ -30,7 +30,7 @@ data class GameUiState(
 
     val displayRiver: Boolean = false,
 
-    val displayComputerCards: Boolean = true,
+    val displayBotCards: Boolean = true,
 
     val displayFoldButton: Boolean = false,
 

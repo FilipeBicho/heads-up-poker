@@ -10,7 +10,7 @@ import com.example.poker.game.Data.blind
 import com.example.poker.game.Data.botMoney
 import com.example.poker.game.Data.cardDealer
 import com.example.poker.game.Data.checkAvailable
-import com.example.poker.game.Data.computerCards
+import com.example.poker.game.Data.botCards
 import com.example.poker.game.Data.dealer
 import com.example.poker.game.Data.gameNumber
 import com.example.poker.game.Data.gameSummaryList
@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.update
 class Init {
 
     private fun dealCards() {
-        cardDealer.setPlayerCards(playerCards, computerCards)
+        cardDealer.setPlayerCards(playerCards, botCards)
         cardDealer.setFlopCards(tableCards)
         cardDealer.setTurnCard(tableCards)
         cardDealer.setRiverCard(tableCards)
@@ -40,9 +40,9 @@ class Init {
 
     private fun initOdds() {
         odds = Odds(Combinations(tableCards.subList(0,3)).combinations)
-        odds.calculateFlopOdds(computerCards, tableCards.subList(0,3))
-        odds.calculateTurnOdds(computerCards, tableCards.subList(0,4))
-        odds.calculateRiverOdds(computerCards, tableCards)
+        odds.calculateFlopOdds(botCards, tableCards.subList(0,3))
+        odds.calculateTurnOdds(botCards, tableCards.subList(0,4))
+        odds.calculateRiverOdds(botCards, tableCards)
     }
 
     private fun resetValues() {
@@ -77,12 +77,12 @@ class Init {
         gameSummaryMap.add(gameNumber, gameSummaryList.toList())
 
         uiStateFlow.update { currentState -> currentState.copy(
-            displayComputerCards = true,
+            displayBotCards = true,
             displayFlop = false,
             displayTurn = false,
             displayRiver = false,
             playerBetValue = 0,
-            computerBetValue = 0,
+            botBetValue = 0,
             totalPot = 0,
             currentPot = 0,
             winnerText = "",

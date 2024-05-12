@@ -12,7 +12,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object Data {
+
     val uiStateFlow = MutableStateFlow(GameUiState())
+    val uiState: StateFlow<GameUiState> = uiStateFlow.asStateFlow()
 
     val name: List<String> = listOf(uiStateFlow.value.playerName, uiStateFlow.value.botName)
 
@@ -22,6 +24,7 @@ object Data {
     var pokerChips: MutableList<Int> = mutableListOf(0,0,0)
     var bet: MutableList<Int> = mutableListOf(0,0,0)
     var totalPotValue: Int = 0
+    var betValue: Int = 0
 
     var gameNumber: Int = 0
     var checkAvailable: Boolean = true
@@ -35,7 +38,7 @@ object Data {
     var botValidActions = BooleanArray(6){false}
 
     var playerCards: SnapshotStateList<Card> = mutableStateListOf()
-    var computerCards: SnapshotStateList<Card> = mutableStateListOf()
+    var botCards: SnapshotStateList<Card> = mutableStateListOf()
     var tableCards: SnapshotStateList<Card> = mutableStateListOf()
 
     var gameSummaryMap: MutableList<List<String>> = ArrayList()
@@ -45,4 +48,5 @@ object Data {
     var init: Init = Init()
     var betting: Betting = Betting()
     var cardDealer: Dealer = Dealer()
+    var showdown: Showdown = Showdown()
 }
