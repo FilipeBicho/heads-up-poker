@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class Showdown(private var game: GameViewModel) {
+class Showdown(private var game: Betting) {
 
     private val mutableStateFlow = MutableStateFlow(GameUiState())
 

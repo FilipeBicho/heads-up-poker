@@ -71,7 +71,7 @@ import kotlin.math.roundToInt
 @Composable
 @Preview
 fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
-    val gameUiState by gameViewModel.uiState.collectAsState()
+    /*val gameUiState by gameViewModel.uiState.collectAsState()
     Background()
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -265,7 +265,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         .fillMaxHeight()
                         .weight(0.3f)
                 ) {
-                    
+
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -558,5 +558,5 @@ private fun BetButton(text: String, onClick: () -> Unit) {
         modifier = Modifier.defaultMinSize(minWidth = ButtonDefaults.MinWidth)
     ) {
         Text(text)
-    }
+    }*/
 }

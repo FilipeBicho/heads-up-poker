@@ -1,10 +1,11 @@
-package com.example.poker.gameplay
+package com.example.poker.game
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.poker.GameUiState
 import com.example.poker.POT
-import com.example.poker.bot.Bot
 import com.example.poker.cards.BOT
 import com.example.poker.cards.Card
 import com.example.poker.cards.Dealer
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class Dealer {
+
 
     // gameplay state
     private val gameplayStateFlow = MutableStateFlow(GameplayState())
@@ -42,7 +44,10 @@ class Dealer {
     private var tableCards = mutableStateListOf<Card>()
 
     private var cardDealer: Dealer = Dealer()
+    private var bet: Bet = Bet()
     private lateinit var odds: Odds
+
+    companion object {}
 
     init {
         gameSummaryMap = uiState.value.gameSummary.toMutableList()
@@ -92,7 +97,7 @@ class Dealer {
     private fun resetValues() {
         gameplayStateFlow.update { currentState -> currentState.copy(
             round = PRE_FLOP,
-            bet = listOf(0,0),
+            bet = mutableListOf(0,0),
             totalPotValue = 0,
             checkAvailable = true,
             playerCards = playerCards,
@@ -143,7 +148,7 @@ class Dealer {
             showdown = false
         )}
 
-      //  preFlopBets()
+      bet.preFlop()
     }
 
 

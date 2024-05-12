@@ -2,7 +2,6 @@ package com.example.poker.gameplay
 
 import androidx.lifecycle.viewModelScope
 import com.example.poker.BIG_BLIND
-import com.example.poker.GameViewModel
 import com.example.poker.POT
 import com.example.poker.SMALL_BLIND
 import com.example.poker.bot.ALLIN

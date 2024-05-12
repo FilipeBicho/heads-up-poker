@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 @SuppressWarnings("LeakingThisInConstructor")
-class Game(private var game: GameViewModel) {
+class Game(private var game: Betting) {
 
     private val mutableStateFlow = MutableStateFlow(GameUiState())
     private val uiState: StateFlow<GameUiState> = mutableStateFlow.asStateFlow()

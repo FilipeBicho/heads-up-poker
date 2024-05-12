@@ -1,10 +1,11 @@
-package com.example.poker.gameplay
+package com.example.poker.game
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.poker.cards.Card
 import com.example.poker.cards.PRE_FLOP
 import com.example.poker.odds.Odds
+import java.util.Objects
 
 data class GameplayState(
     var player: Int = -1,
@@ -14,8 +15,8 @@ data class GameplayState(
     var totalPotValue: Int = 0,
     var round: Int = PRE_FLOP,
 
-    var pokerChips: List<Int> = listOf(0,0,0),
-    var bet: List<Int> = listOf(0,0,0),
+    var pokerChips: MutableList<Int> = mutableListOf(0,0,0),
+    var bet: MutableList<Int> = mutableListOf(0,0,0),
     var checkAvailable: Boolean = true,
 
     var gameSummaryMap: MutableList<List<String>> = ArrayList(),
