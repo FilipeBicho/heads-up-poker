@@ -14,6 +14,7 @@ import com.example.poker.bot.RAISE
 import com.example.poker.cards.BOT
 import com.example.poker.cards.PLAYER
 import com.example.poker.cards.PRE_FLOP
+import com.example.poker.gameplay.Game
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,47 +22,32 @@ import kotlinx.coroutines.flow.update
 
 class Bet {
 
-    // gameplay state
-    private val gameplayStateFlow = MutableStateFlow(GameplayState())
-    private val gameplayState: StateFlow<GameplayState> = gameplayStateFlow.asStateFlow()
+    var pokerChips: MutableList<Int> = GameData.pokerChips
+    var bet: MutableList<Int> = GameData.bet
+    var totalPotValue: Int = GameData.totalPotValue
 
-    // ui state
-    private val uiStateFlow = MutableStateFlow(GameUiState())
-    private val uiState: StateFlow<GameUiState> = uiStateFlow.asStateFlow()
+    private var dealer: Int = GameData.dealer
+    private var blind: Int = GameData.blind
 
-    lateinit var pokerChips: MutableList<Int>
-    lateinit var bet: MutableList<Int>
-    var totalPotValue: Int = -1
-
-    private var dealer: Int = -1
-    private var blind: Int = -1
-
-    private var player: Int = -1
-    private var opponent: Int = -1
+    private var player: Int = GameData.player
+    private var opponent: Int = GameData.opponent
 
     var round = PRE_FLOP
 
     private var computerBotValidActions = BooleanArray(6){false}
 
-    private var playerName: List<String>
-
-    private var gameSummaryList: MutableList<String> = mutableListOf()
-    private var gameSummaryMap: MutableList<List<String>> = mutableListOf()
+    private var gameSummaryList: MutableList<String> = GameData.gameSummaryList
+    private var gameSummaryMap: MutableList<List<String>> = GameData.gameSummaryMap
 
     private lateinit var computerBot: Bot
 
-    init {
-        gameSummaryMap = uiState.value.gameSummary.toMutableList()
-        playerName = listOf(uiState.value.playerName)
-    }
-
     private fun setValues() {
-        pokerChips = gameplayState.value.pokerChips
-        bet = gameplayState.value.bet
-        blind = gameplayState.value.blind
-        player = gameplayState.value.player
-        opponent = gameplayState.value.opponent
-        totalPotValue = gameplayState.value.totalPotValue
+        pokerChips = GameData.pokerChips
+        bet = GameData.bet
+        blind = GameData.blind
+        player = GameData.player
+        opponent = GameData.opponent
+        totalPotValue = GameData.totalPotValue
     }
 
     /**
@@ -98,174 +84,177 @@ class Bet {
     }
 
     fun preFlop() {
+
+
         setValues()
-        if (pokerChips[blind] <= BIG_BLIND) {
-            if (pokerChips[blind] <= SMALL_BLIND) {
+        return
+        /* if (pokerChips[blind] <= BIG_BLIND) {
+             if (pokerChips[blind] <= SMALL_BLIND) {
 
-                // blind makes all in
-                bet[blind] = pokerChips[blind]
-                pokerChips[blind] = 0
+                 // blind makes all in
+                 bet[blind] = pokerChips[blind]
+                 pokerChips[blind] = 0
 
-                // dealer pays all in
-                bet[dealer] = bet[blind]
-                pokerChips[dealer] -= bet[dealer]
+                 // dealer pays all in
+                 bet[dealer] = bet[blind]
+                 pokerChips[dealer] -= bet[dealer]
 
-                // calculate pot
-                pokerChips[POT] = bet[blind] + bet[dealer]
-                totalPotValue += pokerChips[POT]
+                 // calculate pot
+                 pokerChips[POT] = bet[blind] + bet[dealer]
+                 totalPotValue += pokerChips[POT]
 
-                gameSummaryList += "${playerName[blind]} makes all in ${bet[blind]} €"
-                gameSummaryList += "${playerName[dealer]} pays all in ${bet[dealer]} €"
+                 gameSummaryList += "${playerName[blind]} makes all in ${bet[blind]} €"
+                 gameSummaryList += "${playerName[dealer]} pays all in ${bet[dealer]} €"
 
-                uiStateFlow.update { currentState ->
-                    currentState.copy(
-                        playerMoney = pokerChips[PLAYER],
-                        computerMoney = pokerChips[BOT],
-                        playerBetValue = bet[dealer],
-                        currentPot = pokerChips[POT],
-                        totalPot = totalPotValue,
-                        gameSummary = gameSummaryMap
-                    )
-                }
-                gameplayStateFlow.update { currentState ->
-                    currentState.copy(
-                        bet = bet,
-                        pokerChips = pokerChips,
-                        totalPotValue = totalPotValue
-                    )
-                }
+                 uiStateFlow.update { currentState ->
+                     currentState.copy(
+                         playerMoney = pokerChips[PLAYER],
+                         computerMoney = pokerChips[BOT],
+                         playerBetValue = bet[dealer],
+                         currentPot = pokerChips[POT],
+                         totalPot = totalPotValue,
+                         gameSummary = gameSummaryMap
+                     )
+                 }
+                 gameplayStateFlow.update { currentState ->
+                     currentState.copy(
+                         bet = bet,
+                         pokerChips = pokerChips,
+                         totalPotValue = totalPotValue
+                     )
+                 }
 
-                // TODO : showdown
-            } else {
+                 // TODO : showdown
+             } else {
 
-                // blind makes all in
-                bet[blind] = pokerChips[blind]
-                pokerChips[blind] = 0
+                 // blind makes all in
+                 bet[blind] = pokerChips[blind]
+                 pokerChips[blind] = 0
 
-                // dealer pay small blind
-                bet[dealer] = SMALL_BLIND
-                pokerChips[dealer] -= bet[dealer]
+                 // dealer pay small blind
+                 bet[dealer] = SMALL_BLIND
+                 pokerChips[dealer] -= bet[dealer]
 
-                // calculate pot
-                pokerChips[POT] = bet[blind] + bet[dealer]
+                 // calculate pot
+                 pokerChips[POT] = bet[blind] + bet[dealer]
 
-                gameSummaryList += "${playerName[blind]} makes all in ${bet[blind]} €"
-                gameSummaryList += "${playerName[dealer]} pays small blind ${bet[dealer]} €"
+                 gameSummaryList += "${playerName[blind]} makes all in ${bet[blind]} €"
+                 gameSummaryList += "${playerName[dealer]} pays small blind ${bet[dealer]} €"
 
-                player = dealer
+                 player = dealer
 
-                uiStateFlow.update { currentState ->
-                    currentState.copy(
-                        playerMoney = pokerChips[PLAYER],
-                        computerMoney = pokerChips[BOT],
-                        playerBetValue = bet[dealer],
-                        currentPot = pokerChips[POT],
-                        totalPot = totalPotValue,
-                        gameSummary = gameSummaryMap
-                    )
-                }
-                gameplayStateFlow.update { currentState ->
-                    currentState.copy(
-                        bet = bet,
-                        pokerChips = pokerChips,
-                        totalPotValue = totalPotValue
-                    )
-                }
+                 uiStateFlow.update { currentState ->
+                     currentState.copy(
+                         playerMoney = pokerChips[PLAYER],
+                         computerMoney = pokerChips[BOT],
+                         playerBetValue = bet[dealer],
+                         currentPot = pokerChips[POT],
+                         totalPot = totalPotValue,
+                         gameSummary = gameSummaryMap
+                     )
+                 }
+                 gameplayStateFlow.update { currentState ->
+                     currentState.copy(
+                         bet = bet,
+                         pokerChips = pokerChips,
+                         totalPotValue = totalPotValue
+                     )
+                 }
 
-                if (player == PLAYER) {
-                    uiStateFlow.update { currentState -> currentState.copy(
-                        displayFoldButton = true,
-                        displayCheckButton = false,
-                        displayCallButton = true,
-                        displayBetButton = false,
-                        displayRaiseButton = false,
-                        displayAllInButton = false
-                    )}
-                } else {
-                    computerBotValidActions[FOLD] = true
-                    computerBotValidActions[CHECK] = false
-                    computerBotValidActions[CALL] = true
-                    computerBotValidActions[BET] = false
-                    computerBotValidActions[RAISE] = false
-                    computerBotValidActions[ALLIN] = false
+                 if (player == PLAYER) {
+                     uiStateFlow.update { currentState -> currentState.copy(
+                         displayFoldButton = true,
+                         displayCheckButton = false,
+                         displayCallButton = true,
+                         displayBetButton = false,
+                         displayRaiseButton = false,
+                         displayAllInButton = false
+                     )}
+                 } else {
+                     computerBotValidActions[FOLD] = true
+                     computerBotValidActions[CHECK] = false
+                     computerBotValidActions[CALL] = true
+                     computerBotValidActions[BET] = false
+                     computerBotValidActions[RAISE] = false
+                     computerBotValidActions[ALLIN] = false
 
-                    //TODO: bot
-                }
-            }
-        } else if (pokerChips[dealer] <= SMALL_BLIND) {
+                     //TODO: bot
+                 }
+             }
+         } else if (pokerChips[dealer] <= SMALL_BLIND) {
 
-            // dealer makes all in
-            bet[dealer] = pokerChips[dealer]
-            pokerChips[dealer] = 0
+             // dealer makes all in
+             bet[dealer] = pokerChips[dealer]
+             pokerChips[dealer] = 0
 
-            // blind pays all in
-            bet[blind] = bet[player]
-            pokerChips[blind] -= bet[blind]
+             // blind pays all in
+             bet[blind] = bet[player]
+             pokerChips[blind] -= bet[blind]
 
-            // calculate pot
-            pokerChips[POT] = bet[blind] + bet[dealer]
-            totalPotValue += pokerChips[POT]
+             // calculate pot
+             pokerChips[POT] = bet[blind] + bet[dealer]
+             totalPotValue += pokerChips[POT]
 
-            gameSummaryList += "${playerName[blind]} makes all in ${bet[blind]} €"
-            gameSummaryList += "${playerName[dealer]} pays all in ${bet[dealer]} €"
+             gameSummaryList += "${playerName[blind]} makes all in ${bet[blind]} €"
+             gameSummaryList += "${playerName[dealer]} pays all in ${bet[dealer]} €"
 
-            uiStateFlow.update { currentState ->
-                currentState.copy(
-                    playerMoney = pokerChips[PLAYER],
-                    computerMoney = pokerChips[BOT],
-                    playerBetValue = bet[dealer],
-                    currentPot = pokerChips[POT],
-                    totalPot = totalPotValue,
-                    gameSummary = gameSummaryMap
-                )
-            }
-            gameplayStateFlow.update { currentState ->
-                currentState.copy(
-                    bet = bet,
-                    pokerChips = pokerChips,
-                    totalPotValue = totalPotValue
-                )
-            }
+             uiStateFlow.update { currentState ->
+                 currentState.copy(
+                     playerMoney = pokerChips[PLAYER],
+                     computerMoney = pokerChips[BOT],
+                     playerBetValue = bet[dealer],
+                     currentPot = pokerChips[POT],
+                     totalPot = totalPotValue,
+                     gameSummary = gameSummaryMap
+                 )
+             }
+             gameplayStateFlow.update { currentState ->
+                 currentState.copy(
+                     bet = bet,
+                     pokerChips = pokerChips,
+                     totalPotValue = totalPotValue
+                 )
+             }
 
-            // TODO : showdown
-        } else {
+             // TODO : showdown
+         } else {
 
-            // dealer pay small blind
-            bet[dealer] = SMALL_BLIND
-            pokerChips[dealer] -= bet[dealer]
+             // dealer pay small blind
+             bet[dealer] = SMALL_BLIND
+             pokerChips[dealer] -= bet[dealer]
 
-            // blind pay big blind
-            bet[blind] = BIG_BLIND
-            pokerChips[blind] -= bet[blind]
+             // blind pay big blind
+             bet[blind] = BIG_BLIND
+             pokerChips[blind] -= bet[blind]
 
-            // calculate pot
-            pokerChips[POT] = bet[blind] + bet[dealer]
+             // calculate pot
+             pokerChips[POT] = bet[blind] + bet[dealer]
 
-            gameSummaryList += "${playerName[dealer]} pays small blind ${bet[dealer]} €"
-            gameSummaryList += "${playerName[blind]} pays big blind ${bet[blind]} €"
+             gameSummaryList += "${playerName[dealer]} pays small blind ${bet[dealer]} €"
+             gameSummaryList += "${playerName[blind]} pays big blind ${bet[blind]} €"
 
-            player = dealer
+             player = dealer
 
-            if (player == PLAYER) {
-                uiStateFlow.update { currentState -> currentState.copy(
-                    displayFoldButton = true,
-                    displayCheckButton = false,
-                    displayCallButton = true,
-                    displayBetButton = isBetAvailable(),
-                    displayRaiseButton = isRaiseAvailable(),
-                    displayAllInButton = isAllInAvailable()
-                )}
-            } else {
-                computerBotValidActions[FOLD] = true
-                computerBotValidActions[CHECK] = false
-                computerBotValidActions[CALL] = true
-                computerBotValidActions[BET] = isBetAvailable()
-                computerBotValidActions[RAISE] = isRaiseAvailable()
-                computerBotValidActions[ALLIN] = isAllInAvailable()
+             if (player == PLAYER) {
+                 uiStateFlow.update { currentState -> currentState.copy(
+                     displayFoldButton = true,
+                     displayCheckButton = false,
+                     displayCallButton = true,
+                     displayBetButton = isBetAvailable(),
+                     displayRaiseButton = isRaiseAvailable(),
+                     displayAllInButton = isAllInAvailable()
+                 )}
+             } else {
+                 computerBotValidActions[FOLD] = true
+                 computerBotValidActions[CHECK] = false
+                 computerBotValidActions[CALL] = true
+                 computerBotValidActions[BET] = isBetAvailable()
+                 computerBotValidActions[RAISE] = isRaiseAvailable()
+                 computerBotValidActions[ALLIN] = isAllInAvailable()
 
-                //TODO: bot
-            }
-        }
+                 //TODO: bot
+             }
+         }*/
     }
 
 }

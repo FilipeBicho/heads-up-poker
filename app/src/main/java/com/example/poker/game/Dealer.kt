@@ -11,6 +11,7 @@ import com.example.poker.cards.Card
 import com.example.poker.cards.Dealer
 import com.example.poker.cards.PLAYER
 import com.example.poker.cards.PRE_FLOP
+import com.example.poker.gameplay.Game
 import com.example.poker.odds.Combinations
 import com.example.poker.odds.Odds
 import kotlinx.coroutines.flow.MutableStateFlow      //  preFlopBets()
@@ -30,24 +31,22 @@ class Dealer {
     private val uiState: StateFlow<GameUiState> = uiStateFlow.asStateFlow()
 
     //
-    private var dealer: Int = -1
-    private var blind: Int = -1
-    private var gameNumber: Int = 0
+    private var dealer: Int = GameData.dealer
+    private var blind: Int = GameData.blind
+    private var gameNumber: Int = GameData.gameNumber
 
-    private var pokerChips: MutableList<Int> = mutableListOf(0,0,0)
+    private var pokerChips: MutableList<Int> = GameData.pokerChips
 
-    private var gameSummaryList: MutableList<String> = mutableListOf()
-    private var gameSummaryMap: MutableList<List<String>> = mutableListOf()
+    private var gameSummaryList: MutableList<String> = GameData.gameSummaryList
+    private var gameSummaryMap: MutableList<List<String>> = GameData.gameSummaryMap
 
-    private var playerCards: SnapshotStateList<Card> = mutableStateListOf()
-    private var computerCards: SnapshotStateList<Card> = mutableStateListOf()
-    private var tableCards = mutableStateListOf<Card>()
+    private var playerCards: SnapshotStateList<Card> = GameData.playerCards
+    private var computerCards: SnapshotStateList<Card> = GameData.computerCards
+    private var tableCards: SnapshotStateList<Card> = GameData.tableCards
 
     private var cardDealer: Dealer = Dealer()
-    private var bet: Bet = Bet()
+    private var bet: Bet = GameData.Bet
     private lateinit var odds: Odds
-
-    companion object {}
 
     init {
         gameSummaryMap = uiState.value.gameSummary.toMutableList()
@@ -69,11 +68,9 @@ class Dealer {
         // set river
         cardDealer.setRiverCard(tableCards)
 
-        gameplayStateFlow.update { currentState -> currentState.copy(
-            playerCards = playerCards,
-            computerCards = computerCards,
-            tableCards = tableCards
-        )}
+        GameData.playerCards = playerCards
+        GameData.computerCards = computerCards
+        GameData.tableCards = tableCards
     }
 
     private fun initOdds() {
@@ -89,20 +86,16 @@ class Dealer {
         // calculate river odds
         odds.calculateRiverOdds(computerCards, tableCards)
 
-        gameplayStateFlow.update { currentState -> currentState.copy(
-            odds = odds
-        )}
+        GameData.odds = odds
     }
 
     private fun resetValues() {
-        gameplayStateFlow.update { currentState -> currentState.copy(
-            round = PRE_FLOP,
-            bet = mutableListOf(0,0),
-            totalPotValue = 0,
-            checkAvailable = true,
-            playerCards = playerCards,
-            gameSummaryList = gameSummaryList
-        )}
+
+        GameData.round = PRE_FLOP
+        GameData.bet = mutableListOf(0,0,0)
+        GameData.totalPotValue = 0
+        GameData.checkAvailable = true
+        GameData.gameSummaryList = gameSummaryList
     }
 
     private fun initValues() {
@@ -116,13 +109,11 @@ class Dealer {
         dealer = BOT
         blind = if (dealer == 0) 1 else 0
 
-        gameplayStateFlow.update { currentState -> currentState.copy(
-            pokerChips = pokerChips,
-            dealer = BOT,
-            blind = blind,
-            player = dealer,
-            opponent = blind
-        )}
+        GameData.pokerChips = pokerChips
+        GameData.dealer = dealer
+        GameData.player = dealer
+        GameData.blind = blind
+        GameData.opponent = blind
     }
 
     fun newGame() {
