@@ -25,7 +25,6 @@ import com.example.poker.game.Data.totalPotValue
 import com.example.poker.game.Data.uiStateFlow
 import com.example.poker.hand.Hand
 import com.example.poker.hand.HandWinnerCalculator
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 
 class Showdown {
@@ -155,8 +154,10 @@ class Showdown {
 
         uiStateFlow.update { currentState -> currentState.copy(
             playerMoney = pokerChips[PLAYER],
-            computerMoney = pokerChips[BOT],
+            botMoney = pokerChips[BOT],
             currentPot = pokerChips[POT],
+            playerText = "0 €",
+            botText = "0 €",
             playerBetValue = BIG_BLIND,
             totalPot = totalPotValue,
             gameSummary = gameSummaryMap

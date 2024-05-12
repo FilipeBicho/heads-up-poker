@@ -111,7 +111,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         CardsSection(
                             botCards,
                             gameUiState.botName,
-                            gameUiState.computerMoney,
+                            gameUiState.botMoney,
                             gameUiState.displayBotCards
                         )
                     }

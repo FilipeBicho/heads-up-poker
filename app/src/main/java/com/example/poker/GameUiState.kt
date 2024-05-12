@@ -8,7 +8,7 @@ data class GameUiState(
 
     val playerMoney: Int = 200,
 
-    val computerMoney: Int = 200,
+    val botMoney: Int = 200,
 
     val playerText: String = "",
 

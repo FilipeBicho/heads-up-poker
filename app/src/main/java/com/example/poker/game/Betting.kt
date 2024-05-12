@@ -1,6 +1,5 @@
 package com.example.poker.game
 
-import androidx.lifecycle.viewModelScope
 import com.example.poker.BIG_BLIND
 import com.example.poker.POT
 import com.example.poker.SMALL_BLIND
@@ -35,9 +34,7 @@ import com.example.poker.game.Data.showdown
 import com.example.poker.game.Data.tableCards
 import com.example.poker.game.Data.totalPotValue
 import com.example.poker.game.Data.uiStateFlow
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 class Betting {
@@ -181,7 +178,9 @@ class Betting {
             currentState.copy(
                 playerBetValue = bet[PLAYER],
                 botBetValue = bet[BOT],
-                totalPot = totalPotValue
+                totalPot = totalPotValue,
+                playerText = "${bet[PLAYER]} €",
+                botText = "${bet[BOT]} €",
             )
         }
 
@@ -265,10 +264,12 @@ class Betting {
                  uiStateFlow.update { currentState ->
                      currentState.copy(
                          playerMoney = pokerChips[PLAYER],
-                         computerMoney = pokerChips[BOT],
+                         botMoney = pokerChips[BOT],
                          playerBetValue = bet[dealer],
                          currentPot = pokerChips[POT],
                          totalPot = totalPotValue,
+                         playerText = "${bet[PLAYER]} €",
+                         botText = "${bet[BOT]} €",
                          gameSummary = gameSummaryMap
                      )
                  }
@@ -295,10 +296,13 @@ class Betting {
                  uiStateFlow.update { currentState ->
                      currentState.copy(
                          playerMoney = pokerChips[PLAYER],
-                         computerMoney = pokerChips[BOT],
-                         playerBetValue = bet[dealer],
+                         botMoney = pokerChips[BOT],
+                         playerBetValue = bet[PLAYER],
+                         botBetValue = bet[BOT],
                          currentPot = pokerChips[POT],
                          totalPot = totalPotValue,
+                         playerText = "${bet[PLAYER]} €",
+                         botText = "${bet[BOT]} €",
                          gameSummary = gameSummaryMap
                      )
                  }
@@ -326,10 +330,13 @@ class Betting {
              uiStateFlow.update { currentState ->
                  currentState.copy(
                      playerMoney = pokerChips[PLAYER],
-                     computerMoney = pokerChips[BOT],
-                     playerBetValue = bet[dealer],
+                     botMoney = pokerChips[BOT],
+                     playerBetValue = bet[PLAYER],
+                     botBetValue = bet[BOT],
                      currentPot = pokerChips[POT],
                      totalPot = totalPotValue,
+                     playerText = "${bet[PLAYER]} €",
+                     botText = "${bet[BOT]} €",
                      gameSummary = gameSummaryMap
                  )
              }
@@ -352,6 +359,20 @@ class Betting {
              gameSummaryList += "${name[blind]} pays big blind ${bet[blind]} €"
              gameSummaryMap[Data.gameNumber] = gameSummaryList.toList()
 
+             uiStateFlow.update { currentState ->
+                 currentState.copy(
+                     playerMoney = pokerChips[PLAYER],
+                     botMoney = pokerChips[BOT],
+                     playerBetValue = bet[PLAYER],
+                     botBetValue = bet[BOT],
+                     currentPot = pokerChips[POT],
+                     totalPot = totalPotValue,
+                     playerText = "${bet[PLAYER]} €",
+                     botText = "${bet[BOT]} €",
+                     gameSummary = gameSummaryMap
+                 )
+             }
+
              player = dealer
 
              foldCallBet()
@@ -369,8 +390,10 @@ class Betting {
         uiStateFlow.update { currentState ->
             currentState.copy(
                 playerMoney = pokerChips[PLAYER],
-                computerMoney = pokerChips[BOT],
-                gameSummary = gameSummaryMap
+                botMoney = pokerChips[BOT],
+                playerText = "${bet[PLAYER]} €",
+                botText = "${bet[BOT]} €",
+                gameSummary = gameSummaryMap,
             )
         }
 
@@ -437,8 +460,11 @@ class Betting {
             uiStateFlow.update { currentState ->
                 currentState.copy(
                     playerMoney = pokerChips[PLAYER],
-                    computerMoney = pokerChips[BOT],
-                    playerBetValue = bet[dealer],
+                    botMoney = pokerChips[BOT],
+                    playerText = "${bet[PLAYER]} €",
+                    botText = "${bet[BOT]} €",
+                    playerBetValue = bet[PLAYER],
+                    botBetValue = bet[BOT],
                     currentPot = pokerChips[POT],
                     totalPot = totalPotValue,
                     gameSummary = gameSummaryMap
@@ -463,8 +489,11 @@ class Betting {
             uiStateFlow.update { currentState ->
                 currentState.copy(
                     playerMoney = pokerChips[PLAYER],
-                    computerMoney = pokerChips[BOT],
-                    playerBetValue = bet[dealer],
+                    botMoney = pokerChips[BOT],
+                    playerBetValue = bet[PLAYER],
+                    botBetValue = bet[BOT],
+                    playerText = "${bet[PLAYER]} €",
+                    botText = "${bet[BOT]} €",
                     currentPot = pokerChips[POT],
                     totalPot = totalPotValue,
                     gameSummary = gameSummaryMap
@@ -482,6 +511,21 @@ class Betting {
                 } else {
                     if (round == RIVER) {
                         totalPotValue += pokerChips[POT]
+
+                        uiStateFlow.update { currentState ->
+                            currentState.copy(
+                                playerMoney = pokerChips[PLAYER],
+                                botMoney = pokerChips[BOT],
+                                playerBetValue = bet[PLAYER],
+                                botBetValue = bet[BOT],
+                                currentPot = pokerChips[POT],
+                                totalPot = totalPotValue,
+                                playerText = "0 €",
+                                botText = "0 €",
+                                gameSummary = gameSummaryMap
+                            )
+                        }
+
                         showdown.showdown()
                     } else {
                         nextRound()
@@ -511,9 +555,11 @@ class Betting {
         uiStateFlow.update { currentState ->
             currentState.copy(
                 playerMoney = pokerChips[PLAYER],
-                computerMoney = pokerChips[BOT],
+                botMoney = pokerChips[BOT],
                 playerBetValue = bet[dealer],
                 currentPot = pokerChips[POT],
+                playerText = "${bet[PLAYER]} €",
+                botText = "${bet[BOT]} €",
                 totalPot = totalPotValue,
                 gameSummary = gameSummaryMap
             )
@@ -547,7 +593,9 @@ class Betting {
         uiStateFlow.update { currentState ->
             currentState.copy(
                 playerMoney = pokerChips[PLAYER],
-                computerMoney = pokerChips[BOT],
+                botMoney = pokerChips[BOT],
+                playerText = "${bet[PLAYER]} €",
+                botText = "${bet[BOT]} €",
                 playerBetValue = bet[dealer],
                 currentPot = pokerChips[POT],
                 totalPot = totalPotValue,

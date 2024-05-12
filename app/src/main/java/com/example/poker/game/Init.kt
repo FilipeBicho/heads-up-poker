@@ -86,10 +86,12 @@ class Init {
             totalPot = 0,
             currentPot = 0,
             winnerText = "",
+            playerText = "0 €",
+            botText = "0 €",
             gameSummary = gameSummaryMap,
             showdown = false
         )}
 
-      betting.preFlop()
+        betting.preFlop()
     }
 }
