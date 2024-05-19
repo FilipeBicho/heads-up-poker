@@ -2,6 +2,7 @@ package com.example.poker.game
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.example.poker.BIG_BLIND
 import com.example.poker.GameUiState
 import com.example.poker.cards.Card
 import com.example.poker.cards.Dealer
@@ -20,11 +21,11 @@ object Data {
 
     var playerMoney = 200
     var botMoney = 200
+    var minPlayerBet = BIG_BLIND
 
     var pokerChips: MutableList<Int> = mutableListOf(0,0,0)
     var bet: MutableList<Int> = mutableListOf(0,0,0)
     var totalPotValue: Int = 0
-    var betValue: Int = 0
 
     var gameNumber: Int = 0
     var checkAvailable: Boolean = true

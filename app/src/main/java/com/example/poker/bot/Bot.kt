@@ -2,12 +2,13 @@ package com.example.poker.bot
 
 import com.example.poker.BIG_BLIND
 import com.example.poker.cards.BOT
-import com.example.poker.cards.Card
 import com.example.poker.cards.PLAYER
+import com.example.poker.cards.PRE_FLOP
 import com.example.poker.game.Data.bet
-import com.example.poker.game.Data.botValidActions
 import com.example.poker.game.Data.botCards
+import com.example.poker.game.Data.botValidActions
 import com.example.poker.game.Data.pokerChips
+import com.example.poker.game.Data.round
 import kotlin.math.abs
 
 const val FOLD = 0
@@ -33,7 +34,7 @@ open class Bot {
     /**
      * Init stack and call value
      */
-    fun initValues() {
+    private fun initValues() {
 
         totalMoney = pokerChips[BOT]
 
@@ -55,7 +56,7 @@ open class Bot {
     /**
      * Reset stack and call value
      */
-    fun resetValues() {
+    private fun resetValues() {
         playerStack = 0
         botStack = 0
         callValue = 0
@@ -82,32 +83,43 @@ open class Bot {
     }
 
 
-    open fun botAction(): Int {
+    open fun calculateAction(): Int {
         resetValues()
         initValues()
 
-        if (botValidActions[BET]) {
-            betValue = BIG_BLIND
-            action = BET
-        } else if (botValidActions[RAISE]) {
-            betValue = if (bet[PLAYER] >= BIG_BLIND) {
-                2 * bet[PLAYER]
-            } else {
-                2 * BIG_BLIND
-            }
-            action = RAISE
-        } else if (botValidActions[ALLIN]) {
-            betValue = pokerChips[BOT]
-            action = ALLIN
-        }
-
 //        when (round) {
-//            PRE_FLOP -> return PreFlopBot(cards, isDealer).botAction(pokerChips, bet, totalPot, validActions)
+//            PRE_FLOP -> return PreFlopBot().calculateAction()
 //            else -> {
 //                betValue = BIG_BLIND
 //                action = BET
 //            }
 //        }
+
+        action = if (botValidActions[ALLIN]) {
+            ALLIN
+        }
+        else if (botValidActions[RAISE]) {
+            if (pokerChips[BOT] + bet[BOT] > bet[PLAYER] * 2) {
+                betValue = bet[PLAYER] * 2
+                RAISE
+            } else {
+                ALLIN
+            }
+        }
+        else if (botValidActions[BET]) {
+            if (pokerChips[BOT] > BIG_BLIND) {
+                betValue = BIG_BLIND
+                BET
+            } else {
+                ALLIN
+            }
+        }
+        else if (botValidActions[CALL]) {
+            CALL
+        } else {
+            CHECK
+        }
+
 
         return action
     }

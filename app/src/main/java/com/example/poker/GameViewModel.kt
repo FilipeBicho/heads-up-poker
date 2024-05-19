@@ -1,8 +1,6 @@
 package com.example.poker
 
 import androidx.lifecycle.ViewModel
-import com.example.poker.game.Data.bet
-import com.example.poker.game.Data.betValue
 import com.example.poker.game.Data.betting
 import com.example.poker.game.Data.init
 import com.example.poker.game.Data.player
@@ -24,16 +22,9 @@ class GameViewModel : ViewModel() {
      * Update player bet via button interaction
      */
     fun updatePlayerBet(value: Int) {
-
-        betValue = if (value > pokerChips[player]) {
-            pokerChips[player]
-        } else {
-            value
-        }
-
         uiStateFlow.update { currentState ->
             currentState.copy(
-                playerBetValue = betValue
+                playerBetValue = value
             )
         }
     }
@@ -50,12 +41,12 @@ class GameViewModel : ViewModel() {
         betting.call()
     }
 
-    fun betAction() {
-        betting.bet()
+    fun betAction(value: Int) {
+        betting.bet(value)
     }
 
-    fun raiseAction() {
-        betting.raise()
+    fun raiseAction(value: Int) {
+        betting.raise(value)
     }
 
     fun allInAction() {

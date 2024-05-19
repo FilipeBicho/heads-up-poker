@@ -46,21 +46,26 @@ class Init {
     }
 
     private fun resetValues() {
-        round = PRE_FLOP
-        bet = mutableListOf(0,0,0)
-        totalPotValue = 0
-        checkAvailable = true
-        gameSummaryList.clear()
+
     }
 
     private fun initValues() {
-        // init poker chips
+        round = PRE_FLOP
+
         pokerChips[PLAYER] = playerMoney
         pokerChips[BOT] = botMoney
         pokerChips[POT] = 0
 
+        bet[PLAYER] = 0
+        bet[BOT] = 0
+        bet[POT] = 0
+        totalPotValue = 0
+
+        checkAvailable = true
+        gameSummaryList.clear()
+
         // init or change dealer
-        dealer = (0..1).random()
+        dealer = 1//(0..1).random()
         blind = if (dealer == 0) 1 else 0
 
         player = dealer
@@ -68,7 +73,6 @@ class Init {
     }
 
     fun newGame() {
-        resetValues()
         initValues()
         dealCards()
         initOdds()

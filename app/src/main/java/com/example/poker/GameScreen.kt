@@ -68,8 +68,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.poker.cards.Card
 import com.example.poker.cards.PLAYER
 import com.example.poker.game.Data.botCards
+import com.example.poker.game.Data.dealer
+import com.example.poker.game.Data.minPlayerBet
 import com.example.poker.game.Data.player
 import com.example.poker.game.Data.playerCards
+import com.example.poker.game.Data.pokerChips
 import com.example.poker.game.Data.tableCards
 import com.example.poker.game.Data.uiState
 import kotlin.math.roundToInt
@@ -78,6 +81,7 @@ import kotlin.math.roundToInt
 @Preview
 fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
     val gameUiState by uiState.collectAsState()
+    val betValue by remember(key1 = gameUiState.playerBetValue) { mutableStateOf(gameUiState.playerBetValue) }
     Background()
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -102,7 +106,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                 ) {
 
                     Box(modifier = Modifier.align(Alignment.TopStart)) {
-                        if (player != PLAYER) {
+                        if (dealer != PLAYER) {
                             DealerChipImage()
                         }
                     }
@@ -305,7 +309,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                 ) {
 
                     Box(modifier = Modifier.align(Alignment.TopStart)) {
-                        if (player == PLAYER) {
+                        if (dealer == PLAYER) {
                             DealerChipImage()
                         }
                     }
@@ -358,15 +362,15 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                                 }
 
                                 if (gameUiState.displayBetButton) {
-                                    GameActionButton("Bet") { gameViewModel.betAction() }
+                                    GameActionButton("Bet") { gameViewModel.betAction(betValue) }
                                 }
 
                                 if (gameUiState.displayRaiseButton) {
-                                    GameActionButton("Raise") { gameViewModel.raiseAction()}
+                                    GameActionButton("Raise") { gameViewModel.raiseAction(betValue)}
                                 }
 
                                 if (gameUiState.displayAllInButton) {
-                                    GameActionButton("ALL In") { gameViewModel.allInAction() }
+                                    GameActionButton("All n") { gameViewModel.allInAction() }
                                 }
                             }
                         }
@@ -495,7 +499,7 @@ private fun GameActionButton(text: String, onClick: () -> Unit) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun BetSlider(gameUiState: GameUiState, gameViewModel: GameViewModel) {
-    var betValue by remember(key1 = gameUiState.playerBetValue) { mutableStateOf(gameUiState.playerBetValue) }
+    var bet by remember(key1 = minPlayerBet) { mutableStateOf(minPlayerBet) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
@@ -508,10 +512,10 @@ private fun BetSlider(gameUiState: GameUiState, gameViewModel: GameViewModel) {
     ) {
         Box(modifier = Modifier.weight(0.2f)) {
             BasicTextField(
-                value = betValue.toString(),
+                value = bet.toString(),
                 onValueChange = {
                     if (it.isNotEmpty() && it.isDigitsOnly() && it.toInt() <= gameUiState.playerMoney) {
-                        betValue = it.toInt()
+                        bet = it.toInt()
                     }
                 },
                 keyboardOptions = KeyboardOptions(
@@ -520,7 +524,7 @@ private fun BetSlider(gameUiState: GameUiState, gameViewModel: GameViewModel) {
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        gameViewModel.updatePlayerBet(betValue)
+                        gameViewModel.updatePlayerBet(bet)
                         keyboardController?.hide()
                         focusManager.clearFocus()
                     }
@@ -536,11 +540,11 @@ private fun BetSlider(gameUiState: GameUiState, gameViewModel: GameViewModel) {
 
         Box(modifier = Modifier.weight(0.8f)) {
             Slider(
-                value = betValue.toFloat(),
-                onValueChange = { betValue = it.roundToInt() },
-                onValueChangeFinished = { gameViewModel.updatePlayerBet(betValue) },
+                value = bet.toFloat(),
+                onValueChange = { bet = it.roundToInt() },
+                onValueChangeFinished = { gameViewModel.updatePlayerBet(bet) },
                 modifier = Modifier.padding(end = 10.dp),
-                valueRange = betValue.toFloat()..gameUiState.playerMoney.toFloat(),
+                valueRange = minPlayerBet.toFloat()..pokerChips[PLAYER].toFloat(),
                 colors = SliderDefaults.colors(
                     thumbColor = Color.LightGray,
                     activeTrackColor = colorResource(id = R.color.button_red),

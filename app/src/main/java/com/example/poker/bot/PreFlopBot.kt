@@ -1,21 +1,25 @@
 package com.example.poker.bot
 
 import com.example.poker.BIG_BLIND
-import com.example.poker.cards.Card
+import com.example.poker.cards.BOT
 import com.example.poker.cards.PLAYER
+import com.example.poker.game.Data
+import com.example.poker.game.Data.bet
+import com.example.poker.game.Data.botCards
+import com.example.poker.game.Data.dealer
 import com.example.poker.helper.HandGroup
 
-class PreFlopBot(cards: List<Card>, isDealer: Boolean):
+class PreFlopBot:
     Bot() {
 
     private var handRank: Int = 0
 
     init {
-        handRank = HandGroup(cards).group
-        this.isDealer = isDealer
+        handRank = HandGroup(botCards).group
+        this.isDealer = BOT == dealer
     }
 
-    private fun calculateAction(bet: IntArray, validActions: BooleanArray): Int {
+    override fun calculateAction(): Int {
         // Dealer: player called - check and bet available
         // Blind: player didn't play yet - fold, call and bet available
         if (bet[PLAYER] == BIG_BLIND) {
@@ -402,15 +406,7 @@ class PreFlopBot(cards: List<Card>, isDealer: Boolean):
             }
         }
         else {
-            return if (validActions[CHECK]) { CHECK } else { FOLD }
+            return if (Data.botValidActions[CHECK]) { CHECK } else { FOLD }
         }
-    }
-
-     fun botAction(pokerChips: IntArray, bet: IntArray, pot: Int, validActions: BooleanArray): Int {
-
-        resetValues()
-        initValues()
-
-        return calculateAction(bet, validActions)
     }
 }
