@@ -120,6 +120,8 @@ open class Bot {
             CHECK
         }
 
+        action = CHECK
+
 
         return action
     }

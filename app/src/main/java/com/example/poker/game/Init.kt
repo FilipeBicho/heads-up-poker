@@ -65,7 +65,7 @@ class Init {
         gameSummaryList.clear()
 
         // init or change dealer
-        dealer = 1//(0..1).random()
+        dealer = 0//(0..1).random()
         blind = if (dealer == 0) 1 else 0
 
         player = dealer

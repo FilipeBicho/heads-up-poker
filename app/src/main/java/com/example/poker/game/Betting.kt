@@ -94,6 +94,7 @@ class Betting {
     private fun calculateBotAction() {
         when (computerBot.calculateAction()) {
             FOLD -> fold()
+            CHECK -> check()
             CALL -> call()
             BET -> {
                 bet(computerBot.betValue)
@@ -184,6 +185,7 @@ class Betting {
         totalPotValue += pokerChips[POT]
         bet[PLAYER] = 0
         bet[BOT] = 0
+        pokerChips[POT] = 0
         checkAvailable = true
         minPlayerBet = BIG_BLIND
 
@@ -384,19 +386,17 @@ class Betting {
 
     fun check() {
 
+        gameSummaryList += "${name[player]} checks"
+        gameSummaryMap[gameNumber] = gameSummaryList.toList()
+
+        uiStateFlow.update { currentState ->
+            currentState.copy(
+                gameSummary = gameSummaryMap
+            )
+        }
+
         if (checkAvailable && round != PRE_FLOP) {
-
             checkAvailable = false
-
-            gameSummaryList += "${name[player]} checks"
-            gameSummaryMap[gameNumber] = gameSummaryList.toList()
-
-            uiStateFlow.update { currentState ->
-                currentState.copy(
-                    gameSummary = gameSummaryMap
-                )
-            }
-
             switchPlayerTurn()
             checkBet()
         } else {

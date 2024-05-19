@@ -106,14 +106,17 @@ class Showdown {
         gameSummaryList.add("---- $riverString ----")
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
-        uiStateFlow.update { currentState -> currentState.copy(
-            displayRiver = true,
-            gameSummary = gameSummaryMap
-        )}
+        if (showdownCards) {
+            Timer().schedule(timerTask {
+                showdownCards()
+            }, 2000)
+        } else {
+            uiStateFlow.update { currentState -> currentState.copy(
+                displayRiver = true,
+                gameSummary = gameSummaryMap
+            )}
 
-        Timer().schedule(timerTask {
-            showdownCards()
-        }, 2000)
+        }
     }
 
     fun showdownCards() {
