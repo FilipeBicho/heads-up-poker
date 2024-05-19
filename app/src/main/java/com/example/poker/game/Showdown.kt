@@ -26,6 +26,8 @@ import com.example.poker.game.Data.uiStateFlow
 import com.example.poker.hand.Hand
 import com.example.poker.hand.HandWinnerCalculator
 import kotlinx.coroutines.flow.update
+import java.util.Timer
+import kotlin.concurrent.timerTask
 
 class Showdown {
 
@@ -50,6 +52,10 @@ class Showdown {
                 botText = "${odds.getShowdownOpponentOdds()} %",
                 gameSummary = gameSummaryMap
             )}
+            Timer().schedule(timerTask {
+                showdownCards()
+            }, 2000)
+
         } else {
             uiStateFlow.update { currentState -> currentState.copy(
                 displayFlop = true,
@@ -80,6 +86,10 @@ class Showdown {
                 botText = "${odds.getShowdownOpponentOdds()} %",
                 gameSummary = gameSummaryMap
             )}
+
+            Timer().schedule(timerTask {
+                showdownCards()
+            }, 2000)
         } else {
             uiStateFlow.update { currentState -> currentState.copy(
                 displayTurn = true,
@@ -101,9 +111,9 @@ class Showdown {
             gameSummary = gameSummaryMap
         )}
 
-        if (showdownCards) {
-            calculateWinner()
-        }
+        Timer().schedule(timerTask {
+            showdownCards()
+        }, 2000)
     }
 
     fun showdownCards() {
@@ -191,9 +201,10 @@ class Showdown {
             }
         }
 
-        //TODO implement delay 2000
-//        if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
-//            init.newGame()
-//        }
+        if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
+            Timer().schedule(timerTask {
+                init.newGame()
+            }, 2000)
+        }
     }
 }

@@ -35,6 +35,8 @@ import com.example.poker.game.Data.showdown
 import com.example.poker.game.Data.totalPotValue
 import com.example.poker.game.Data.uiStateFlow
 import kotlinx.coroutines.flow.update
+import java.util.Timer
+import kotlin.concurrent.timerTask
 
 class Betting {
 
@@ -375,9 +377,9 @@ class Betting {
                 gameSummary = gameSummaryMap,
             )
         }
-
-        // new game
-        init.newGame()
+        Timer().schedule(timerTask {
+            init.newGame()
+        }, 2000)
     }
 
     fun check() {
@@ -398,7 +400,6 @@ class Betting {
             switchPlayerTurn()
             checkBet()
         } else {
-           //TODO: implement delay
             nextRound()
         }
     }
@@ -424,7 +425,7 @@ class Betting {
             pokerChips[POT] = bet[blind] + bet[dealer]
             totalPotValue += pokerChips[POT]
 
-            gameSummaryList += "${name[player]} calls ${bet[player]} €"
+            gameSummaryList += "${name[player]} calls $callValue €"
             gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
             uiStateFlow.update { currentState ->
@@ -577,7 +578,7 @@ class Betting {
         checkAvailable = false
 
         // bet all chips
-        bet[player] = pokerChips[player]
+        bet[player] = pokerChips[player] + bet[player]
         pokerChips[player] = 0
         pokerChips[POT] = bet[player] + bet[opponent]
 
