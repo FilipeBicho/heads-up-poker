@@ -1,6 +1,7 @@
 package com.example.poker
 
 import androidx.lifecycle.ViewModel
+import com.example.poker.cards.PLAYER
 import com.example.poker.game.Data.betting
 import com.example.poker.game.Data.init
 import com.example.poker.game.Data.player
@@ -15,7 +16,7 @@ const val BIG_BLIND = 40
 class GameViewModel : ViewModel() {
 
     init {
-        init.newGame()
+        init.initGame()
     }
 
     /**
@@ -42,11 +43,19 @@ class GameViewModel : ViewModel() {
     }
 
     fun betAction(value: Int) {
-        betting.bet(value)
+        if (pokerChips[PLAYER] - value == 0) {
+            betting.allIn()
+        } else {
+            betting.bet(value)
+        }
     }
 
     fun raiseAction(value: Int) {
-        betting.raise(value)
+        if (pokerChips[PLAYER] - value == 0) {
+            betting.allIn()
+        } else {
+            betting.raise(value)
+        }
     }
 
     fun allInAction() {

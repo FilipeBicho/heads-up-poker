@@ -45,24 +45,28 @@ class Init {
         odds.calculateRiverOdds(botCards, tableCards)
     }
 
-    private fun resetValues() {
 
-    }
 
     private fun initValues() {
         round = PRE_FLOP
 
-        pokerChips[PLAYER] = playerMoney
-        pokerChips[BOT] = botMoney
-        pokerChips[POT] = 0
-
+        // players
         bet[PLAYER] = 0
         bet[BOT] = 0
+
+        // pot
+        pokerChips[POT] = 0
         bet[POT] = 0
         totalPotValue = 0
 
         checkAvailable = true
         gameSummaryList.clear()
+
+        if (gameSummaryMap.isNotEmpty()) {
+            gameNumber += 1
+        }
+        gameSummaryList.add("Game ${gameNumber+1}")
+        gameSummaryMap.add(gameNumber, gameSummaryList.toList())
 
         // init or change dealer
         dealer = 0//(0..1).random()
@@ -72,16 +76,17 @@ class Init {
         opponent = blind
     }
 
+    fun initGame() {
+        pokerChips[PLAYER] = playerMoney
+        pokerChips[BOT] = botMoney
+        newGame()
+    }
+
     fun newGame() {
         initValues()
-        dealCards()
-        initOdds()
-
-        gameSummaryList.add("Game ${gameNumber+1}")
-        gameSummaryMap.add(gameNumber, gameSummaryList.toList())
 
         uiStateFlow.update { currentState -> currentState.copy(
-            displayBotCards = true,
+            displayBotCards = false,
             displayFlop = false,
             displayTurn = false,
             displayRiver = false,
@@ -89,13 +94,15 @@ class Init {
             botBetValue = 0,
             totalPot = 0,
             currentPot = 0,
-            winnerText = "",
+            actionText = "",
             playerText = "0 €",
             botText = "0 €",
             gameSummary = gameSummaryMap,
             showdown = false
         )}
 
+        dealCards()
+        initOdds()
         betting.preFlop()
     }
 }

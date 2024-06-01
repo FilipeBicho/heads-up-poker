@@ -52,10 +52,7 @@ class Showdown {
                 botText = "${odds.getShowdownOpponentOdds()} %",
                 gameSummary = gameSummaryMap
             )}
-            Timer().schedule(timerTask {
-                showdownCards()
-            }, 2000)
-
+            showdownCards()
         } else {
             uiStateFlow.update { currentState -> currentState.copy(
                 displayFlop = true,
@@ -72,7 +69,6 @@ class Showdown {
         gameSummaryList.add("---- $turnString ----")
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
-
         if (showdownCards) {
             odds.calculateShowdownTurnOdds(
                 playerCards = playerCards,
@@ -87,9 +83,7 @@ class Showdown {
                 gameSummary = gameSummaryMap
             )}
 
-            Timer().schedule(timerTask {
-                showdownCards()
-            }, 2000)
+            showdownCards()
         } else {
             uiStateFlow.update { currentState -> currentState.copy(
                 displayTurn = true,
@@ -107,9 +101,14 @@ class Showdown {
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
         if (showdownCards) {
-            Timer().schedule(timerTask {
-                showdownCards()
-            }, 2000)
+            uiStateFlow.update { currentState -> currentState.copy(
+                displayRiver = true,
+                playerText = "${odds.getShowdownPlayerOdds()} %",
+                botText = "${odds.getShowdownOpponentOdds()} %",
+                gameSummary = gameSummaryMap
+            )}
+
+            showdownCards()
         } else {
             uiStateFlow.update { currentState -> currentState.copy(
                 displayRiver = true,
@@ -127,9 +126,9 @@ class Showdown {
         )}
 
         when (round) {
-            PRE_FLOP -> flop(true)
-            FLOP -> turn(true)
-            TURN -> river(true)
+            PRE_FLOP -> Timer().schedule(timerTask {flop(true)}, 2000)
+            FLOP -> Timer().schedule(timerTask {turn(true)}, 2000)
+            TURN -> Timer().schedule(timerTask {river(true)}, 2000)
             RIVER -> calculateWinner()
         }
     }
@@ -143,6 +142,7 @@ class Showdown {
             displayCheckButton = false,
             displayCallButton = false,
             displayBetButton = false,
+            displayAllInButton = false,
             displayBotCards = true,
             showdown = true
         )}
@@ -171,9 +171,11 @@ class Showdown {
                 gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
                 uiStateFlow.update { currentState -> currentState.copy(
+                    playerMoney = pokerChips[PLAYER],
+                    botMoney = pokerChips[BOT],
                     playerText = "${playerHand.resultText} 100 %",
                     botText = "${computerHand.resultText} 0 %",
-                    winnerText = "Player wins $totalPotValue €",
+                    actionText = "${name[PLAYER]} wins $totalPotValue €",
                     gameSummary = gameSummaryMap
                 )}
             }
@@ -183,9 +185,11 @@ class Showdown {
                 gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
                 uiStateFlow.update { currentState -> currentState.copy(
+                    playerMoney = pokerChips[PLAYER],
+                    botMoney = pokerChips[BOT],
                     playerText = "${playerHand.resultText} 0 %",
                     botText = "${computerHand.resultText} 100 %",
-                    winnerText = "Computer wins $totalPotValue €",
+                    actionText = "${name[BOT]} wins $totalPotValue €",
                     gameSummary = gameSummaryMap
                 )}
             }
@@ -198,7 +202,7 @@ class Showdown {
                 uiStateFlow.update { currentState -> currentState.copy(
                     playerText = "${playerHand.resultText} 0 %",
                     botText = "${computerHand.resultText} 0 %",
-                    winnerText = "Draw, split $totalPotValue €",
+                    actionText = "Draw, split $totalPotValue €",
                     gameSummary = gameSummaryMap
                 )}
             }

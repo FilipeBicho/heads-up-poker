@@ -50,7 +50,7 @@ data class GameUiState(
 
     val showdown: Boolean = false,
 
-    val winnerText: String = "",
+    val actionText: String = "",
 
     val gameSummary: List<List<String>> = ArrayList()
 )

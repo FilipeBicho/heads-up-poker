@@ -95,18 +95,9 @@ open class Bot {
 //            }
 //        }
 
-        action = if (botValidActions[ALLIN]) {
-            ALLIN
-        }
-        else if (botValidActions[RAISE]) {
-            if (pokerChips[BOT] + bet[BOT] > bet[PLAYER] * 2) {
-                betValue = bet[PLAYER] * 2
-                RAISE
-            } else {
-                ALLIN
-            }
-        }
-        else if (botValidActions[BET]) {
+
+
+        action = if (botValidActions[BET]) {
             if (pokerChips[BOT] > BIG_BLIND) {
                 betValue = BIG_BLIND
                 BET
@@ -119,8 +110,6 @@ open class Bot {
         } else {
             CHECK
         }
-
-        action = CHECK
 
 
         return action

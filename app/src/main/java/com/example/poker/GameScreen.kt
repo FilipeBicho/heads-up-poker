@@ -218,9 +218,9 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         }
 
                         // winner text
-                        if (gameUiState.winnerText != "" && gameUiState.showdown) {
+                        if (gameUiState.actionText != "") {
                             Text(
-                                text = gameUiState.winnerText,
+                                text = gameUiState.actionText,
                                 modifier = Modifier
                                     .weight(0.4f)
                                     .align(Alignment.CenterHorizontally)
