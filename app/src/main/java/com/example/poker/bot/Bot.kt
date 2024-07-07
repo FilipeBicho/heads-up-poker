@@ -7,6 +7,7 @@ import com.example.poker.cards.PRE_FLOP
 import com.example.poker.game.Data.bet
 import com.example.poker.game.Data.botCards
 import com.example.poker.game.Data.botValidActions
+import com.example.poker.game.Data.player
 import com.example.poker.game.Data.pokerChips
 import com.example.poker.game.Data.round
 import kotlin.math.abs
@@ -34,7 +35,7 @@ open class Bot {
     /**
      * Init stack and call value
      */
-    private fun initValues() {
+    protected fun initValues() {
 
         totalMoney = pokerChips[BOT]
 
@@ -56,7 +57,7 @@ open class Bot {
     /**
      * Reset stack and call value
      */
-    private fun resetValues() {
+    protected fun resetValues() {
         playerStack = 0
         botStack = 0
         callValue = 0
@@ -64,31 +65,39 @@ open class Bot {
     }
 
     protected fun allIn(): Int {
-        return if (totalMoney - callValue < 0) {
-            CALL
-        } else {
-            betValue = totalMoney
-            BET
+
+        if (pokerChips[PLAYER] == 0) {
+            return CALL
         }
+
+        return ALLIN
     }
 
     protected fun betBlinds(blinds: Int): Int {
+
+        if (pokerChips[PLAYER] == 0) {
+            return CALL
+        }
+
         betValue = if (blinds * BIG_BLIND >= totalMoney) {
             totalMoney
         } else {
             blinds * BIG_BLIND
         }
 
-        return BET
+        return if (bet[PLAYER] > 0) RAISE else BET
     }
 
 
     open fun calculateAction(): Int {
-        resetValues()
-        initValues()
-
         when (round) {
-            PRE_FLOP -> return PreFlopBot().calculateAction()
+            PRE_FLOP -> {
+                val preFlopBot = PreFlopBot();
+                action = preFlopBot.calculateAction()
+                if (action == BET || action == RAISE) {
+                    betValue = preFlopBot.betValue
+                }
+            }
             else -> {
                 action = if (botValidActions[BET]) {
                     if (pokerChips[BOT] > BIG_BLIND) {

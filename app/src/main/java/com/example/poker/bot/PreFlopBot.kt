@@ -17,6 +17,8 @@ class PreFlopBot:
     init {
         handRank = HandGroup(botCards).group
         this.isDealer = BOT == dealer
+        resetValues()
+        initValues()
     }
 
     override fun calculateAction(): Int {

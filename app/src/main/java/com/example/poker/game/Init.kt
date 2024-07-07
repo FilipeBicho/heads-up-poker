@@ -69,7 +69,7 @@ class Init {
         gameSummaryMap.add(gameNumber, gameSummaryList.toList())
 
         // init or change dealer
-        dealer = 0//(0..1).random()
+        dealer = (0..1).random()
         blind = if (dealer == 0) 1 else 0
 
         player = dealer
@@ -86,7 +86,7 @@ class Init {
         initValues()
 
         uiStateFlow.update { currentState -> currentState.copy(
-            displayBotCards = false,
+            displayBotCards = true,
             displayFlop = false,
             displayTurn = false,
             displayRiver = false,
