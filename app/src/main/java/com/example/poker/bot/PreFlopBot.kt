@@ -97,7 +97,6 @@ class PreFlopBot:
             }
 
             // more than 600 chips
-
             if (isDealer) {
                 // player didn't play yet - fold, call and bet available
                 return when (handRank) {

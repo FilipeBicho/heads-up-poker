@@ -87,30 +87,24 @@ open class Bot {
         resetValues()
         initValues()
 
-//        when (round) {
-//            PRE_FLOP -> return PreFlopBot().calculateAction()
-//            else -> {
-//                betValue = BIG_BLIND
-//                action = BET
-//            }
-//        }
-
-
-
-        action = if (botValidActions[BET]) {
-            if (pokerChips[BOT] > BIG_BLIND) {
-                betValue = BIG_BLIND
-                BET
-            } else {
-                ALLIN
+        when (round) {
+            PRE_FLOP -> return PreFlopBot().calculateAction()
+            else -> {
+                action = if (botValidActions[BET]) {
+                    if (pokerChips[BOT] > BIG_BLIND) {
+                        betValue = BIG_BLIND
+                        BET
+                    } else {
+                        ALLIN
+                    }
+                }
+                else if (botValidActions[CALL]) {
+                    CALL
+                } else {
+                    CHECK
+                }
             }
         }
-        else if (botValidActions[CALL]) {
-            CALL
-        } else {
-            CHECK
-        }
-
 
         return action
     }
