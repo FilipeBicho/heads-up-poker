@@ -31,8 +31,8 @@ class Dealer {
         // debug specific game
 //        playerCards.add(Card(KING, CLUBS))
 //        playerCards.add(Card(ACE, CLUBS))
-//        botCards.add(Card(TWO, SPADES))
-//        botCards.add(Card(FOUR, HEARTS))
+//        botCards.add(Card(NINE, HEARTS))
+//        botCards.add(Card(QUEEN, HEARTS))
     }
 
     /**

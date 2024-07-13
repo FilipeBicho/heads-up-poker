@@ -52,7 +52,7 @@ open class Bot {
         betValue = if (blinds * BIG_BLIND >= pokerChips[BOT]) {
             pokerChips[BOT]
         } else {
-            blinds * BIG_BLIND
+            bet[PLAYER] + blinds * BIG_BLIND
         }
 
         return if (bet[PLAYER] > 0) RAISE else BET
