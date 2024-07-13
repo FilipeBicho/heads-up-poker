@@ -48,6 +48,6 @@ object Data {
     lateinit var odds: Odds
     var init: Init = Init()
     var betting: Betting = Betting()
-    var cardDealer: Dealer = Dealer()
+    lateinit var cardDealer: Dealer
     var showdown: Showdown = Showdown()
 }

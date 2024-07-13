@@ -40,7 +40,7 @@ import kotlin.concurrent.timerTask
 
 class Betting {
 
-    private var computerBot: Bot = Bot()
+    private var bot: Bot = Bot()
 
     /**
      * bet is available if:
@@ -101,16 +101,16 @@ class Betting {
         opponent = if (player == BOT) PLAYER else BOT
     }
 
-    private fun calculateBotAction() {
-        when (computerBot.calculateAction()) {
+    private fun botAction() {
+        when (bot.calculateAction()) {
             FOLD -> fold()
             CHECK -> check()
             CALL -> call()
             BET -> {
-                bet(computerBot.betValue)
+                bet(bot.betValue)
             }
             RAISE -> {
-                raise(computerBot.betValue)
+                raise(bot.betValue)
             }
             ALLIN -> {
                 allIn()
@@ -151,7 +151,7 @@ class Betting {
             botValidActions[RAISE] = false
             botValidActions[ALLIN] = false
 
-            calculateBotAction()
+            botAction()
         }
     }
 
@@ -173,7 +173,7 @@ class Betting {
             botValidActions[RAISE] = isRaiseAvailable()
             botValidActions[ALLIN] = isAllInAvailable()
 
-           calculateBotAction()
+            botAction()
         }
     }
 
@@ -197,7 +197,7 @@ class Betting {
             botValidActions[RAISE] = isRaiseAvailable()
             botValidActions[ALLIN] = isAllInAvailable()
 
-            calculateBotAction()
+            botAction()
         }
     }
 
@@ -344,19 +344,18 @@ class Betting {
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
         uiStateFlow.update { currentState ->
-
             currentState.copy(
                 playerMoney = pokerChips[PLAYER],
                 botMoney = pokerChips[BOT],
-                playerText = "0 €",
-                botText = "0 €",
-                actionText = "${name[player]} wins $totalPotValue €",
+                playerText = "${bet[PLAYER]} €",
+                botText = "${bet[BOT]} €",
+                actionText = "${name[player]} folds, ${name[opponent]} wins ${pokerChips[POT] + totalPotValue} €",
                 gameSummary = gameSummaryMap,
             )
         }
         Timer().schedule(timerTask {
             init.newGame()
-        }, 2000)
+        }, 3000)
     }
 
     fun check() {

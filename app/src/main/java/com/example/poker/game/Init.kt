@@ -2,6 +2,7 @@ package com.example.poker.game
 
 import com.example.poker.POT
 import com.example.poker.cards.BOT
+import com.example.poker.cards.Dealer
 import com.example.poker.cards.PLAYER
 import com.example.poker.cards.PRE_FLOP
 import com.example.poker.game.Data.bet
@@ -32,6 +33,7 @@ import kotlinx.coroutines.flow.update
 class Init {
 
     private fun dealCards() {
+        cardDealer = Dealer()
         cardDealer.setPlayerCards(playerCards, botCards)
         cardDealer.setFlopCards(tableCards)
         cardDealer.setTurnCard(tableCards)
@@ -69,7 +71,12 @@ class Init {
         gameSummaryMap.add(gameNumber, gameSummaryList.toList())
 
         // init or change dealer
-        dealer = (0..1).random()
+        dealer = if (dealer == -1) {
+            (0..1).random()
+        } else {
+            if (dealer == 0) 1 else 0
+        }
+
         blind = if (dealer == 0) 1 else 0
 
         player = dealer

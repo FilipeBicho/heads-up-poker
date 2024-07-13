@@ -1,12 +1,10 @@
 package com.example.poker.bot
 
 import com.example.poker.BIG_BLIND
-import com.example.poker.cards.BOT
 import com.example.poker.cards.PLAYER
 import com.example.poker.game.Data
 import com.example.poker.game.Data.bet
 import com.example.poker.game.Data.botCards
-import com.example.poker.game.Data.dealer
 import com.example.poker.helper.HandGroup
 
 class PreFlopBot:
@@ -15,10 +13,12 @@ class PreFlopBot:
     private var handRank: Int = 0
 
     init {
-        handRank = HandGroup(botCards).group
-        this.isDealer = BOT == dealer
-        resetValues()
         initValues()
+    }
+
+    override fun initValues() {
+        handRank = HandGroup(botCards).group
+        super.initValues()
     }
 
     override fun calculateAction(): Int {

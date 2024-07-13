@@ -32,7 +32,7 @@ class Dealer {
 //        playerCards.add(Card(KING, CLUBS))
 //        playerCards.add(Card(ACE, CLUBS))
 //        botCards.add(Card(TWO, SPADES))
-//        botCards.add(Card(THREE, HEARTS))
+//        botCards.add(Card(FOUR, HEARTS))
     }
 
     /**
