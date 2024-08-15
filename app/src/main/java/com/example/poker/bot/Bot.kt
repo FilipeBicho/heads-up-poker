@@ -33,8 +33,8 @@ open class Bot {
 
     protected open fun initValues() {
         isDealer = BOT == dealer
-        playerStack = if (pokerChips[PLAYER] > 0) pokerChips[PLAYER]/ BIG_BLIND else 0
-        botStack = if (pokerChips[BOT] > 0) pokerChips[BOT]/ BIG_BLIND else 0
+        playerStack = if (pokerChips[PLAYER] > 0) pokerChips[PLAYER]/BIG_BLIND else 0
+        botStack = if (pokerChips[BOT] > 0) pokerChips[BOT]/BIG_BLIND else 0
         callValue = if (playerStack > 0 && botStack > 0) abs(bet[BOT] - bet[PLAYER]) else 0
         hasHandPair = botCards.first().rank == botCards.last().rank
     }
@@ -58,14 +58,15 @@ open class Bot {
         return if (bet[PLAYER] > 0) RAISE else BET
     }
 
-
     open fun calculateAction(): Int {
+
+        val bot = if (round == PRE_FLOP) PreFlopBot() else InGameBot()
+
         when (round) {
             PRE_FLOP -> {
-                val preFlopBot = PreFlopBot()
-                action = preFlopBot.calculateAction()
+                action = bot.calculateAction()
                 if (action == BET || action == RAISE) {
-                    betValue = preFlopBot.betValue
+                    betValue = bot.betValue
                 }
             }
             else -> {

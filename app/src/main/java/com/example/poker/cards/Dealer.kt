@@ -14,7 +14,11 @@ const val RIVER = 3
 @SuppressLint("MutableCollectionMutableState")
 class Dealer {
 
-    private var deck: Deck = Deck()
+    private lateinit var deck: Deck
+
+   fun shuffle() {
+       deck = Deck()
+   }
 
     /**
      * Set player cards

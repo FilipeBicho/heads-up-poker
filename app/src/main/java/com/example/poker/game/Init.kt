@@ -34,6 +34,7 @@ class Init {
 
     private fun dealCards() {
         cardDealer = Dealer()
+        cardDealer.shuffle()
         cardDealer.setPlayerCards(playerCards, botCards)
         cardDealer.setFlopCards(tableCards)
         cardDealer.setTurnCard(tableCards)
@@ -47,8 +48,6 @@ class Init {
         odds.calculateRiverOdds(botCards, tableCards)
     }
 
-
-
     private fun initValues() {
         round = PRE_FLOP
 
@@ -60,6 +59,11 @@ class Init {
         pokerChips[POT] = 0
         bet[POT] = 0
         totalPotValue = 0
+
+        // cards
+        playerCards.clear()
+        botCards.clear()
+        tableCards.clear()
 
         checkAvailable = true
         gameSummaryList.clear()

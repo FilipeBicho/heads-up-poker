@@ -161,8 +161,8 @@ class Showdown {
             computerHandString += it.cardString()+" "
         }
 
-        gameSummaryList += "${name[PLAYER]} hand:  $playerHandString - ${playerHand.resultText}"
-        gameSummaryList += "${name[BOT]} hand:  $computerHandString - ${computerHand.resultText}"
+        gameSummaryList += "${name[PLAYER]} hand: $playerHandString - ${playerHand.resultText}"
+        gameSummaryList += "${name[BOT]} hand: $computerHandString - ${computerHand.resultText}"
 
         when (winnerCalculator.getWinner()) {
             PLAYER -> {
