@@ -1,5 +1,6 @@
 package com.example.poker.game
 
+import android.util.Log
 import com.example.poker.POT
 import com.example.poker.cards.BOT
 import com.example.poker.cards.Dealer
@@ -26,6 +27,7 @@ import com.example.poker.game.Data.round
 import com.example.poker.game.Data.tableCards
 import com.example.poker.game.Data.totalPotValue
 import com.example.poker.game.Data.uiStateFlow
+import com.example.poker.hand.RESULT
 import com.example.poker.odds.Combinations
 import com.example.poker.odds.Odds
 import kotlinx.coroutines.flow.update
@@ -43,6 +45,7 @@ class Init {
 
     private fun initOdds() {
         odds = Odds(Combinations(tableCards.subList(0,3)).combinations)
+        Log.d("ODDS cards", "${botCards.first()} ${botCards.last()}")
         odds.calculateFlopOdds(botCards, tableCards.subList(0,3))
         odds.calculateTurnOdds(botCards, tableCards.subList(0,4))
         odds.calculateRiverOdds(botCards, tableCards)
@@ -75,11 +78,12 @@ class Init {
         gameSummaryMap.add(gameNumber, gameSummaryList.toList())
 
         // init or change dealer
-        dealer = if (dealer == -1) {
-            (0..1).random()
-        } else {
-            if (dealer == 0) 1 else 0
-        }
+        dealer = 0
+//        dealer = if (dealer == -1) {
+//            (0..1).random()
+//        } else {
+//            if (dealer == 0) 1 else 0
+//        }
 
         blind = if (dealer == 0) 1 else 0
 
