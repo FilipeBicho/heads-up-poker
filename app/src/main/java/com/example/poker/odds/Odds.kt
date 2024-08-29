@@ -3,6 +3,7 @@ package com.example.poker.odds
 import android.util.Log
 import com.example.poker.cards.Card
 import com.example.poker.cards.Deck
+import com.example.poker.hand.HIGH_CARD
 import com.example.poker.hand.Hand
 import com.example.poker.hand.HandWinnerCalculator
 import com.example.poker.hand.RESULT
@@ -15,6 +16,7 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
 
     private var fullDeck = Deck().getDeck()
     private val flopOdds = Array(11) { _ -> 0}
+    private val opponentFlopOdds = Array(11) { _ -> 0}
     private val turnOdds = Array(11) { _ -> 1}
     private val riverOdds = Array(11) { _ -> 1}
     private var showdownPlayerOdds = 0
@@ -62,6 +64,7 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
 
                 // use 1st combination cards and table cards to calculate opponent hand
                 val opponentHand = Hand(opponentCards, tempTableCards)
+                opponentFlopOdds[opponentHand.resultValue]++
 
                 // calculate winner
                 when (HandWinnerCalculator(
@@ -99,6 +102,14 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
             Log.d("ODDS",
                 "${Hand.handRankToString(index)} - ${flopOdds[index]}"
             )
+        }
+
+        for ((index, value) in opponentFlopOdds.withIndex()) {
+            if (index == RESULT) {
+                opponentFlopOdds[RESULT] = ((player2.toDouble()/count) * 100).roundToInt()
+            } else {
+                opponentFlopOdds[index] = ((value.toFloat() / count) * 100).roundToInt()
+            }
         }
 
         Log.d("------------------------------------", '0'.toString())
@@ -327,28 +338,15 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
         showdownOpponentOdds = ((player2.toDouble()/count) * 100).roundToInt()
     }
 
-    /**
-     * get flop odds
-     */
     fun getFlopOdds() = flopOdds
 
-    /**
-     * get turn odds
-     */
+    fun getOpponentFlopOdds() = opponentFlopOdds
+
     fun getTurnOdds() = turnOdds
 
-    /**
-     * get river odds
-     */
     fun getRiverOdds() = riverOdds
 
-    /**
-     * get showdown player odds
-     */
     fun getShowdownPlayerOdds() = showdownPlayerOdds
 
-    /**
-     * get showdown opponent odds
-     */
     fun getShowdownOpponentOdds() = showdownOpponentOdds
 }

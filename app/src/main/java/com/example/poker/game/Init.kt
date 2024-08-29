@@ -45,7 +45,6 @@ class Init {
 
     private fun initOdds() {
         odds = Odds(Combinations(tableCards.subList(0,3)).combinations)
-        Log.d("ODDS cards", "${botCards.first()} ${botCards.last()}")
         odds.calculateFlopOdds(botCards, tableCards.subList(0,3))
         odds.calculateTurnOdds(botCards, tableCards.subList(0,4))
         odds.calculateRiverOdds(botCards, tableCards)

@@ -3,6 +3,7 @@ package com.example.poker.cards
 import android.annotation.SuppressLint
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.example.poker.hand.THREE_OF_A_KIND
 
 const val PLAYER = 0
 const val BOT = 1
@@ -27,16 +28,16 @@ class Dealer {
         playerCards: SnapshotStateList<Card>,
         botCards: SnapshotStateList<Card>
     ) {
-        playerCards.add(deck.dealCard())
-        botCards.add(deck.dealCard())
-        playerCards.add(deck.dealCard())
-        botCards.add(deck.dealCard())
+//        playerCards.add(deck.dealCard())
+//        botCards.add(deck.dealCard())
+//        playerCards.add(deck.dealCard())
+//        botCards.add(deck.dealCard())
 
         // debug specific game
-//        playerCards.add(Card(KING, CLUBS))
-//        playerCards.add(Card(ACE, CLUBS))
-//        botCards.add(Card(NINE, HEARTS))
-//        botCards.add(Card(QUEEN, HEARTS))
+        playerCards.add(Card(SIX, CLUBS))
+        playerCards.add(Card(TWO, CLUBS))
+        botCards.add(Card(ACE, HEARTS))
+        botCards.add(Card(KING, HEARTS))
     }
 
     /**
@@ -45,14 +46,14 @@ class Dealer {
     fun setFlopCards(tableCards: SnapshotStateList<Card>) {
 
         deck.dealCard()
-        for (i in 0 until 3) {
-            tableCards.add(deck.dealCard())
-        }
+//        for (i in 0 until 3) {
+//            tableCards.add(deck.dealCard())
+//        }
 
         // debug specific game
-//        tableCards.add(Card(KING, SPADES))
-//        tableCards.add(Card(ACE, SPADES))
-//        tableCards.add(Card(TWO, HEARTS))
+        tableCards.add(Card(FIVE, HEARTS))
+        tableCards.add(Card(TEN, HEARTS))
+        tableCards.add(Card(QUEEN, CLUBS))
     }
 
     /**

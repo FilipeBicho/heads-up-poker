@@ -2,6 +2,8 @@ package com.example.poker.bot
 
 import com.example.poker.BIG_BLIND
 import com.example.poker.cards.BOT
+import com.example.poker.cards.Card
+import com.example.poker.cards.FLOP
 import com.example.poker.cards.PLAYER
 import com.example.poker.cards.PRE_FLOP
 import com.example.poker.game.Data.bet
@@ -59,15 +61,17 @@ open class Bot {
     }
 
     open fun calculateAction(): Int {
-
-        val bot = if (round == PRE_FLOP) PreFlopBot() else InGameBot()
-
         when (round) {
             PRE_FLOP -> {
-                action = bot.calculateAction()
+                val bot = PreFlopDecisionMaking()
+                action = bot.getDecision()
                 if (action == BET || action == RAISE) {
                     betValue = bot.betValue
                 }
+            }
+            FLOP -> {
+                val bot = FlopDecisionMaking()
+                action = bot.getDecision()
             }
             else -> {
                 action = if (botValidActions[BET]) {
