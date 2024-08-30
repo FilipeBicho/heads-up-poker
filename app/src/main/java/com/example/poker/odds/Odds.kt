@@ -1,6 +1,12 @@
-package com.example.poker
+package com.example.poker.odds
 
 import android.util.Log
+import com.example.poker.cards.Card
+import com.example.poker.cards.Deck
+import com.example.poker.hand.HIGH_CARD
+import com.example.poker.hand.Hand
+import com.example.poker.hand.HandWinnerCalculator
+import com.example.poker.hand.RESULT
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -9,17 +15,17 @@ const val MAX_COMBINATIONS = 1000
 class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
 
     private var fullDeck = Deck().getDeck()
-    private val odds = Array(11) { _ -> 0}
-    private var flopOdds = 0
-    private var turnOdds = 0
-    private var riverOdds = 0
+    private val flopOdds = Array(11) { _ -> 0}
+    private val opponentFlopOdds = Array(11) { _ -> 0}
+    private val turnOdds = Array(11) { _ -> 1}
+    private val riverOdds = Array(11) { _ -> 1}
     private var showdownPlayerOdds = 0
     private var showdownOpponentOdds = 0
 
     /**
      * Calculate flop odds
      */
-    fun calculateFlopOdds(playerCards: MutableList<Card>, tableCards: MutableList<Card>) {
+    fun calculateFlopOdds(holeCards: MutableList<Card>, tableCards: MutableList<Card>) {
 
         var player1 = 0
         var player2 = 0
@@ -27,8 +33,8 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
         var count = 0
         val combinations = allCombinations.toMutableList()
 
-        // remove player and table cards from combinations
-        for (card in playerCards + tableCards) {
+        // remove hole and table cards from combinations
+        for (card in holeCards + tableCards) {
             combinations.removeIf { it.any { it.toString() == card.toString() } }
         }
 
@@ -53,15 +59,16 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
                 tempTableCards.addAll(combinations[i+1])
 
                 // use table cards to calculate player hand
-                val playerHand = Hand(playerCards, tempTableCards)
-                odds[playerHand.resultValue]++
+                val hand = Hand(holeCards, tempTableCards)
+                flopOdds[hand.resultValue]++
 
                 // use 1st combination cards and table cards to calculate opponent hand
                 val opponentHand = Hand(opponentCards, tempTableCards)
+                opponentFlopOdds[opponentHand.resultValue]++
 
                 // calculate winner
                 when (HandWinnerCalculator(
-                    player1Hand = playerHand,
+                    player1Hand = hand,
                     player2Hand = opponentHand
                 ).getWinner()) {
                     0 -> player1++
@@ -71,7 +78,7 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
                 }
 
                 if (count >= MAX_COMBINATIONS) {
-                    break;
+                    break
                 }
 
                 // remove temporarily table cards
@@ -84,23 +91,34 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
             combinations.shuffle()
         }
 
-        // calculate odds per hand ranking
-        for ((index, value) in odds.withIndex()) {
-            odds[index] = ((value.toFloat() / count) * 100).roundToInt()
+        // calculate odds
+        for ((index, value) in flopOdds.withIndex()) {
+            if (index == RESULT) {
+                flopOdds[RESULT] = ((player1.toDouble()/count) * 100).roundToInt()
+            } else {
+                flopOdds[index] = ((value.toFloat() / count) * 100).roundToInt()
+            }
+
+            Log.d("ODDS",
+                "${Hand.handRankToString(index)} - ${flopOdds[index]}"
+            )
         }
 
-        Log.d("ODDS", odds.joinToString("\n"))
-        Log.d("ODDS flop combination", count.toString())
-        Log.d("ODDS result", ((player1.toDouble()/count) * 100).roundToInt().toString())
+        for ((index, value) in opponentFlopOdds.withIndex()) {
+            if (index == RESULT) {
+                opponentFlopOdds[RESULT] = ((player2.toDouble()/count) * 100).roundToInt()
+            } else {
+                opponentFlopOdds[index] = ((value.toFloat() / count) * 100).roundToInt()
+            }
+        }
 
-        // calculate odds
-        flopOdds = ((player1.toDouble()/count) * 100).roundToInt()
+        Log.d("------------------------------------", '0'.toString())
     }
 
     /**
      * calculate turn odds
      */
-    fun calculateTurnOdds(playerCards: MutableList<Card>, tableCards: MutableList<Card>) {
+    fun calculateTurnOdds(holeCards: MutableList<Card>, tableCards: MutableList<Card>) {
 
         var player1 = 0
         var player2 = 0
@@ -111,7 +129,7 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
         val tempTableCards: ArrayList<Card> = ArrayList()
 
         // remove player and table cards from combinations
-        for (card in playerCards + tableCards) {
+        for (card in holeCards + tableCards) {
             combinations.removeIf { it.any { it.toString() == card.toString() } }
             deck.removeIf { card.toString() == it.toString() }
         }
@@ -133,15 +151,15 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
                 tempTableCards.add(turnCard)
 
                 // use table cards to calculate player hand
-                val playerHand = Hand(playerCards, tempTableCards)
-                odds[playerHand.resultValue]++
+                val hand = Hand(holeCards, tempTableCards)
+                turnOdds[hand.resultValue]++
 
                 // use combination cards and table cards to calculate opponent hand
                 val opponentHand = Hand(opponentCards, tempTableCards)
 
                 // calculate winner
                 when (HandWinnerCalculator(
-                    player1Hand = playerHand,
+                    player1Hand = hand,
                     player2Hand = opponentHand
                 ).getWinner()) {
                     0 -> player1++
@@ -151,7 +169,7 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
                 }
 
                 if (count >= MAX_COMBINATIONS) {
-                    break;
+                    break
                 }
 
                 tempTableCards.removeLast()
@@ -160,18 +178,21 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
             combinations.shuffle()
         }
 
-        Log.d("ODDS turn combinations", count.toString())
+        // calculate odds
+        for ((index, value) in turnOdds.withIndex()) {
 
-        // calculate odds per hand ranking
-        for ((index, value) in odds.withIndex()) {
-            odds[index] = ((value.toFloat() / count) * 100).roundToInt()
+            if (index == RESULT) {
+                turnOdds[RESULT] = ((player1.toDouble()/count) * 100).toInt()
+            } else {
+                turnOdds[index] = ((value.toFloat() / count) * 100).roundToInt()
+            }
+
+            Log.d("ODDS",
+                "${Hand.handRankToString(index)} - ${turnOdds[index]}"
+            )
         }
 
-        // calculate odds
-        odds[RESULT] = ((player1.toDouble()/count) * 100).toInt()
-
-        // calculate odds
-        turnOdds = ((player1.toDouble()/count) * 100).roundToInt()
+        Log.d("------------------------------------", '0'.toString())
     }
 
     /**
@@ -191,8 +212,8 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
         }
 
         // use table cards to calculate player hand
-        val playerHand = Hand(playerCards, tableCards)
-        odds[playerHand.resultValue] = 100
+        val hand = Hand(playerCards, tableCards)
+        turnOdds[hand.resultValue] = 100
 
         for (opponentCards: ArrayList<Card> in combinations) {
 
@@ -201,7 +222,7 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
 
             // calculate winner
             when (HandWinnerCalculator(
-                player1Hand = playerHand,
+                player1Hand = hand,
                 player2Hand = opponentHand
             ).getWinner()) {
                 0 -> player1++
@@ -214,7 +235,10 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
         }
 
         // calculate odds
-        riverOdds = ((player1.toDouble()/count) * 100).roundToInt()
+        riverOdds[RESULT] = ((player1.toDouble()/count) * 100).roundToInt()
+
+        Log.d("ODDS river result", riverOdds[RESULT].toString())
+        Log.d("------------------------------------", '0'.toString())
     }
 
     /**
@@ -242,12 +266,12 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
 
             // use table cards to calculate player hand
             val playerHand = Hand(playerCards, tempTableCards)
-            val opponentHand = Hand(opponentCards, tempTableCards)
+            val botHand = Hand(opponentCards, tempTableCards)
 
             // calculate winner
             when (HandWinnerCalculator(
                 player1Hand = playerHand,
-                player2Hand = opponentHand
+                player2Hand = botHand
             ).getWinner()) {
                 0 -> player1++
                 1 -> player2++
@@ -291,12 +315,12 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
 
             // use table cards to calculate player hand
             val playerHand = Hand(playerCards, tempTableCards)
-            val opponentHand = Hand(opponentCards, tempTableCards)
+            val botHand = Hand(opponentCards, tempTableCards)
 
             // calculate winner
             when (HandWinnerCalculator(
                 player1Hand = playerHand,
-                player2Hand = opponentHand
+                player2Hand = botHand
             ).getWinner()) {
                 0 -> player1++
                 1 -> player2++
@@ -314,28 +338,15 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
         showdownOpponentOdds = ((player2.toDouble()/count) * 100).roundToInt()
     }
 
-    /**
-     * get flop odds
-     */
     fun getFlopOdds() = flopOdds
 
-    /**
-     * get turn odds
-     */
+    fun getOpponentFlopOdds() = opponentFlopOdds
+
     fun getTurnOdds() = turnOdds
 
-    /**
-     * get river odds
-     */
     fun getRiverOdds() = riverOdds
 
-    /**
-     * get showdown player odds
-     */
     fun getShowdownPlayerOdds() = showdownPlayerOdds
 
-    /**
-     * get showdown opponent odds
-     */
     fun getShowdownOpponentOdds() = showdownOpponentOdds
 }

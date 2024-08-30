@@ -1,4 +1,8 @@
-package com.example.poker
+package com.example.poker.hand
+
+import com.example.poker.cards.ACE
+import com.example.poker.cards.Card
+import com.example.poker.cards.KING
 
 const val ROYAL_STRAIGHT_FLUSH: Int = 10
 const val STRAIGHT_FLUSH: Int = 9
@@ -19,7 +23,7 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
     private lateinit var suitRepeatedCards: MutableList<Map.Entry<Int, List<Card>>>
     private lateinit var rankRepeatedCards: MutableList<Map.Entry<Int, List<Card>>>
     private lateinit var flushCards: List<Card>
-    private var resultText: String = ""
+    var resultText: String = ""
     var resultValue: Int = 0
 
     init {
@@ -87,9 +91,6 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
         resultText = "High Card"
     }
 
-    /**
-     * Is Royal Straight Flush
-     */
     private fun isRoyalStraightFlush(): Boolean {
         // is straight flush hand first card is an Ace
         if (isStraightFlush() && hand[0].rank == ACE) {
@@ -100,9 +101,6 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
         return false
     }
 
-    /**
-     * Is Straight flush
-     */
     private fun isStraightFlush(): Boolean {
         if (flushCards.size >= 5 && isStraight(flushCards.toMutableList())) {
             return true
@@ -112,9 +110,6 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
         return false
     }
 
-    /**
-     * Is Four of a Kind
-     */
     private fun isFourOfAKind(): Boolean {
         if (rankRepeatedCards[0].value.size == 4) {
             hand.addAll(rankRepeatedCards[0].value)
@@ -125,9 +120,6 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
         return false
     }
 
-    /**
-     * Is Full House
-     */
     private fun isFullHouse(): Boolean {
         val threeOfAKindList = rankRepeatedCards
             .filter { it.value.size == 3 }
@@ -172,9 +164,6 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
         return false
     }
 
-    /**
-     * Is Flush
-     */
     private fun isFlush(): Boolean {
         // more than 5 cards with the same suit
         if (flushCards.size >= 5) {
@@ -195,14 +184,11 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
         return false
     }
 
-    /**
-     * Is Straight
-     */
-    private fun isStraight(cards: MutableList<Card> = allCards): Boolean {
+    private fun isStraight(cards: MutableList<Card> = allCards.distinctBy { it.rank }.toMutableList()): Boolean {
         var currentRank: Int?
         var nextCardRank: Int?
-        var sequentialCardsCount: Int = 1
-        var straight: Int = 1
+        var sequentialCardsCount = 0
+        var straight = 1
         var lastSequentialCardRank: Int = -1
         var lastSequentialCardIndex: Int = -1
 
@@ -217,11 +203,11 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
 
             // next card has the same rank
             if (currentRank == nextCardRank) {
-                continue;
+                continue
             }
 
             // is a sequential card
-            if (currentRank == nextCardRank - 1) {
+            if (currentRank == (nextCardRank - 1)) {
                 sequentialCardsCount++
 
                 if (straight < sequentialCardsCount) {
@@ -256,9 +242,6 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
         return false
     }
 
-    /**
-     * Is Three of a Kind
-     */
     private fun isThreeOfAKind(): Boolean {
         val threeOfAKindHashMap = rankRepeatedCards
             .filter { it.value.size == 3 }
@@ -279,9 +262,6 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
         return true
     }
 
-    /**
-     * Is Two Pair
-     */
     private fun isTwoPair(): Boolean {
         val pairList = rankRepeatedCards
             .filter { it.value.size == 2 }
@@ -304,9 +284,6 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
         return false
     }
 
-    /**
-     * Is Pair
-     */
     private fun isPair(): Boolean {
         val pairList = rankRepeatedCards
             .filter { it.value.size == 2 }
@@ -322,9 +299,6 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
         return false
     }
 
-    /**
-     * Set High cards
-     */
     private fun highCards() {
         val otherCards: ArrayList<Card> = ArrayList()
 
@@ -343,9 +317,6 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
         }
     }
 
-    /**
-     * Init cards
-     */
     private fun initCards() {
         // join player and table cards
         allCards.addAll(0, this.playerCards)
@@ -371,8 +342,25 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
         flushCards = suitRepeatedCards[0].value.sortedBy { it.rank }
     }
 
-    /**
-     * Return player hand
-     */
-    fun getHand() = hand;
+    fun getHand() = hand
+
+    companion object {
+        fun handRankToString(index: Int): String {
+            return when (index) {
+                RESULT -> "Result"
+                HIGH_CARD -> "High card"
+                PAIR -> "Pair"
+                TWO_PAIR -> "2 Pair"
+                THREE_OF_A_KIND -> "Three of a Kind"
+                STRAIGHT -> "Straight"
+                FLUSH -> "Flush"
+                FULL_HOUSE -> "Full House"
+                FOUR_OF_A_KIND -> "Four of a Kind"
+                STRAIGHT_FLUSH -> "Straight Flush"
+                ROYAL_STRAIGHT_FLUSH -> "Royal Straight Flush"
+                else -> "ERROR"
+            }
+        }
+    }
+
 }

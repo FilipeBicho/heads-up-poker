@@ -1,4 +1,7 @@
-package com.example.poker
+package com.example.poker.odds
+
+import com.example.poker.cards.Card
+import com.example.poker.cards.Deck
 
 data class Combinations(private var usedCards: MutableList<Card>) {
     var combinations = getCardCombinations(usedCards)

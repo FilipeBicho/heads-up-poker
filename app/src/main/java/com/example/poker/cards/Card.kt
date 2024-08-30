@@ -1,11 +1,4 @@
-package com.example.poker
-
-import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+package com.example.poker.cards
 
 const val ACE = 0
 const val KING = 12
@@ -21,10 +14,18 @@ const val FOUR = 3
 const val THREE = 2
 const val TWO = 1
 
+const val HEARTS = 0
+const val SPADES = 1
+const val CLUBS = 2
+const val DIAMONDS = 3
+
 class Card(var rank: Int, var suit: Int) {
 
     private val rankArray = arrayOf("ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king")
     private val suitArray = arrayOf("hearts", "spades", "clubs", "diamonds")
+
+    private val rankArraySymbols = arrayOf("A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K")
+    private val suitArraySymbols = arrayOf("\u2665", "\u2660", "\u2663", "\u2666")
 
     /**
      * Get Card image path
@@ -36,5 +37,9 @@ class Card(var rank: Int, var suit: Int) {
      */
     override fun toString(): String {
         return "${this.rankArray[this.rank]}_${this.suitArray[this.suit]}"
+    }
+
+    fun cardString(): String {
+        return "${this.rankArraySymbols[this.rank]}${this.suitArraySymbols[this.suit]}"
     }
 }

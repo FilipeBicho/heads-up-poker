@@ -1,4 +1,8 @@
-package com.example.poker
+package com.example.poker.hand
+
+import com.example.poker.cards.ACE
+import com.example.poker.cards.BOT
+import com.example.poker.cards.PLAYER
 
 class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
 
@@ -12,7 +16,7 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
         winner = if (player1Result > player2Result) {
             PLAYER
         } else if (player1Result < player2Result) {
-            COMPUTER
+            BOT
         } else {
             calculateWinner()
         }
@@ -43,7 +47,7 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
         return if (player1Cards[0].rank == ACE && player2Cards[0].rank != ACE) {
             PLAYER
         } else if (player1Cards[0].rank != ACE && player2Cards[0].rank == ACE) {
-            COMPUTER
+            BOT
         } else {
             compareHigherKicker(startIndex = 3)
         }
@@ -56,7 +60,7 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
         return if (player1Cards.last().rank > player2Cards.last().rank) {
             PLAYER
         } else  if (player1Cards.last().rank < player2Cards.last().rank) {
-            COMPUTER
+            BOT
         } else {
             2
         }
@@ -70,13 +74,13 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
         return if (player1Cards[0].rank == ACE && player2Cards[0].rank != ACE) {
             PLAYER
         } else if (player1Cards[0].rank != ACE && player2Cards[0].rank == ACE) {
-            COMPUTER
+            BOT
         } else {
             // check if highest three of a kind
             if (player1Cards[0].rank > player2Cards[0].rank) {
                 PLAYER
             } else if (player1Cards[0].rank < player2Cards[0].rank) {
-                COMPUTER
+                BOT
             } else {
                 compareHigherKicker(startIndex = 3)
             }
@@ -90,17 +94,17 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
         return if (player1Cards[0].rank == ACE && player2Cards[0].rank != ACE) {
             PLAYER
         } else if (player1Cards[0].rank != ACE && player2Cards[0].rank == ACE) {
-            COMPUTER
+            BOT
         } else {
             if (player1Cards[0].rank > player2Cards[0].rank) {
                 PLAYER
             } else if (player1Cards[0].rank < player2Cards[0].rank) {
-                COMPUTER
+                BOT
             } else {
                 if (player1Cards[3].rank > player2Cards[3].rank) {
                     PLAYER
                 } else if (player1Cards[3].rank < player2Cards[3].rank) {
-                    COMPUTER
+                    BOT
                 } else {
                     compareHigherKicker(startIndex = 4)
                 }
@@ -115,7 +119,7 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
         return if (player1Cards[0].rank == ACE && player2Cards[0].rank != ACE) {
             PLAYER
         } else if (player1Cards[0].rank != ACE && player2Cards[0].rank == ACE) {
-            COMPUTER
+            BOT
         } else {
             compareHigherKicker(startIndex = 2)
         }
@@ -136,12 +140,12 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
             return if (player1Cards.last().rank == ACE && player2Cards.last().rank != ACE) {
                 PLAYER
             } else if (player1Cards.last().rank != ACE && player2Cards.last().rank == ACE) {
-                COMPUTER
+                BOT
             } else {
                 if (player1Cards.last().rank > player2Cards.last().rank) {
                     PLAYER
                 } else if (player1Cards.last().rank < player2Cards.last().rank) {
-                    COMPUTER
+                    BOT
                 } else {
                     2
                 }
@@ -152,12 +156,12 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
         return if (player1Cards[0].rank == ACE && player2Cards[0].rank != ACE) {
             PLAYER
         } else if (player1Cards[0].rank != ACE && player2Cards[0].rank == ACE) {
-            COMPUTER
+            BOT
         } else {
             if (player1Cards[0].rank > player2Cards[0].rank) {
                 PLAYER
             } else if (player1Cards[0].rank < player2Cards[0].rank) {
-                COMPUTER
+                BOT
             } else {
                 2
             }
@@ -172,14 +176,14 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
         if (player1Cards[startIndex].rank == ACE && player2Cards[startIndex].rank != ACE) {
             return PLAYER
         } else if (player1Cards[startIndex].rank != ACE && player2Cards[startIndex].rank == ACE) {
-            return COMPUTER
+            return BOT
         } else {
             // check higher kicker
             for (index: Int in startIndex .. 4) {
                 if (player1Cards[index].rank > player2Cards[index].rank) {
                     return PLAYER
                 } else if (player1Cards[index].rank < player2Cards[index].rank) {
-                    return COMPUTER
+                    return BOT
                 }
             }
             return 2
@@ -192,7 +196,7 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
     fun getResult(): String {
         return when (winner) {
             PLAYER -> "player 1 wins"
-            COMPUTER -> "player 2 wins"
+            BOT -> "player 2 wins"
             2 -> "draw"
             else -> {"draw"}
         }

@@ -1,10 +1,10 @@
-package com.example.poker
+package com.example.poker.cards
 
 import kotlin.random.Random
 
 class Deck {
 
-    private var deck = arrayListOf<Card>();
+    private var deck = arrayListOf<Card>()
 
     init {
         // init cards
@@ -23,14 +23,14 @@ class Deck {
             // set current card in a random index
             deck[index] = deck[i]
             // set random card in the current index
-            deck[i] = tempCard;
+            deck[i] = tempCard
         }
     }
 
     /**
      * Return deck
      */
-    fun getDeck() = deck;
+    fun getDeck() = deck
 
     /**
      * Remove card from the top of the deck
