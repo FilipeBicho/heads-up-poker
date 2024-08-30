@@ -1,6 +1,7 @@
 package com.example.poker.bot
 
 import com.example.poker.BIG_BLIND
+import com.example.poker.cards.ACE
 import com.example.poker.cards.BOT
 import com.example.poker.cards.Card
 import com.example.poker.cards.FLOP
@@ -32,6 +33,12 @@ open class Bot {
     protected var pot: Int = 0
     protected var isDealer: Boolean = false
     protected var hasHandPair = false
+    protected var hasOpenEndStraight: Boolean = false
+    protected var hasInsideStraight: Boolean = false
+    protected var hasWetBoardFlush: Boolean = false
+    protected var hasWetBoardStraight: Boolean = false
+    protected var hasWetBoardThreeOfAKind: Boolean = false
+    protected var hasWetBoardPair: Boolean = false
 
     protected open fun initValues() {
         isDealer = BOT == dealer
@@ -58,6 +65,40 @@ open class Bot {
         }
 
         return if (bet[PLAYER] > 0) RAISE else BET
+    }
+
+    /**
+     * has flush draw if has 4 cards of the same suit
+     */
+    protected fun hasFlushDraw(combinedCards: List<Card>): Boolean {
+        val suitCount = combinedCards.groupingBy { it.suit }.eachCount()
+        return suitCount.values.any { it == 4}
+    }
+
+    protected fun hasStraightDraw(combinedCards: List<Card>): Boolean {
+        val sortedValues = combinedCards.map { it.rank }.distinct().sorted().toMutableList()
+
+        if (sortedValues.any { it == ACE }) {
+            sortedValues.add(13) // Simulate ACE in the end
+        }
+
+        for (i in 0 until sortedValues.size - 3) {
+            val subList = sortedValues.subList(i, i + 4)
+
+            // Check for open-ended straight draw (consecutive numbers)
+            if (subList.first() == subList.last() - 3) {
+                hasOpenEndStraight = true
+                return true
+            }
+
+            // Check for inside straight draw (gap of one number)
+            if (subList[3] - subList[0] == 4 && (subList[1] - subList[0] > 1 || subList[3] - subList[2] > 1)) {
+                hasInsideStraight = true
+                return true
+            }
+        }
+
+        return false
     }
 
     open fun calculateAction(): Int {

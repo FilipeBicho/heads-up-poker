@@ -3,7 +3,10 @@ package com.example.poker.cards
 import android.annotation.SuppressLint
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.example.poker.bot.FOLD
+import com.example.poker.hand.FOUR_OF_A_KIND
 import com.example.poker.hand.THREE_OF_A_KIND
+import java.nio.channels.FileChannel
 
 const val PLAYER = 0
 const val BOT = 1
@@ -36,8 +39,8 @@ class Dealer {
         // debug specific game
         playerCards.add(Card(SIX, CLUBS))
         playerCards.add(Card(TWO, CLUBS))
-        botCards.add(Card(ACE, HEARTS))
-        botCards.add(Card(KING, HEARTS))
+        botCards.add(Card(EIGHT, HEARTS))
+        botCards.add(Card(NINE, HEARTS))
     }
 
     /**
@@ -52,8 +55,8 @@ class Dealer {
 
         // debug specific game
         tableCards.add(Card(FIVE, HEARTS))
-        tableCards.add(Card(TEN, HEARTS))
-        tableCards.add(Card(QUEEN, CLUBS))
+        tableCards.add(Card(FOUR, HEARTS))
+        tableCards.add(Card(SIX, CLUBS))
     }
 
     /**

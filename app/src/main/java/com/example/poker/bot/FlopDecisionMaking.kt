@@ -8,6 +8,8 @@ import com.example.poker.cards.TEN
 import com.example.poker.game.Data.botCards
 import com.example.poker.game.Data.odds
 import com.example.poker.game.Data.tableCards
+import com.example.poker.hand.Hand
+import com.example.poker.hand.STRAIGHT
 
 class FlopDecisionMaking: Bot() {
 
@@ -17,46 +19,47 @@ class FlopDecisionMaking: Bot() {
         .sortedBy { it.rank }
         .toMutableList()
     private lateinit var suitCount: Map<Int, Int>
-    private var hasFlushDraw: Boolean = false
-    private var hasStraightDraw: Boolean = false
-    private var hasOpenEndStraight: Boolean = false
-    private var hasInsideStraight: Boolean = false
+    private var isWetBoard: Boolean = false
 
     init {
         initValues()
         calculateDecision()
     }
 
-    /**
-     * has flush draw if has 4 cards of the same suit
-     */
-    private fun hasFlushDraw(): Boolean {
-        suitCount = combinedCards.groupingBy { it.suit }.eachCount()
-        return suitCount.values.any { it == 4}
+    override fun initValues() {
+        super.initValues()
+        isWetBoard = isWetBoard()
     }
 
-    /**
-     * TODO check straight draw with ACE
-     */
-    private fun hasStraightDraw(): Boolean {
-        val sortedValues = combinedCards.map { it.rank }.distinct().sorted().toMutableList()
+    private fun isWetBoard(): Boolean {
+        val suits = communityCards.map { it.suit }
+        val ranks = communityCards.map { it.rank }.sorted()
 
-        if (sortedValues.any { it == ACE}) {
-            sortedValues.add(13) // Simulate ACE in the end
+        val ranksCount = ranks.groupingBy { it }.eachCount()
+
+        // three of a kind
+        if (ranksCount.values.any { it == 3}) {
+            hasWetBoardThreeOfAKind = true
+            return true
         }
 
-        for (i in 0 until sortedValues.size - 3) {
-            val subList = sortedValues.subList(i, i + 4)
+        // pair
+        if (ranksCount.values.any { it == 2}) {
+            hasWetBoardPair = true
+            return true
+        }
 
-            // Check for open-ended straight draw (consecutive numbers)
-            if (subList.first() == subList.last() - 3) {
-                hasOpenEndStraight = true
-                return true
-            }
+        // flush (2 or more cards)
+        val suitCounts = suits.groupingBy { it }.eachCount()
+        if (suitCounts.values.any { it >= 2 }) {
+            hasWetBoardFlush = true
+            return true
+        }
 
-            // Check for inside straight draw (gap of one number)
-            if (subList[3] - subList[0] == 4 && (subList[1] - subList[0] > 1 || subList[3] - subList[2] > 1)) {
-                hasInsideStraight = true
+        // straight (2 or more consecutive cards)
+        for (i in 0 until ranks.size - 2) {
+            if (ranks[i + 2] - ranks[i] <= 2) {
+                hasWetBoardStraight = true
                 return true
             }
         }
@@ -64,15 +67,11 @@ class FlopDecisionMaking: Bot() {
         return false
     }
 
-    override fun initValues() {
-        hasFlushDraw = hasFlushDraw()
-        hasStraightDraw = hasStraightDraw()
-        super.initValues()
-    }
 
     private fun calculateDecision(): Int {
         val botOdds = odds.getFlopOdds()
         val opponentOdds = odds.getOpponentFlopOdds()
+        val botHand = Hand(botCards, communityCards)
 
         return 0
 
