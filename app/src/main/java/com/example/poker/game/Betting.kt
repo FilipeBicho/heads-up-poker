@@ -490,8 +490,13 @@ class Betting {
         checkAvailable = false
 
         // bet all chips
-        bet[player] = pokerChips[player] + bet[player]
-        pokerChips[player] = 0
+        bet[player] = if (pokerChips[player] + bet[player] > pokerChips[opponent] + bet[opponent]) {
+            pokerChips[opponent] + bet[opponent]
+        } else {
+            pokerChips[player] + bet[player]
+        }
+
+        pokerChips[player] -= bet[player]
         pokerChips[POT] = bet[player] + bet[opponent]
 
         gameSummaryList += "${name[player]} makes all in with ${bet[player]} €"

@@ -19,8 +19,8 @@ object Data {
 
     val name: List<String> = listOf(uiStateFlow.value.playerName, uiStateFlow.value.botName)
 
-    var playerMoney = 1500
-    var botMoney = 1500
+    var playerMoney = 100
+    var botMoney = 2900
     var minPlayerBet = BIG_BLIND
 
     var pokerChips: MutableList<Int> = mutableListOf(0,0,0)

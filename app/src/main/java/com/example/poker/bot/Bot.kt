@@ -1,6 +1,7 @@
 package com.example.poker.bot
 
 import com.example.poker.BIG_BLIND
+import com.example.poker.POT
 import com.example.poker.cards.ACE
 import com.example.poker.cards.BOT
 import com.example.poker.cards.Card
@@ -13,6 +14,7 @@ import com.example.poker.game.Data.botValidActions
 import com.example.poker.game.Data.dealer
 import com.example.poker.game.Data.pokerChips
 import com.example.poker.game.Data.round
+import com.example.poker.hand.ROYAL_STRAIGHT_FLUSH
 import kotlin.math.abs
 
 const val FOLD = 0
@@ -25,10 +27,12 @@ const val ALLIN = 5
 open class Bot {
 
     private var action: Int = 0
-    private var playerStack: Int = 0
+
+    protected var playerStack: Int = 0
+    protected var botStack: Int = 0
 
     var betValue: Int = 0
-    protected var botStack: Int = 0
+
     protected var callValue: Int = 0
     protected var pot: Int = 0
     protected var isDealer: Boolean = false

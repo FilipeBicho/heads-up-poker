@@ -65,10 +65,10 @@ class Dealer {
     fun setTurnCard(tableCards: SnapshotStateList<Card>) {
 
         deck.dealCard()
-        tableCards.add(deck.dealCard())
+     //   tableCards.add(deck.dealCard())
 
         // debug specific game
-//        tableCards.add(Card(THREE, DIAMONDS))
+        tableCards.add(Card(TWO, SPADES))
     }
 
     /**
@@ -77,9 +77,9 @@ class Dealer {
     fun setRiverCard(tableCards: SnapshotStateList<Card>) {
 
         deck.dealCard()
-        tableCards.add(deck.dealCard())
+        //tableCards.add(deck.dealCard())
 
         // debug specific game
-//        tableCards.add(Card(FIVE, DIAMONDS))
+        tableCards.add(Card(ACE, SPADES))
     }
 }
