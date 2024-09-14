@@ -77,7 +77,7 @@ class Init {
         gameSummaryMap.add(gameNumber, gameSummaryList.toList())
 
         // init or change dealer
-        dealer = 0
+        dealer = 1
 //        dealer = if (dealer == -1) {
 //            (0..1).random()
 //        } else {

@@ -108,7 +108,7 @@ class PreFlopBot: Bot() {
                     4 -> if (hasHandPair) { betBlinds(3) } else { betBlinds(1) }
                     5 -> if (hasHandPair) { betBlinds(2) } else { CALL }
                     6 -> if (hasHandPair) { betBlinds(1) } else { CALL }
-                    else -> if (hasHandPair) { CALL } else { FOLD }
+                    else -> CALL
                 }
             } else {
                 // player called - check and bet available

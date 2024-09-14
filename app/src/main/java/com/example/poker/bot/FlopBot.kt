@@ -2,6 +2,7 @@ package com.example.poker.bot
 
 import com.example.poker.BIG_BLIND
 import com.example.poker.POT
+import com.example.poker.cards.BOT
 import com.example.poker.cards.Card
 import com.example.poker.cards.PLAYER
 import com.example.poker.game.Data.bet
@@ -102,58 +103,52 @@ class FlopBot: Bot() {
     private fun fullHouse(): Int {
 
         val playerBet = bet[PLAYER]
+        val playerMoney = pokerChips[PLAYER]
+        val botMoney = pokerChips[BOT]
 
-        return when {
-            hasHandPair -> {
-                if (botStack > 20 && playerStack > 20) {
-                    if (playerBet > 0)
-                        if (playerBet < 200)
-                            raiseBetByMultiplier(2)
-                        else
-                            CALL
-                    else
-                        betBlinds(5)
-                }
-                if (playerStack < 20) {
-                    if (playerBet > 0)
-                        if (playerBet < 200)
-                            raiseBetByMultiplier(2)
-                        else
-                            CALL
-                    else
-                        betBlinds(5)
-                }
-                else {
-                    if (playerBet > 0)
-                        if (playerBet < 200)
-                            raiseBetByMultiplier(4)
-                        else
-                            raiseBetByMultiplier(2)
-                    else
-                        betBlinds(5)
+        return when(playerBet) {
+            0 -> {
+                when (playerMoney) {
+                    in 0..399 -> if (hasHandPair) betBlinds(3) else betBlinds(4)
+                    in 400 .. 800 -> if (hasHandPair) betBlinds(4) else betBlinds(5)
+                    else -> if (hasHandPair) betBlinds(5) else betBlinds(6)
                 }
             }
-            else -> {
-                if (botStack > 20 && playerStack > 20) {
-                    if (playerBet > 0)
-                        if (playerBet < 200)
-                            raiseBetByMultiplier(3)
-                        else
-                            raiseBetByMultiplier(2)
-                    else
-                        betBlinds(8)
+            in 1..200 -> {
+                when (playerMoney) {
+                    in 0..400 -> allIn()
+                    else -> {
+                        when (botMoney) {
+                            in 0..400 -> allIn()
+                            in 401 .. 800 -> if (hasHandPair) raiseBetByMultiplier(2) else raiseBetByMultiplier(3)
+                            else ->  if (hasHandPair) raiseBetByMultiplier(3) else raiseBetByMultiplier(4)
+
+                        }
+                    }
                 }
-                if (playerStack < 20) {
-                    if (playerBet > 0)
-                        if (playerBet < 200)
-                            raiseBetByMultiplier(4)
-                        else
-                            raiseBetByMultiplier(3)
-                    else
-                        betBlinds(10)
+            }
+            in 201..500 -> {
+                when (playerMoney) {
+                    in 0..400 -> allIn()
+                    else -> {
+                        when (botMoney) {
+                            in 0..400 -> allIn()
+                            in 401 .. 800 -> if (hasHandPair) CALL else allIn()
+                            else -> if (hasHandPair) raiseBetByMultiplier(2) else raiseBetByMultiplier(5)
+
+                        }
+                    }
                 }
-                else {
-                    allIn()
+            }
+            else-> {
+                when (playerMoney) {
+                    in 0..400 -> allIn()
+                    else -> {
+                        when (botMoney) {
+                            in 0..400 -> allIn()
+                            else-> if (hasHandPair) CALL else allIn()
+                        }
+                    }
                 }
             }
         }
