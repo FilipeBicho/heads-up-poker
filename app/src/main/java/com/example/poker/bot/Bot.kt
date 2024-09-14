@@ -1,7 +1,6 @@
 package com.example.poker.bot
 
 import com.example.poker.BIG_BLIND
-import com.example.poker.POT
 import com.example.poker.cards.ACE
 import com.example.poker.cards.BOT
 import com.example.poker.cards.Card
@@ -14,7 +13,6 @@ import com.example.poker.game.Data.botValidActions
 import com.example.poker.game.Data.dealer
 import com.example.poker.game.Data.pokerChips
 import com.example.poker.game.Data.round
-import com.example.poker.hand.ROYAL_STRAIGHT_FLUSH
 import kotlin.math.abs
 
 const val FOLD = 0
@@ -24,17 +22,17 @@ const val BET = 3
 const val RAISE = 4
 const val ALLIN = 5
 
-open class Bot {
+abstract class Bot {
 
-    private var action: Int = 0
+    var action: Int = 0
+    var betValue: Int = 0
 
     protected var playerStack: Int = 0
     protected var botStack: Int = 0
 
-    var betValue: Int = 0
-
     protected var callValue: Int = 0
     protected var pot: Int = 0
+
     protected var isDealer: Boolean = false
     protected var hasHandPair = false
     protected var hasOpenEndStraight: Boolean = false
@@ -54,6 +52,21 @@ open class Bot {
 
     protected fun allIn(): Int {
         return if (pokerChips[PLAYER] == 0) CALL else ALLIN
+    }
+
+    protected fun raiseBetByMultiplier(multiplier: Int): Int {
+
+        if (pokerChips[PLAYER] == 0)
+            return CALL
+
+        betValue = multiplier * bet[PLAYER]
+
+        if (betValue >= pokerChips[PLAYER])
+            betValue = pokerChips[PLAYER]
+        else if (betValue >= pokerChips[BOT])
+            betValue = pokerChips[BOT]
+
+        return RAISE
     }
 
     protected fun betBlinds(blinds: Int): Int {
@@ -105,39 +118,5 @@ open class Bot {
         return false
     }
 
-    open fun calculateAction(): Int {
-        when (round) {
-            PRE_FLOP -> {
-                val bot = PreFlopDecisionMaking()
-                action = bot.getDecision()
-                if (action == BET || action == RAISE) {
-                    betValue = bot.betValue
-                }
-            }
-            FLOP -> {
-                val bot = FlopDecisionMaking()
-                action = bot.getDecision()
-                if (action == BET || action == RAISE) {
-                    betValue = bot.betValue
-                }
-            }
-            else -> {
-                action = if (botValidActions[BET]) {
-                    if (pokerChips[BOT] > BIG_BLIND) {
-                        betValue = BIG_BLIND
-                        BET
-                    } else {
-                        ALLIN
-                    }
-                }
-                else if (botValidActions[CALL]) {
-                    CALL
-                } else {
-                    CHECK
-                }
-            }
-        }
-
-        return action
-    }
+    abstract fun calculateAction(): Int
 }

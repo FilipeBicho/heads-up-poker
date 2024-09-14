@@ -417,7 +417,8 @@ private fun CardsSection(cards: MutableList<Card>, name: String, money: Int, dis
                 fontSize = 14.sp,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = Color.White
             )
 
             Divider(
@@ -429,7 +430,8 @@ private fun CardsSection(cards: MutableList<Card>, name: String, money: Int, dis
             Text(
                 text = "$money €",
                 fontSize = 14.sp,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = Color.White
             )
         }
     }

@@ -9,6 +9,8 @@ import com.example.poker.bot.Bot
 import com.example.poker.bot.CALL
 import com.example.poker.bot.CHECK
 import com.example.poker.bot.FOLD
+import com.example.poker.bot.FlopBot
+import com.example.poker.bot.PreFlopBot
 import com.example.poker.bot.RAISE
 import com.example.poker.cards.BOT
 import com.example.poker.cards.FLOP
@@ -39,8 +41,6 @@ import java.util.Timer
 import kotlin.concurrent.timerTask
 
 class Betting {
-
-    private var bot: Bot = Bot()
 
     /**
      * bet is available if:
@@ -102,7 +102,13 @@ class Betting {
     }
 
     private fun botAction() {
-        when (bot.calculateAction()) {
+        val bot: Bot = when (round) {
+            PRE_FLOP -> PreFlopBot()
+            FLOP -> FlopBot()
+            else -> throw IllegalArgumentException("Invalid round $round")
+        }
+
+        when (bot.action) {
             FOLD -> fold()
             CHECK -> check()
             CALL -> call()
@@ -496,7 +502,7 @@ class Betting {
             pokerChips[player] + bet[player]
         }
 
-        pokerChips[player] -= bet[player]
+        pokerChips[player] = 0
         pokerChips[POT] = bet[player] + bet[opponent]
 
         gameSummaryList += "${name[player]} makes all in with ${bet[player]} €"

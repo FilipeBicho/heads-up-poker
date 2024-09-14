@@ -2,9 +2,7 @@ package com.example.poker.bot
 
 import com.example.poker.BIG_BLIND
 import com.example.poker.POT
-import com.example.poker.cards.BOT
 import com.example.poker.cards.Card
-import com.example.poker.cards.Dealer
 import com.example.poker.cards.PLAYER
 import com.example.poker.game.Data.bet
 import com.example.poker.game.Data.botCards
@@ -12,22 +10,14 @@ import com.example.poker.game.Data.odds
 import com.example.poker.game.Data.pokerChips
 import com.example.poker.game.Data.tableCards
 import com.example.poker.game.Data.totalPotValue
-import com.example.poker.hand.FLUSH
 import com.example.poker.hand.FOUR_OF_A_KIND
 import com.example.poker.hand.FULL_HOUSE
 import com.example.poker.hand.Hand
-import com.example.poker.hand.PAIR
 import com.example.poker.hand.RESULT
 import com.example.poker.hand.ROYAL_STRAIGHT_FLUSH
-import com.example.poker.hand.STRAIGHT
 import com.example.poker.hand.STRAIGHT_FLUSH
-import com.example.poker.hand.THREE_OF_A_KIND
-import com.example.poker.hand.TWO_PAIR
 
-class FlopDecisionMaking: Bot() {
-
-    private var decision: Int = -1
-
+class FlopBot: Bot() {
     private lateinit var communityCards: List<Card>
     private lateinit var combinedCards:  List<Card>
 
@@ -44,7 +34,7 @@ class FlopDecisionMaking: Bot() {
 
     init {
         initValues()
-        decision = calculateDecision()
+        action = calculateAction()
     }
 
     override fun initValues() {
@@ -104,26 +94,76 @@ class FlopDecisionMaking: Bot() {
     private fun monsterHand(): Int {
         return when {
             totalPotValue > 400 || currentPot > 200 -> allIn()
-            botStack > 20 && playerStack > 20 ->
-                if (callValue > 0)
-                    betBlinds((bet[PLAYER] * 5) / BIG_BLIND)
-                else
-                    betBlinds(10)
-            else -> allIn()
+            botStack > 20 && playerStack > 20 -> if (callValue > 0) betBlinds((bet[PLAYER] * 5) / BIG_BLIND) else betBlinds(5)
+            else -> if (botStack < 8 || callValue > 0) allIn() else betBlinds(3)
         }
     }
 
-    private fun fullHouse() {
-        when {
-            botOdds[RESULT] > 90 -> if (totalPotValue > 10) allIn() else betBlinds(10)
+    private fun fullHouse(): Int {
 
+        val playerBet = bet[PLAYER]
+
+        return when {
+            hasHandPair -> {
+                if (botStack > 20 && playerStack > 20) {
+                    if (playerBet > 0)
+                        if (playerBet < 200)
+                            raiseBetByMultiplier(2)
+                        else
+                            CALL
+                    else
+                        betBlinds(5)
+                }
+                if (playerStack < 20) {
+                    if (playerBet > 0)
+                        if (playerBet < 200)
+                            raiseBetByMultiplier(2)
+                        else
+                            CALL
+                    else
+                        betBlinds(5)
+                }
+                else {
+                    if (playerBet > 0)
+                        if (playerBet < 200)
+                            raiseBetByMultiplier(4)
+                        else
+                            raiseBetByMultiplier(2)
+                    else
+                        betBlinds(5)
+                }
+            }
+            else -> {
+                if (botStack > 20 && playerStack > 20) {
+                    if (playerBet > 0)
+                        if (playerBet < 200)
+                            raiseBetByMultiplier(3)
+                        else
+                            raiseBetByMultiplier(2)
+                    else
+                        betBlinds(8)
+                }
+                if (playerStack < 20) {
+                    if (playerBet > 0)
+                        if (playerBet < 200)
+                            raiseBetByMultiplier(4)
+                        else
+                            raiseBetByMultiplier(3)
+                    else
+                        betBlinds(10)
+                }
+                else {
+                    allIn()
+                }
+            }
         }
     }
 
-    private fun calculateDecision(): Int {
+    override fun calculateAction(): Int {
 
         return when (botHand.resultValue) {
             ROYAL_STRAIGHT_FLUSH, STRAIGHT_FLUSH, FOUR_OF_A_KIND -> monsterHand()
+            FULL_HOUSE -> fullHouse()
             else -> {
                 if (botOdds[RESULT] > 90) {
                     monsterHand()
@@ -133,7 +173,4 @@ class FlopDecisionMaking: Bot() {
             }
         }
     }
-
-    fun getDecision() = decision
-
 }

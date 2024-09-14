@@ -7,14 +7,13 @@ import com.example.poker.game.Data.bet
 import com.example.poker.game.Data.botCards
 import com.example.poker.helper.HandGroup
 
-class PreFlopDecisionMaking: Bot() {
+class PreFlopBot: Bot() {
 
     private var handRank: Int = 0
-    private var decision: Int = -1
 
     init {
         initValues()
-        decision = calculateDecision()
+        action = calculateAction()
     }
 
     override fun initValues() {
@@ -22,7 +21,7 @@ class PreFlopDecisionMaking: Bot() {
         super.initValues()
     }
 
-    private fun calculateDecision(): Int {
+    override fun calculateAction(): Int {
         // Dealer: player called - check and bet available
         // Blind: player didn't play yet - fold, call and bet available
         if (bet[PLAYER] == BIG_BLIND) {
@@ -411,6 +410,4 @@ class PreFlopDecisionMaking: Bot() {
             return if (Data.botValidActions[CHECK]) { CHECK } else { FOLD }
         }
     }
-
-    fun getDecision() = decision
 }

@@ -40,7 +40,7 @@ class Dealer {
         playerCards.add(Card(SIX, CLUBS))
         playerCards.add(Card(TWO, CLUBS))
         botCards.add(Card(SEVEN, HEARTS))
-        botCards.add(Card(EIGHT, HEARTS))
+        botCards.add(Card(SEVEN, CLUBS))
     }
 
     /**
@@ -54,9 +54,9 @@ class Dealer {
 //        }
 
         // debug specific game
-        tableCards.add(Card(SIX, HEARTS))
-        tableCards.add(Card(FIVE, HEARTS))
-        tableCards.add(Card(TEN, HEARTS))
+        tableCards.add(Card(SEVEN, SPADES))
+        tableCards.add(Card(EIGHT, HEARTS))
+        tableCards.add(Card(EIGHT, CLUBS))
     }
 
     /**
