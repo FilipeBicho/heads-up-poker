@@ -117,6 +117,9 @@ open class Bot {
             FLOP -> {
                 val bot = FlopDecisionMaking()
                 action = bot.getDecision()
+                if (action == BET || action == RAISE) {
+                    betValue = bot.betValue
+                }
             }
             else -> {
                 action = if (botValidActions[BET]) {

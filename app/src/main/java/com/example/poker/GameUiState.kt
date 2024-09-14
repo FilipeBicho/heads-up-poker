@@ -6,9 +6,9 @@ data class GameUiState(
 
     val botName: String = "Bot",
 
-    val playerMoney: Int = 200,
+    val playerMoney: Int = 1500,
 
-    val botMoney: Int = 200,
+    val botMoney: Int = 1500,
 
     val playerText: String = "",
 

@@ -101,7 +101,7 @@ class Init {
 
         uiStateFlow.update { currentState -> currentState.copy(
             displayBotCards = true,
-            displayFlop = true,
+            displayFlop = false,
             displayTurn = false,
             displayRiver = false,
             playerBetValue = 0,

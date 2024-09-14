@@ -2,6 +2,7 @@ package com.example.poker.bot
 
 import com.example.poker.BIG_BLIND
 import com.example.poker.POT
+import com.example.poker.cards.BOT
 import com.example.poker.cards.Card
 import com.example.poker.cards.Dealer
 import com.example.poker.cards.PLAYER
@@ -11,8 +12,17 @@ import com.example.poker.game.Data.odds
 import com.example.poker.game.Data.pokerChips
 import com.example.poker.game.Data.tableCards
 import com.example.poker.game.Data.totalPotValue
+import com.example.poker.hand.FLUSH
+import com.example.poker.hand.FOUR_OF_A_KIND
+import com.example.poker.hand.FULL_HOUSE
 import com.example.poker.hand.Hand
+import com.example.poker.hand.PAIR
 import com.example.poker.hand.RESULT
+import com.example.poker.hand.ROYAL_STRAIGHT_FLUSH
+import com.example.poker.hand.STRAIGHT
+import com.example.poker.hand.STRAIGHT_FLUSH
+import com.example.poker.hand.THREE_OF_A_KIND
+import com.example.poker.hand.TWO_PAIR
 
 class FlopDecisionMaking: Bot() {
 
@@ -30,6 +40,7 @@ class FlopDecisionMaking: Bot() {
     private var hasFlushDraw: Boolean = false
 
     private var potOdds: Double = 0.0
+    private var currentPot = pokerChips[POT]
 
     init {
         initValues()
@@ -90,31 +101,37 @@ class FlopDecisionMaking: Bot() {
         return false
     }
 
+    private fun monsterHand(): Int {
+        return when {
+            totalPotValue > 400 || currentPot > 200 -> allIn()
+            botStack > 20 && playerStack > 20 ->
+                if (callValue > 0)
+                    betBlinds((bet[PLAYER] * 5) / BIG_BLIND)
+                else
+                    betBlinds(10)
+            else -> allIn()
+        }
+    }
+
+    private fun fullHouse() {
+        when {
+            botOdds[RESULT] > 90 -> if (totalPotValue > 10) allIn() else betBlinds(10)
+
+        }
+    }
+
     private fun calculateDecision(): Int {
 
-        if (botOdds[RESULT] < 50 && !hasFlushDraw && !hasStraightDraw) {
-           return if (callValue == 0) CHECK else FOLD
-        }
-
-        // bot has less than 160 chips
-        if (botStack < 4) {
-            return when {
-                hasHandPair || hasStraightDraw || hasFlushDraw || botOdds[RESULT] > 60 -> allIn()
-                else -> if (callValue == 0) CHECK else FOLD
+        return when (botHand.resultValue) {
+            ROYAL_STRAIGHT_FLUSH, STRAIGHT_FLUSH, FOUR_OF_A_KIND -> monsterHand()
+            else -> {
+                if (botOdds[RESULT] > 90) {
+                    monsterHand()
+                } else {
+                    FOLD
+                }
             }
         }
-
-        // player has less than 160 chips
-        if (playerStack < 4) {
-            return when {
-                hasHandPair -> if (isWetBoard) allIn() else betBlinds(2)
-                opponentOdds[RESULT] < 50 || botOdds[RESULT] > 60 -> allIn()
-                hasFlushDraw || hasStraightDraw -> betBlinds(2)
-                else -> if (callValue == 0) CHECK else FOLD
-            }
-        }
-
-        return -1
     }
 
     fun getDecision() = decision
