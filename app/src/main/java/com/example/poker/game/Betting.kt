@@ -1,6 +1,5 @@
 package com.example.poker.game
 
-import androidx.lifecycle.ViewModel
 import com.example.poker.BIG_BLIND
 import com.example.poker.POT
 import com.example.poker.SMALL_BLIND
@@ -41,7 +40,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Timer
 import kotlin.concurrent.timerTask
 
@@ -115,24 +114,30 @@ class Betting {
         }
 
         CoroutineScope(Dispatchers.IO).launch {
-            val action = bot.calculateAction()
 
-            when (action) {
-                FOLD -> fold()
-                CHECK -> check()
-                CALL -> call()
-                BET -> {
-                    bet(bot.betValue)
+            try {
+                val action = bot.calculateAction()
+                when (action) {
+                    FOLD -> fold()
+                    CHECK -> check()
+                    CALL -> call()
+                    BET -> {
+                        bet(bot.betValue)
+                    }
+                    RAISE -> {
+                        raise(bot.betValue)
+                    }
+                    ALLIN -> {
+                        allIn()
+                    }
                 }
-                RAISE -> {
-                    raise(bot.betValue)
-                }
-                ALLIN -> {
-                    allIn()
+            } catch (e: Exception) {
+                // Handle any errors that occurred during API call
+                withContext(Dispatchers.Main) {
+                    println("Error: ${e.message}")
                 }
             }
         }
-
     }
 
     private fun updateStateFlowBets() {

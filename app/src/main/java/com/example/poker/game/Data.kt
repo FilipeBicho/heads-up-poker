@@ -26,6 +26,7 @@ object Data {
     var pokerChips: MutableList<Int> = mutableListOf(0,0,0)
     var bet: MutableList<Int> = mutableListOf(0,0,0)
     var totalPotValue: Int = 0
+    var action: Int = -1
 
     var gameNumber: Int = 0
     var checkAvailable: Boolean = true

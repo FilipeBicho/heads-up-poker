@@ -1,7 +1,14 @@
 package com.example.poker
 
 import androidx.lifecycle.ViewModel
+import com.example.poker.bot.ALLIN
+import com.example.poker.bot.BET
+import com.example.poker.bot.CALL
+import com.example.poker.bot.CHECK
+import com.example.poker.bot.FOLD
+import com.example.poker.bot.RAISE
 import com.example.poker.cards.PLAYER
+import com.example.poker.game.Data.action
 import com.example.poker.game.Data.betting
 import com.example.poker.game.Data.init
 import com.example.poker.game.Data.player
@@ -31,18 +38,22 @@ class GameViewModel : ViewModel() {
     }
 
     fun foldAction() {
+        action = FOLD
         betting.fold()
     }
 
     fun checkAction() {
+        action = CHECK
         betting.check()
     }
 
     fun callAction() {
+        action = CALL
         betting.call()
     }
 
     fun betAction(value: Int) {
+        action = BET
         if (pokerChips[PLAYER] - value == 0) {
             betting.allIn()
         } else {
@@ -51,6 +62,7 @@ class GameViewModel : ViewModel() {
     }
 
     fun raiseAction(value: Int) {
+        action = RAISE
         if (pokerChips[PLAYER] - value == 0) {
             betting.allIn()
         } else {
@@ -59,6 +71,7 @@ class GameViewModel : ViewModel() {
     }
 
     fun allInAction() {
+        action = ALLIN
         betting.allIn()
     }
 }
