@@ -4,15 +4,11 @@ import com.example.poker.BIG_BLIND
 import com.example.poker.cards.ACE
 import com.example.poker.cards.BOT
 import com.example.poker.cards.Card
-import com.example.poker.cards.FLOP
 import com.example.poker.cards.PLAYER
-import com.example.poker.cards.PRE_FLOP
 import com.example.poker.game.Data.bet
 import com.example.poker.game.Data.botCards
-import com.example.poker.game.Data.botValidActions
 import com.example.poker.game.Data.dealer
 import com.example.poker.game.Data.pokerChips
-import com.example.poker.game.Data.round
 import kotlin.math.abs
 
 const val FOLD = 0
@@ -41,6 +37,8 @@ abstract class Bot {
     protected var hasWetBoardStraight: Boolean = false
     protected var hasWetBoardThreeOfAKind: Boolean = false
     protected var hasWetBoardPair: Boolean = false
+
+    protected val retrofit = RetrofitClient.getOpenAiClient()
 
     protected open fun initValues() {
         isDealer = BOT == dealer
@@ -118,5 +116,5 @@ abstract class Bot {
         return false
     }
 
-    abstract fun calculateAction(): Int
+    abstract suspend fun calculateAction(): Int
 }

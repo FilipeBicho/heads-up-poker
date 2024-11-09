@@ -13,7 +13,6 @@ class PreFlopBot: Bot() {
 
     init {
         initValues()
-        action = calculateAction()
     }
 
     override fun initValues() {
@@ -21,7 +20,7 @@ class PreFlopBot: Bot() {
         super.initValues()
     }
 
-    override fun calculateAction(): Int {
+    override suspend fun calculateAction(): Int {
         // Dealer: player called - check and bet available
         // Blind: player didn't play yet - fold, call and bet available
         if (bet[PLAYER] == BIG_BLIND) {

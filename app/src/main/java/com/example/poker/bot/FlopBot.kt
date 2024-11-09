@@ -1,5 +1,6 @@
 package com.example.poker.bot
 
+
 import com.example.poker.BIG_BLIND
 import com.example.poker.POT
 import com.example.poker.cards.BOT
@@ -11,16 +12,14 @@ import com.example.poker.game.Data.odds
 import com.example.poker.game.Data.pokerChips
 import com.example.poker.game.Data.tableCards
 import com.example.poker.game.Data.totalPotValue
-import com.example.poker.hand.FOUR_OF_A_KIND
-import com.example.poker.hand.FULL_HOUSE
 import com.example.poker.hand.Hand
-import com.example.poker.hand.RESULT
-import com.example.poker.hand.ROYAL_STRAIGHT_FLUSH
-import com.example.poker.hand.STRAIGHT_FLUSH
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class FlopBot: Bot() {
     private lateinit var communityCards: List<Card>
-    private lateinit var combinedCards:  List<Card>
+    private lateinit var combinedCards: List<Card>
 
     private lateinit var botOdds: Array<Int>
     private lateinit var opponentOdds: Array<Int>
@@ -35,7 +34,6 @@ class FlopBot: Bot() {
 
     init {
         initValues()
-        action = calculateAction()
     }
 
     override fun initValues() {
@@ -63,13 +61,13 @@ class FlopBot: Bot() {
         val ranksCount = ranks.groupingBy { it }.eachCount()
 
         // three of a kind
-        if (ranksCount.values.any { it == 3}) {
+        if (ranksCount.values.any { it == 3 }) {
             hasWetBoardThreeOfAKind = true
             return true
         }
 
         // pair
-        if (ranksCount.values.any { it == 2}) {
+        if (ranksCount.values.any { it == 2 }) {
             hasWetBoardPair = true
             return true
         }
@@ -95,7 +93,10 @@ class FlopBot: Bot() {
     private fun monsterHand(): Int {
         return when {
             totalPotValue > 400 || currentPot > 200 -> allIn()
-            botStack > 20 && playerStack > 20 -> if (callValue > 0) betBlinds((bet[PLAYER] * 5) / BIG_BLIND) else betBlinds(5)
+            botStack > 20 && playerStack > 20 -> if (callValue > 0) betBlinds((bet[PLAYER] * 5) / BIG_BLIND) else betBlinds(
+                5
+            )
+
             else -> if (botStack < 8 || callValue > 0) allIn() else betBlinds(3)
         }
     }
@@ -106,47 +107,57 @@ class FlopBot: Bot() {
         val playerMoney = pokerChips[PLAYER]
         val botMoney = pokerChips[BOT]
 
-        return when(playerBet) {
+        return when (playerBet) {
             0 -> {
                 when (playerMoney) {
                     in 0..399 -> if (hasHandPair) betBlinds(3) else betBlinds(4)
-                    in 400 .. 800 -> if (hasHandPair) betBlinds(4) else betBlinds(5)
+                    in 400..800 -> if (hasHandPair) betBlinds(4) else betBlinds(5)
                     else -> if (hasHandPair) betBlinds(5) else betBlinds(6)
                 }
             }
+
             in 1..200 -> {
                 when (playerMoney) {
                     in 0..400 -> allIn()
                     else -> {
                         when (botMoney) {
                             in 0..400 -> allIn()
-                            in 401 .. 800 -> if (hasHandPair) raiseBetByMultiplier(2) else raiseBetByMultiplier(3)
-                            else ->  if (hasHandPair) raiseBetByMultiplier(3) else raiseBetByMultiplier(4)
+                            in 401..800 -> if (hasHandPair) raiseBetByMultiplier(2) else raiseBetByMultiplier(
+                                3
+                            )
+
+                            else -> if (hasHandPair) raiseBetByMultiplier(3) else raiseBetByMultiplier(
+                                4
+                            )
 
                         }
                     }
                 }
             }
+
             in 201..500 -> {
                 when (playerMoney) {
                     in 0..400 -> allIn()
                     else -> {
                         when (botMoney) {
                             in 0..400 -> allIn()
-                            in 401 .. 800 -> if (hasHandPair) CALL else allIn()
-                            else -> if (hasHandPair) raiseBetByMultiplier(2) else raiseBetByMultiplier(5)
+                            in 401..800 -> if (hasHandPair) CALL else allIn()
+                            else -> if (hasHandPair) raiseBetByMultiplier(2) else raiseBetByMultiplier(
+                                5
+                            )
 
                         }
                     }
                 }
             }
-            else-> {
+
+            else -> {
                 when (playerMoney) {
                     in 0..400 -> allIn()
                     else -> {
                         when (botMoney) {
                             in 0..400 -> allIn()
-                            else-> if (hasHandPair) CALL else allIn()
+                            else -> if (hasHandPair) CALL else allIn()
                         }
                     }
                 }
@@ -154,18 +165,25 @@ class FlopBot: Bot() {
         }
     }
 
-    override fun calculateAction(): Int {
+    override suspend fun calculateAction(): Int {
 
-        return when (botHand.resultValue) {
-            ROYAL_STRAIGHT_FLUSH, STRAIGHT_FLUSH, FOUR_OF_A_KIND -> monsterHand()
-            FULL_HOUSE -> fullHouse()
-            else -> {
-                if (botOdds[RESULT] > 90) {
-                    monsterHand()
-                } else {
-                    FOLD
-                }
-            }
+        val chatgptApi: ChatgptApi = ChatgptApi()
+        chatgptApi.makeApiCall(retrofit)
+        action = when(chatgptApi.getAction()) {
+            "Fold" -> FOLD
+            "Call" -> CALL
+            "Check" -> CHECK
+            "Bet" -> BET
+            "Raise" -> RAISE
+            "All in" -> ALLIN
+            else -> -1
         }
+
+        if (action == BET || action == RAISE) {
+            betValue = chatgptApi.getBet().toInt()
+        }
+
+
+        return action
     }
 }

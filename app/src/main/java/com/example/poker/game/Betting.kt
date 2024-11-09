@@ -1,5 +1,6 @@
 package com.example.poker.game
 
+import androidx.lifecycle.ViewModel
 import com.example.poker.BIG_BLIND
 import com.example.poker.POT
 import com.example.poker.SMALL_BLIND
@@ -37,6 +38,10 @@ import com.example.poker.game.Data.showdown
 import com.example.poker.game.Data.totalPotValue
 import com.example.poker.game.Data.uiStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.launch
 import java.util.Timer
 import kotlin.concurrent.timerTask
 
@@ -102,26 +107,32 @@ class Betting {
     }
 
     private fun botAction() {
+
         val bot: Bot = when (round) {
             PRE_FLOP -> PreFlopBot()
             FLOP -> FlopBot()
             else -> throw IllegalArgumentException("Invalid round $round")
         }
 
-        when (bot.action) {
-            FOLD -> fold()
-            CHECK -> check()
-            CALL -> call()
-            BET -> {
-                bet(bot.betValue)
-            }
-            RAISE -> {
-                raise(bot.betValue)
-            }
-            ALLIN -> {
-                allIn()
+        CoroutineScope(Dispatchers.IO).launch {
+            val action = bot.calculateAction()
+
+            when (action) {
+                FOLD -> fold()
+                CHECK -> check()
+                CALL -> call()
+                BET -> {
+                    bet(bot.betValue)
+                }
+                RAISE -> {
+                    raise(bot.betValue)
+                }
+                ALLIN -> {
+                    allIn()
+                }
             }
         }
+
     }
 
     private fun updateStateFlowBets() {
