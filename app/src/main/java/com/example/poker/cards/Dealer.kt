@@ -31,16 +31,16 @@ class Dealer {
         playerCards: SnapshotStateList<Card>,
         botCards: SnapshotStateList<Card>
     ) {
-//        playerCards.add(deck.dealCard())
-//        botCards.add(deck.dealCard())
-//        playerCards.add(deck.dealCard())
-//        botCards.add(deck.dealCard())
+        playerCards.add(deck.dealCard())
+        botCards.add(deck.dealCard())
+        playerCards.add(deck.dealCard())
+        botCards.add(deck.dealCard())
 
         // debug specific game
-        playerCards.add(Card(SIX, CLUBS))
-        playerCards.add(Card(TWO, CLUBS))
-        botCards.add(Card(SEVEN, HEARTS))
-        botCards.add(Card(EIGHT, CLUBS))
+//        playerCards.add(Card(SIX, CLUBS))
+//        playerCards.add(Card(TWO, CLUBS))
+//        botCards.add(Card(SEVEN, HEARTS))
+//        botCards.add(Card(EIGHT, CLUBS))
     }
 
     /**
@@ -49,14 +49,14 @@ class Dealer {
     fun setFlopCards(tableCards: SnapshotStateList<Card>) {
 
         deck.dealCard()
-//        for (i in 0 until 3) {
-//            tableCards.add(deck.dealCard())
-//        }
+        for (i in 0 until 3) {
+            tableCards.add(deck.dealCard())
+        }
 
         // debug specific game
-        tableCards.add(Card(SEVEN, SPADES))
-        tableCards.add(Card(EIGHT, HEARTS))
-        tableCards.add(Card(EIGHT, SPADES))
+//        tableCards.add(Card(SEVEN, SPADES))
+//        tableCards.add(Card(EIGHT, HEARTS))
+//        tableCards.add(Card(EIGHT, SPADES))
     }
 
     /**

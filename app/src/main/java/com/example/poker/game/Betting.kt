@@ -8,6 +8,7 @@ import com.example.poker.bot.BET
 import com.example.poker.bot.Bot
 import com.example.poker.bot.CALL
 import com.example.poker.bot.CHECK
+import com.example.poker.bot.ChatgptBot
 import com.example.poker.bot.FOLD
 import com.example.poker.bot.FlopBot
 import com.example.poker.bot.PreFlopBot
@@ -107,9 +108,9 @@ class Betting {
 
     private fun botAction() {
 
-        val bot: Bot = when (round) {
+        val bot = when (round) {
             PRE_FLOP -> PreFlopBot()
-            FLOP -> FlopBot()
+            FLOP, TURN, RIVER -> ChatgptBot()
             else -> throw IllegalArgumentException("Invalid round $round")
         }
 

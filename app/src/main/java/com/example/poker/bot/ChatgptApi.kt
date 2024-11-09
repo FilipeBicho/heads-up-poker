@@ -8,8 +8,6 @@ import com.example.poker.cards.RIVER
 import com.example.poker.cards.TURN
 import com.example.poker.game.Data
 import com.example.poker.game.Data.botCards
-import com.example.poker.game.Data.botMoney
-import com.example.poker.game.Data.playerMoney
 import com.example.poker.game.Data.pokerChips
 import com.example.poker.game.Data.round
 import com.example.poker.game.Data.tableCards
@@ -40,12 +38,11 @@ class ChatgptApi {
                 FOLD -> "Fold"
                 CHECK -> "Check"
                 CALL -> "Call"
-                BET -> "Bet ${bet[PLAYER]}"
-                RAISE -> "Raise ${bet[PLAYER]}"
+                BET -> "Bet ${Data.bet[PLAYER]}"
+                RAISE -> "Raise ${Data.bet[PLAYER]}"
                 ALLIN -> "All in"
                 else -> ""
             }
-
 
             val message =
                 listOf(
