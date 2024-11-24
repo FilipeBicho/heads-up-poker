@@ -36,7 +36,7 @@ class Card(var rank: Int, var suit: Int) {
      * output card rank_suit
      */
     override fun toString(): String {
-        return "${this.rankArray[this.rank]}_${this.suitArray[this.suit]}"
+        return "${this.rankArray[this.rank]} ${this.suitArray[this.suit]}"
     }
 
     fun cardString(): String {

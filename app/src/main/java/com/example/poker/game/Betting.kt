@@ -5,12 +5,11 @@ import com.example.poker.POT
 import com.example.poker.SMALL_BLIND
 import com.example.poker.bot.ALLIN
 import com.example.poker.bot.BET
-import com.example.poker.bot.Bot
 import com.example.poker.bot.CALL
 import com.example.poker.bot.CHECK
 import com.example.poker.bot.ChatgptBot
 import com.example.poker.bot.FOLD
-import com.example.poker.bot.FlopBot
+import com.example.poker.bot.NO_ACTION
 import com.example.poker.bot.PreFlopBot
 import com.example.poker.bot.RAISE
 import com.example.poker.cards.BOT
@@ -19,6 +18,7 @@ import com.example.poker.cards.PLAYER
 import com.example.poker.cards.PRE_FLOP
 import com.example.poker.cards.RIVER
 import com.example.poker.cards.TURN
+import com.example.poker.game.Data.action
 import com.example.poker.game.Data.bet
 import com.example.poker.game.Data.blind
 import com.example.poker.game.Data.botValidActions
@@ -114,7 +114,7 @@ class Betting {
             else -> throw IllegalArgumentException("Invalid round $round")
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Default).launch() {
 
             try {
                 val action = bot.calculateAction()
@@ -229,6 +229,8 @@ class Betting {
         if (player == dealer) {
             switchPlayerTurn()
         }
+
+        action = NO_ACTION
 
         totalPotValue += pokerChips[POT]
         bet[PLAYER] = 0

@@ -11,6 +11,7 @@ import com.example.poker.game.Data.dealer
 import com.example.poker.game.Data.pokerChips
 import kotlin.math.abs
 
+const val NO_ACTION = -1
 const val FOLD = 0
 const val CHECK = 1
 const val CALL = 2

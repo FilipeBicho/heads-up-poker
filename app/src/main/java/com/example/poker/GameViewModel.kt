@@ -7,8 +7,10 @@ import com.example.poker.bot.CALL
 import com.example.poker.bot.CHECK
 import com.example.poker.bot.FOLD
 import com.example.poker.bot.RAISE
+import com.example.poker.cards.BOT
 import com.example.poker.cards.PLAYER
 import com.example.poker.game.Data.action
+import com.example.poker.game.Data.bet
 import com.example.poker.game.Data.betting
 import com.example.poker.game.Data.init
 import com.example.poker.game.Data.player
@@ -30,10 +32,10 @@ class GameViewModel : ViewModel() {
      * Update player bet via button interaction
      */
     fun updatePlayerBet(value: Int) {
-        uiStateFlow.update { currentState ->
-            currentState.copy(
-                playerBetValue = value
-            )
+        if (bet[BOT] == 0) {
+            betAction(value)
+        } else {
+            raiseAction(value)
         }
     }
 

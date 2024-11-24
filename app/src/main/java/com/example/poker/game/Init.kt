@@ -1,11 +1,12 @@
 package com.example.poker.game
 
-import android.util.Log
 import com.example.poker.POT
+import com.example.poker.bot.NO_ACTION
 import com.example.poker.cards.BOT
 import com.example.poker.cards.Dealer
 import com.example.poker.cards.PLAYER
 import com.example.poker.cards.PRE_FLOP
+import com.example.poker.game.Data.action
 import com.example.poker.game.Data.bet
 import com.example.poker.game.Data.betting
 import com.example.poker.game.Data.blind
@@ -52,6 +53,8 @@ class Init {
 
     private fun initValues() {
         round = PRE_FLOP
+
+        action = NO_ACTION
 
         // players
         bet[PLAYER] = 0

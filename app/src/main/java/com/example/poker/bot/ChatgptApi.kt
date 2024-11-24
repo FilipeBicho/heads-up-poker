@@ -23,18 +23,19 @@ class ChatgptApi {
 
         try {
 
-            val botCard1 = botCards.first().cardString()
-            val botCard2 = botCards.last().cardString()
+            val botCard1 = botCards.first().toString()
+            val botCard2 = botCards.last().toString()
 
             var tableCardsString = ""
             when (round) {
-                FLOP -> tableCards.subList(0,3).forEach { tableCardsString += it.cardString()+" " }
-                TURN -> tableCards.subList(0,4).forEach { tableCardsString += it.cardString()+" " }
-                RIVER -> tableCards.forEach { tableCardsString += it.cardString()+" "}
+                FLOP -> tableCards.subList(0,3).forEach { tableCardsString += "$it " }
+                TURN -> tableCards.subList(0,4).forEach { tableCardsString += "$it " }
+                RIVER -> tableCards.forEach { tableCardsString += "$it " }
                 else -> ""
             }
 
             var playerAction = when (Data.action) {
+                NO_ACTION -> "No action"
                 FOLD -> "Fold"
                 CHECK -> "Check"
                 CALL -> "Call"
@@ -62,7 +63,7 @@ class ChatgptApi {
                                 "Question: What should be my action and Bet?\n"
                     ))
 
-            val request = ChatRequest(model = "gpt-4o-mini", messages = message, response_format = ResponseFormat(type = "json_object"))
+            val request = ChatRequest(model = "gpt-4o", messages = message, response_format = ResponseFormat(type = "json_object"))
             val response = retrofit.getChatCompletion(request).execute()
 
             if (response.isSuccessful) {
@@ -75,7 +76,7 @@ class ChatgptApi {
 
             }
 
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             Log.e("MainViewModel", "Error: ${e.message}")
         }
 
