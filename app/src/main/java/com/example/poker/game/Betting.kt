@@ -114,24 +114,26 @@ class Betting {
             else -> throw IllegalArgumentException("Invalid round $round")
         }
 
-        CoroutineScope(Dispatchers.Default).launch() {
-
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 val action = bot.calculateAction()
-                when (action) {
-                    FOLD -> fold()
-                    CHECK -> check()
-                    CALL -> call()
-                    BET -> {
-                        bet(bot.betValue)
-                    }
-                    RAISE -> {
-                        raise(bot.betValue)
-                    }
-                    ALLIN -> {
-                        allIn()
+                withContext(Dispatchers.Main) {
+                    when (action) {
+                        FOLD -> fold()
+                        CHECK -> check()
+                        CALL -> call()
+                        BET -> {
+                            bet(bot.betValue)
+                        }
+                        RAISE -> {
+                            raise(bot.betValue)
+                        }
+                        ALLIN -> {
+                            allIn()
+                        }
                     }
                 }
+
             } catch (e: Exception) {
                 // Handle any errors that occurred during API call
                 withContext(Dispatchers.Main) {

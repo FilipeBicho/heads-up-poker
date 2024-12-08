@@ -6,24 +6,15 @@ class ChatgptBot: Bot() {
 
         try {
             val chatgptApi: ChatgptApi = ChatgptApi()
-            chatgptApi.makeApiCall(retrofit)
-            action = when(chatgptApi.getAction()) {
-                "Fold" -> FOLD
-                "Call" -> CALL
-                "Check" -> CHECK
-                "Bet" -> BET
-                "Raise" -> RAISE
-                "All in" -> ALLIN
-                else -> -1
-            }
+            var (actionValue, bet) = chatgptApi.makeApiCall(retrofit)
 
+            action = actionValue
             if (action == BET || action == RAISE) {
-                betValue = chatgptApi.getBet().toInt()
+                betValue = bet?.toInt() ?: 0
             }
         } catch (e: Exception) {
             println("Error111: ${e.message}")
         }
-
 
         return action
     }
