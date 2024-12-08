@@ -104,6 +104,17 @@ class Betting {
     private fun switchPlayerTurn() {
         player = if (player == PLAYER) BOT else PLAYER
         opponent = if (player == BOT) PLAYER else BOT
+
+        if (player == BOT) {
+            uiStateFlow.update { currentState -> currentState.copy(
+                displayFoldButton = false,
+                displayCheckButton = false,
+                displayCallButton = false,
+                displayBetButton = false,
+                displayRaiseButton = false,
+                displayAllInButton = false
+            )}
+        }
     }
 
     private fun botAction() {
