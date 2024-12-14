@@ -7,10 +7,8 @@ import com.example.poker.bot.ALLIN
 import com.example.poker.bot.BET
 import com.example.poker.bot.CALL
 import com.example.poker.bot.CHECK
-import com.example.poker.bot.ChatgptBot
 import com.example.poker.bot.FOLD
 import com.example.poker.bot.NO_ACTION
-import com.example.poker.bot.PreFlopBot
 import com.example.poker.bot.RAISE
 import com.example.poker.cards.BOT
 import com.example.poker.cards.FLOP
@@ -22,6 +20,7 @@ import com.example.poker.game.Data.action
 import com.example.poker.game.Data.bet
 import com.example.poker.game.Data.blind
 import com.example.poker.game.Data.botValidActions
+import com.example.poker.game.Data.chatGptBot
 import com.example.poker.game.Data.checkAvailable
 import com.example.poker.game.Data.dealer
 import com.example.poker.game.Data.gameNumber
@@ -119,25 +118,19 @@ class Betting {
 
     private fun botAction() {
 
-        val bot = when (round) {
-            PRE_FLOP -> PreFlopBot()
-            FLOP, TURN, RIVER -> ChatgptBot()
-            else -> throw IllegalArgumentException("Invalid round $round")
-        }
-
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val action = bot.calculateAction()
+                val action = chatGptBot.calculateAction()
                 withContext(Dispatchers.Main) {
                     when (action) {
                         FOLD -> fold()
                         CHECK -> check()
                         CALL -> call()
                         BET -> {
-                            bet(bot.betValue)
+                            bet(chatGptBot.betValue)
                         }
                         RAISE -> {
-                            raise(bot.betValue)
+                            raise(chatGptBot.betValue)
                         }
                         ALLIN -> {
                             allIn()

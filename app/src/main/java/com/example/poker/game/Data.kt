@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.poker.BIG_BLIND
 import com.example.poker.GameUiState
+import com.example.poker.bot.ChatgptBot
 import com.example.poker.cards.Card
 import com.example.poker.cards.Dealer
 import com.example.poker.cards.PRE_FLOP
@@ -51,4 +52,6 @@ object Data {
     var betting: Betting = Betting()
     lateinit var cardDealer: Dealer
     var showdown: Showdown = Showdown()
+
+    val chatGptBot = ChatgptBot()
 }

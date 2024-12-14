@@ -14,5 +14,4 @@ interface ChatgptApiInterface {
     )
     @POST("chat/completions")
     fun getChatCompletion(@Body request: ChatRequest): Call<ChatResponse>
-
 }

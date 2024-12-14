@@ -1,13 +1,28 @@
 package com.example.poker.bot
 
-class ChatgptBot: Bot() {
+const val NO_ACTION = -1
+const val FOLD = 0
+const val CHECK = 1
+const val CALL = 2
+const val BET = 3
+const val RAISE = 4
+const val ALLIN = 5
 
-    override suspend fun calculateAction(): Int {
+class ChatgptBot {
+
+    val retrofit = RetrofitClient.getOpenAiClient()
+    val chatgptApi: ChatgptApi = ChatgptApi()
+
+    var action: Int = 0
+    var betValue: Int = 0
+
+    suspend fun calculateAction(): Int {
+
+        action = 0
+        betValue = 0
 
         try {
-            val chatgptApi: ChatgptApi = ChatgptApi()
             var (actionValue, bet) = chatgptApi.makeApiCall(retrofit)
-
             action = actionValue
             if (action == BET || action == RAISE) {
                 betValue = bet?.toInt() ?: 0
