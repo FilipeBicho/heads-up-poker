@@ -251,7 +251,8 @@ class Betting {
                 botBetValue = bet[BOT],
                 totalPot = totalPotValue,
                 playerText = "${bet[PLAYER]} €",
-                botText = "${bet[BOT]} €"
+                botText = "${bet[BOT]} €",
+                currentPot = 0
             )
         }
 
@@ -520,6 +521,8 @@ class Betting {
     fun allIn() {
         checkAvailable = false
 
+        val previousBet = bet[player]
+
         // bet all chips
         bet[player] = if (pokerChips[player] + bet[player] > pokerChips[opponent] + bet[opponent]) {
             pokerChips[opponent] + bet[opponent]
@@ -527,7 +530,9 @@ class Betting {
             pokerChips[player] + bet[player]
         }
 
+        pokerChips[player] += previousBet
         pokerChips[player] -= bet[player]
+
         pokerChips[POT] = bet[player] + bet[opponent]
 
         gameSummaryList += "${name[player]} makes all in with ${bet[player]} €"

@@ -247,16 +247,23 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                 ) {
                     Row(
                         modifier = Modifier
-                            .align(Alignment.BottomStart)
+                            .align(Alignment.BottomEnd)
                             .height(25.dp),
                         horizontalArrangement = Arrangement.spacedBy(1.dp)
                     ) {
-                        if (player == PLAYER && !gameUiState.showdown && gameUiState.displayBetButton) {
-                            if (BIG_BLIND * 2 > gameUiState.totalPot) {
+                        if (player == PLAYER && !gameUiState.showdown && (gameUiState.displayBetButton || gameUiState.displayRaiseButton)) {
+                            if (2 * BIG_BLIND > minPlayerBet) {
                                 BetButton(text = "2 BB") { gameViewModel.updatePlayerBet(BIG_BLIND * 2) }
                             }
-                            BetButton(text = "Pot") { gameViewModel.updatePlayerBet(gameUiState.totalPot) }
-                            BetButton(text = "Max") { gameViewModel.updatePlayerBet(gameUiState.playerMoney) }
+                            if (3 * BIG_BLIND > minPlayerBet) {
+                                BetButton(text = "3 BB") { gameViewModel.updatePlayerBet(BIG_BLIND * 3) }
+                            }
+                            if (gameUiState.currentPot > minPlayerBet) {
+                                BetButton(text = "Pot") { gameViewModel.updatePlayerBet(gameUiState.currentPot) }
+                            }
+                            if (gameUiState.playerMoney > minPlayerBet) {
+                                BetButton(text = "All in") { gameViewModel.updatePlayerBet(gameUiState.playerMoney) }
+                            }
                         }
                     }
                 }
@@ -501,7 +508,7 @@ private fun GameActionButton(text: String, onClick: () -> Unit) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun BetSlider(gameUiState: GameUiState, gameViewModel: GameViewModel) {
-    var bet by remember(key1 = minPlayerBet) { mutableStateOf(minPlayerBet) }
+    var bet by remember(key1 = gameUiState.playerBetValue) { mutableStateOf(gameUiState.playerBetValue) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
