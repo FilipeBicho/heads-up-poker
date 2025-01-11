@@ -243,7 +243,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .weight(0.2f)
+                        .weight(0.3f)
                 ) {
                     Row(
                         modifier = Modifier
@@ -368,15 +368,15 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                                     GameActionButton("Call") { gameViewModel.callAction() }
                                 }
 
-                                if (gameUiState.displayBetButton) {
+                                if (gameUiState.displayBetButton && gameUiState.playerBetValue != pokerChips[PLAYER]) {
                                     GameActionButton("Bet") { gameViewModel.betAction(betValue) }
                                 }
 
-                                if (gameUiState.displayRaiseButton) {
+                                if (gameUiState.displayRaiseButton && gameUiState.playerBetValue != pokerChips[PLAYER]) {
                                     GameActionButton("Raise") { gameViewModel.raiseAction(betValue)}
                                 }
 
-                                if (gameUiState.displayAllInButton) {
+                                if (gameUiState.displayAllInButton || gameUiState.playerBetValue == pokerChips[PLAYER]) {
                                     GameActionButton("All n") { gameViewModel.allInAction() }
                                 }
                             }
