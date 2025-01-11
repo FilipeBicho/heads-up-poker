@@ -527,7 +527,7 @@ class Betting {
             pokerChips[player] + bet[player]
         }
 
-        pokerChips[player] = 0
+        pokerChips[player] -= bet[player]
         pokerChips[POT] = bet[player] + bet[opponent]
 
         gameSummaryList += "${name[player]} makes all in with ${bet[player]} €"
