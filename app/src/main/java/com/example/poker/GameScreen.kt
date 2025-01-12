@@ -121,13 +121,24 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                     }
                 }
 
-                // top right side - empty
+                // top right side - winner count
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(0.3f)
                 ) {
-
+                    Column (
+                        modifier = Modifier.align(Alignment.TopEnd).padding(16.dp   )
+                    ) {
+                        Text(
+                            text = "Player wins: ${gameUiState.playerWins}",
+                            fontSize = 12.sp,
+                        )
+                        Text(
+                            text = "Bot wins: ${gameUiState.botWins}",
+                            fontSize = 12.sp
+                        )
+                    }
                 }
             }
         }
@@ -178,7 +189,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         )
 
                         // table cards
-                        if (tableCards.isNotEmpty()) {
+                        if (tableCards.isNotEmpty() && !gameUiState.newGame) {
                             Row(modifier = Modifier.weight(0.6f)) {
 
                                 AnimatedVisibility(
@@ -215,6 +226,12 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                                     CardImage(card = tableCards[4], Modifier.padding(all = 5.dp), true)
                                 }
                             }
+                        } else {
+                            Box(modifier = Modifier.fillMaxWidth()) {
+                                Column(modifier = Modifier.align(Alignment.Center)) {
+                                    NewGameButton { gameViewModel.newGame() }
+                                }
+                            }
                         }
 
                         // winner text
@@ -247,16 +264,20 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                 ) {
                     Row(
                         modifier = Modifier
-                            .align(Alignment.BottomStart)
+                            .align(Alignment.BottomEnd)
                             .height(25.dp),
                         horizontalArrangement = Arrangement.spacedBy(1.dp)
                     ) {
-                        if (player == PLAYER && !gameUiState.showdown && gameUiState.displayBetButton) {
-                            if (BIG_BLIND * 2 > gameUiState.totalPot) {
+                        if (player == PLAYER && !gameUiState.showdown && (gameUiState.displayBetButton || gameUiState.displayRaiseButton)) {
+                            if (2 * BIG_BLIND > minPlayerBet) {
                                 BetButton(text = "2 BB") { gameViewModel.updatePlayerBet(BIG_BLIND * 2) }
                             }
-                            BetButton(text = "Pot") { gameViewModel.updatePlayerBet(gameUiState.totalPot) }
-                            BetButton(text = "Max") { gameViewModel.updatePlayerBet(gameUiState.playerMoney) }
+                            if (gameUiState.currentPot > minPlayerBet) {
+                                BetButton(text = "Pot") { gameViewModel.updatePlayerBet(gameUiState.currentPot) }
+                            }
+                            if (gameUiState.playerMoney > minPlayerBet) {
+                                BetButton(text = "All in") { gameViewModel.updatePlayerBet(gameUiState.playerMoney) }
+                            }
                         }
                     }
                 }
@@ -361,15 +382,15 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                                     GameActionButton("Call") { gameViewModel.callAction() }
                                 }
 
-                                if (gameUiState.displayBetButton) {
+                                if (gameUiState.displayBetButton && gameUiState.playerBetValue != pokerChips[PLAYER]) {
                                     GameActionButton("Bet") { gameViewModel.betAction(betValue) }
                                 }
 
-                                if (gameUiState.displayRaiseButton) {
+                                if (gameUiState.displayRaiseButton && gameUiState.playerBetValue != pokerChips[PLAYER]) {
                                     GameActionButton("Raise") { gameViewModel.raiseAction(betValue)}
                                 }
 
-                                if (gameUiState.displayAllInButton) {
+                                if (gameUiState.displayAllInButton || gameUiState.playerBetValue == pokerChips[PLAYER]) {
                                     GameActionButton("All n") { gameViewModel.allInAction() }
                                 }
                             }
@@ -501,7 +522,7 @@ private fun GameActionButton(text: String, onClick: () -> Unit) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun BetSlider(gameUiState: GameUiState, gameViewModel: GameViewModel) {
-    var bet by remember(key1 = minPlayerBet) { mutableStateOf(minPlayerBet) }
+    var bet by remember(key1 = gameUiState.playerBetValue) { mutableStateOf(gameUiState.playerBetValue) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
@@ -570,5 +591,35 @@ private fun BetButton(text: String, onClick: () -> Unit) {
         modifier = Modifier.defaultMinSize(minWidth = ButtonDefaults.MinWidth)
     ) {
         Text(text)
+    }
+}
+
+@Composable
+private fun NewGameButton(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .clip(shape = RoundedCornerShape(10.dp))
+            .border(
+                2.dp,
+                colorResource(id = R.color.border_gray),
+                shape = RoundedCornerShape(10.dp)
+            )
+            .height(35.dp)
+            .width(150.dp)
+            .background(colorResource(id = R.color.button_red))
+    )
+    {
+        Button(
+            onClick = onClick,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.White
+            ),
+            contentPadding = PaddingValues(4.dp),
+            modifier = Modifier.align(Alignment.Center)
+        )
+        {
+            Text(text = "New game", fontSize = 15.sp)
+        }
     }
 }

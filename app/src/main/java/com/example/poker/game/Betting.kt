@@ -5,12 +5,10 @@ import com.example.poker.POT
 import com.example.poker.SMALL_BLIND
 import com.example.poker.bot.ALLIN
 import com.example.poker.bot.BET
-import com.example.poker.bot.Bot
 import com.example.poker.bot.CALL
 import com.example.poker.bot.CHECK
 import com.example.poker.bot.FOLD
-import com.example.poker.bot.FlopBot
-import com.example.poker.bot.PreFlopBot
+import com.example.poker.bot.NO_ACTION
 import com.example.poker.bot.RAISE
 import com.example.poker.cards.BOT
 import com.example.poker.cards.FLOP
@@ -18,9 +16,11 @@ import com.example.poker.cards.PLAYER
 import com.example.poker.cards.PRE_FLOP
 import com.example.poker.cards.RIVER
 import com.example.poker.cards.TURN
+import com.example.poker.game.Data.action
 import com.example.poker.game.Data.bet
 import com.example.poker.game.Data.blind
 import com.example.poker.game.Data.botValidActions
+import com.example.poker.game.Data.chatGptBot
 import com.example.poker.game.Data.checkAvailable
 import com.example.poker.game.Data.dealer
 import com.example.poker.game.Data.gameNumber
@@ -37,6 +37,10 @@ import com.example.poker.game.Data.showdown
 import com.example.poker.game.Data.totalPotValue
 import com.example.poker.game.Data.uiStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Timer
 import kotlin.concurrent.timerTask
 
@@ -99,27 +103,46 @@ class Betting {
     private fun switchPlayerTurn() {
         player = if (player == PLAYER) BOT else PLAYER
         opponent = if (player == BOT) PLAYER else BOT
+
+        if (player == BOT) {
+            uiStateFlow.update { currentState -> currentState.copy(
+                displayFoldButton = false,
+                displayCheckButton = false,
+                displayCallButton = false,
+                displayBetButton = false,
+                displayRaiseButton = false,
+                displayAllInButton = false
+            )}
+        }
     }
 
     private fun botAction() {
-        val bot: Bot = when (round) {
-            PRE_FLOP -> PreFlopBot()
-            FLOP -> FlopBot()
-            else -> throw IllegalArgumentException("Invalid round $round")
-        }
 
-        when (bot.action) {
-            FOLD -> fold()
-            CHECK -> check()
-            CALL -> call()
-            BET -> {
-                bet(bot.betValue)
-            }
-            RAISE -> {
-                raise(bot.betValue)
-            }
-            ALLIN -> {
-                allIn()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val action = chatGptBot.calculateAction()
+                withContext(Dispatchers.Main) {
+                    when (action) {
+                        FOLD -> fold()
+                        CHECK -> check()
+                        CALL -> call()
+                        BET -> {
+                            bet(chatGptBot.betValue)
+                        }
+                        RAISE -> {
+                            raise(chatGptBot.betValue)
+                        }
+                        ALLIN -> {
+                            allIn()
+                        }
+                    }
+                }
+
+            } catch (e: Exception) {
+                // Handle any errors that occurred during API call
+                withContext(Dispatchers.Main) {
+                    println("Error: ${e.message}")
+                }
             }
         }
     }
@@ -213,6 +236,8 @@ class Betting {
             switchPlayerTurn()
         }
 
+        action = NO_ACTION
+
         totalPotValue += pokerChips[POT]
         bet[PLAYER] = 0
         bet[BOT] = 0
@@ -226,7 +251,8 @@ class Betting {
                 botBetValue = bet[BOT],
                 totalPot = totalPotValue,
                 playerText = "${bet[PLAYER]} €",
-                botText = "${bet[BOT]} €"
+                botText = "${bet[BOT]} €",
+                currentPot = 0
             )
         }
 
@@ -495,6 +521,8 @@ class Betting {
     fun allIn() {
         checkAvailable = false
 
+        val previousBet = bet[player]
+
         // bet all chips
         bet[player] = if (pokerChips[player] + bet[player] > pokerChips[opponent] + bet[opponent]) {
             pokerChips[opponent] + bet[opponent]
@@ -502,7 +530,9 @@ class Betting {
             pokerChips[player] + bet[player]
         }
 
-        pokerChips[player] = 0
+        pokerChips[player] += previousBet
+        pokerChips[player] -= bet[player]
+
         pokerChips[POT] = bet[player] + bet[opponent]
 
         gameSummaryList += "${name[player]} makes all in with ${bet[player]} €"

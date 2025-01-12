@@ -1,11 +1,12 @@
 package com.example.poker.game
 
-import android.util.Log
 import com.example.poker.POT
+import com.example.poker.bot.NO_ACTION
 import com.example.poker.cards.BOT
 import com.example.poker.cards.Dealer
 import com.example.poker.cards.PLAYER
 import com.example.poker.cards.PRE_FLOP
+import com.example.poker.game.Data.action
 import com.example.poker.game.Data.bet
 import com.example.poker.game.Data.betting
 import com.example.poker.game.Data.blind
@@ -27,7 +28,6 @@ import com.example.poker.game.Data.round
 import com.example.poker.game.Data.tableCards
 import com.example.poker.game.Data.totalPotValue
 import com.example.poker.game.Data.uiStateFlow
-import com.example.poker.hand.RESULT
 import com.example.poker.odds.Combinations
 import com.example.poker.odds.Odds
 import kotlinx.coroutines.flow.update
@@ -53,6 +53,8 @@ class Init {
     private fun initValues() {
         round = PRE_FLOP
 
+        action = NO_ACTION
+
         // players
         bet[PLAYER] = 0
         bet[BOT] = 0
@@ -77,12 +79,11 @@ class Init {
         gameSummaryMap.add(gameNumber, gameSummaryList.toList())
 
         // init or change dealer
-        dealer = 1
-//        dealer = if (dealer == -1) {
-//            (0..1).random()
-//        } else {
-//            if (dealer == 0) 1 else 0
-//        }
+        dealer = if (dealer == -1) {
+            (0..1).random()
+        } else {
+            if (dealer == 0) 1 else 0
+        }
 
         blind = if (dealer == 0) 1 else 0
 
@@ -100,7 +101,7 @@ class Init {
         initValues()
 
         uiStateFlow.update { currentState -> currentState.copy(
-            displayBotCards = true,
+            displayBotCards = false,
             displayFlop = false,
             displayTurn = false,
             displayRiver = false,
@@ -112,7 +113,8 @@ class Init {
             playerText = "0 €",
             botText = "0 €",
             gameSummary = gameSummaryMap,
-            showdown = false
+            showdown = false,
+            newGame = false
         )}
 
         dealCards()

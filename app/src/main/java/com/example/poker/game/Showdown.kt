@@ -23,6 +23,7 @@ import com.example.poker.game.Data.round
 import com.example.poker.game.Data.tableCards
 import com.example.poker.game.Data.totalPotValue
 import com.example.poker.game.Data.uiStateFlow
+import com.example.poker.game.Data.winnerCount
 import com.example.poker.hand.Hand
 import com.example.poker.hand.HandWinnerCalculator
 import kotlinx.coroutines.flow.update
@@ -150,6 +151,7 @@ class Showdown {
         val playerHand = Hand(playerCards = playerCards, tableCards = tableCards)
         val computerHand = Hand(playerCards = botCards, tableCards = tableCards)
         val winnerCalculator = HandWinnerCalculator(player1Hand = playerHand, player2Hand = computerHand)
+        val winner = winnerCalculator.getWinner()
 
         var playerHandString = ""
         playerHand.getHand().forEach {
@@ -164,7 +166,7 @@ class Showdown {
         gameSummaryList += "${name[PLAYER]} hand: $playerHandString - ${playerHand.resultText}"
         gameSummaryList += "${name[BOT]} hand: $computerHandString - ${computerHand.resultText}"
 
-        when (winnerCalculator.getWinner()) {
+        when (winner) {
             PLAYER -> {
                 pokerChips[PLAYER] += totalPotValue
                 gameSummaryList += "${name[PLAYER]} wins $totalPotValue €"
@@ -212,6 +214,18 @@ class Showdown {
             Timer().schedule(timerTask {
                 init.newGame()
             }, 2000)
+        } else {
+            winnerCount[winner]++
+            Timer().schedule(timerTask {
+                uiStateFlow.update { currentState -> currentState.copy(
+                    newGame = true,
+                    actionText = "${name[winner]} wins the game",
+                    playerText = "${name[PLAYER]} has ${winnerCount[PLAYER]} win(s)",
+                    botText = "${name[BOT]} has ${winnerCount[BOT]} win(s)",
+                    playerWins = winnerCount[PLAYER],
+                    botWins = winnerCount[BOT]
+                )}
+            }, 4000)
         }
     }
 }

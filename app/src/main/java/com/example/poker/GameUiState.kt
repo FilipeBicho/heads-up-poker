@@ -52,5 +52,11 @@ data class GameUiState(
 
     val actionText: String = "",
 
-    val gameSummary: List<List<String>> = ArrayList()
+    val gameSummary: List<List<String>> = ArrayList(),
+
+    val newGame: Boolean = false,
+
+    val playerWins: Int = 0,
+
+    val botWins: Int = 0
 )
