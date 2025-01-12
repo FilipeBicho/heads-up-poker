@@ -113,7 +113,8 @@ class Init {
             playerText = "0 €",
             botText = "0 €",
             gameSummary = gameSummaryMap,
-            showdown = false
+            showdown = false,
+            newGame = false
         )}
 
         dealCards()

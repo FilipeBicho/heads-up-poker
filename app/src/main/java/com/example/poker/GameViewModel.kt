@@ -74,4 +74,8 @@ class GameViewModel : ViewModel() {
         action = ALLIN
         betting.allIn()
     }
+
+    fun newGame() {
+        init.initGame()
+    }
 }

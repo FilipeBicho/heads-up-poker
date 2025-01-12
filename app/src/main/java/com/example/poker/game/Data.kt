@@ -28,6 +28,7 @@ object Data {
     var bet: MutableList<Int> = mutableListOf(0,0,0)
     var totalPotValue: Int = 0
     var action: Int = -1
+    var winnerCount: MutableList<Int> = mutableListOf(0,0)
 
     var gameNumber: Int = 0
     var checkAvailable: Boolean = true
