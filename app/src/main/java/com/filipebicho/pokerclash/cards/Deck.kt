@@ -1,0 +1,46 @@
+package com.filipebicho.pokerclash.cards
+
+import kotlin.random.Random
+
+class Deck {
+
+    private var deck = arrayListOf<Card>()
+
+    init {
+        // init cards
+        for (rank in 0 until 13) {
+            for (suit in 0 until 4) {
+                deck.add(Card(rank, suit))
+            }
+        }
+
+        // shuffle
+        for (i in deck.size -1 downTo 1) {
+            // Get random number
+            val index = Random.nextInt(i + 1)
+            // get card at random index
+            val tempCard = deck[index]
+            // set current card in a random index
+            deck[index] = deck[i]
+            // set random card in the current index
+            deck[i] = tempCard
+        }
+    }
+
+    /**
+     * Return deck
+     */
+    fun getDeck() = deck
+
+    /**
+     * Remove card from the top of the deck
+     */
+    fun dealCard() = deck.removeLast()
+
+    /**
+     * Get card from the top of the deck
+     */
+    fun getCard() = deck.last()
+
+    fun getCardAtIndex(index: Int) = deck[index]
+}

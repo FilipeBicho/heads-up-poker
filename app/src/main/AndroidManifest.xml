@@ -4,6 +4,7 @@
 
     <!-- Add this line to request internet permission -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-feature android:name="android.hardware.telephony"/>
 
     <application
         android:allowBackup="true"

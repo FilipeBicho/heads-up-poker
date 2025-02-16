@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.filipebicho.gptpoker'
+    namespace 'com.filipebicho.pokerclash'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.filipebicho.gptpoker"
+        applicationId "com.filipebicho.pokerclash"
         minSdk 33
         targetSdk 35
         versionCode 3
