@@ -117,32 +117,22 @@ class Betting {
     }
 
     private fun botAction() {
-
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val action = chatGptBot.calculateAction()
-                withContext(Dispatchers.Main) {
-                    when (action) {
-                        FOLD -> fold()
-                        CHECK -> check()
-                        CALL -> call()
-                        BET -> {
-                            bet(chatGptBot.betValue)
-                        }
-                        RAISE -> {
-                            raise(chatGptBot.betValue)
-                        }
-                        ALLIN -> {
-                            allIn()
-                        }
-                    }
+        CoroutineScope(Dispatchers.Main).launch {
+            val action = chatGptBot.calculateAction()
+            when (action) {
+                FOLD -> fold()
+                CHECK -> check()
+                CALL -> call()
+                BET -> {
+                    bet(chatGptBot.betValue)
                 }
-
-            } catch (e: Exception) {
-                // Handle any errors that occurred during API call
-                withContext(Dispatchers.Main) {
-                    println("Error: ${e.message}")
+                RAISE -> {
+                    raise(chatGptBot.betValue)
                 }
+                ALLIN -> {
+                    allIn()
+                }
+                else -> null
             }
         }
     }
