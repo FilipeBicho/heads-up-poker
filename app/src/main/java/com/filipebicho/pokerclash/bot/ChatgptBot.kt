@@ -37,7 +37,7 @@ class ChatgptBot {
     var betValue: Int = 0
 
     suspend fun getAction(): Int = suspendCoroutine { continuation ->
-        val request = ChatRequest(model = "gpt-4o", messages = getRequestMessage(), response_format = ResponseFormat(type = "json_object"))
+        val request = ChatRequest(model = "chatgpt-4o-latest", messages = getRequestMessage(), response_format = ResponseFormat(type = "json_object"))
         retrofit.getChatCompletion(request).enqueue(object : Callback<ChatResponse> {
             override fun onResponse(call: Call<ChatResponse>, response: Response<ChatResponse>) {
                 if (response.isSuccessful) {
