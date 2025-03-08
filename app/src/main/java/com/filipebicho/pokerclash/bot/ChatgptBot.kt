@@ -1,6 +1,5 @@
 package com.filipebicho.pokerclash.bot
 
-import android.util.Log
 import com.filipebicho.pokerclash.cards.BOT
 import com.filipebicho.pokerclash.cards.FLOP
 import com.filipebicho.pokerclash.cards.PLAYER
@@ -15,13 +14,13 @@ import com.filipebicho.pokerclash.game.Data.pokerChips
 import com.filipebicho.pokerclash.game.Data.round
 import com.filipebicho.pokerclash.game.Data.tableCards
 import com.filipebicho.pokerclash.game.Data.totalPotValue
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 const val NO_ACTION = -1
 const val FOLD = 0
@@ -36,8 +35,8 @@ class ChatgptBot {
     val retrofit = RetrofitClient.getOpenAiClient()
     var betValue: Int = 0
 
-    suspend fun getAction(): Int = suspendCoroutine { continuation ->
-        val request = ChatRequest(model = "chatgpt-4o-latest", messages = getRequestMessage(), response_format = ResponseFormat(type = "json_object"))
+    suspend fun getAction(): Int = suspendCancellableCoroutine { continuation ->
+        val request = ChatRequest(model = "gpt-4o", messages = getRequestMessage(), response_format = ResponseFormat(type = "json_object"))
         retrofit.getChatCompletion(request).enqueue(object : Callback<ChatResponse> {
             override fun onResponse(call: Call<ChatResponse>, response: Response<ChatResponse>) {
                 if (response.isSuccessful) {
@@ -120,24 +119,6 @@ class ChatgptBot {
         val totalPot = totalPotValue + currentPot
 
         val dealer = if (dealer == BOT) "You" else "Opponent"
-
-        Log.d("ChatgptBot", "Game type: Heads-up Texas hold'em\n" +
-                "Your hand: $botCard1, $botCard2\n" +
-                "Table cards: $tableCardsString\n" +
-                "Round: $roundString\n" +
-                "Dealer: $dealer\n" +
-                "Initial money: 1500\n" +
-                "Your money: ${pokerChips[BOT]}\n" +
-                "Opponent money: ${pokerChips[PLAYER]}\n" +
-                "Your previous bet: ${bet[BOT]}\n"+
-                "Opponent bet: ${bet[PLAYER]}\n"+
-                "Current pot round: $currentPot\n" +
-                "Total pot: $totalPot\n" +
-                "Opponent action: $playerAction \n" +
-                "Output: JSON containing only the action and bet\n" +
-                "Action types: Fold, Check, Call, Bet, Raise, All in\n" +
-                "Bet: value of the bet\n" +
-                "Question: What should be my action and Bet?\n")
 
         return listOf(Message(
             role = "user",

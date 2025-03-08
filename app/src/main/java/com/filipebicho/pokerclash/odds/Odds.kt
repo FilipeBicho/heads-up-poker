@@ -97,10 +97,6 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
             } else {
                 flopOdds[index] = ((value.toFloat() / count) * 100).roundToInt()
             }
-
-            Log.d("ODDS",
-                "${Hand.handRankToString(index)} - ${flopOdds[index]}"
-            )
         }
 
         for ((index, value) in opponentFlopOdds.withIndex()) {
@@ -110,8 +106,6 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
                 opponentFlopOdds[index] = ((value.toFloat() / count) * 100).roundToInt()
             }
         }
-
-        Log.d("------------------------------------", '0'.toString())
     }
 
     /**
@@ -185,13 +179,7 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
             } else {
                 turnOdds[index] = ((value.toFloat() / count) * 100).roundToInt()
             }
-
-            Log.d("ODDS",
-                "${Hand.handRankToString(index)} - ${turnOdds[index]}"
-            )
         }
-
-        Log.d("------------------------------------", '0'.toString())
     }
 
     /**
@@ -235,9 +223,6 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
 
         // calculate odds
         riverOdds[RESULT] = ((player1.toDouble()/count) * 100).roundToInt()
-
-        Log.d("ODDS river result", riverOdds[RESULT].toString())
-        Log.d("------------------------------------", '0'.toString())
     }
 
     /**
