@@ -190,18 +190,6 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
     }
 
     /**
-     * Get result
-     */
-    fun getResult(): String {
-        return when (winner) {
-            PLAYER -> "player 1 wins"
-            BOT -> "player 2 wins"
-            2 -> "draw"
-            else -> {"draw"}
-        }
-    }
-
-    /**
      * Get winner
      */
     fun getWinner() = winner

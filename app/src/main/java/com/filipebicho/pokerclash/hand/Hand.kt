@@ -343,24 +343,4 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
     }
 
     fun getHand() = hand
-
-    companion object {
-        fun handRankToString(index: Int): String {
-            return when (index) {
-                RESULT -> "Result"
-                HIGH_CARD -> "High card"
-                PAIR -> "Pair"
-                TWO_PAIR -> "2 Pair"
-                THREE_OF_A_KIND -> "Three of a Kind"
-                STRAIGHT -> "Straight"
-                FLUSH -> "Flush"
-                FULL_HOUSE -> "Full House"
-                FOUR_OF_A_KIND -> "Four of a Kind"
-                STRAIGHT_FLUSH -> "Straight Flush"
-                ROYAL_STRAIGHT_FLUSH -> "Royal Straight Flush"
-                else -> "ERROR"
-            }
-        }
-    }
-
 }

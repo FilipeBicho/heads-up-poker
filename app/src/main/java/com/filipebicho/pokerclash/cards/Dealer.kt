@@ -31,12 +31,6 @@ class Dealer {
         botCards.add(deck.dealCard())
         playerCards.add(deck.dealCard())
         botCards.add(deck.dealCard())
-
-        // debug specific game
-//        playerCards.add(Card(SIX, CLUBS))
-//        playerCards.add(Card(TWO, CLUBS))
-//        botCards.add(Card(SEVEN, HEARTS))
-//        botCards.add(Card(EIGHT, CLUBS))
     }
 
     /**
@@ -48,11 +42,6 @@ class Dealer {
         for (i in 0 until 3) {
             tableCards.add(deck.dealCard())
         }
-
-        // debug specific game
-//        tableCards.add(Card(SEVEN, SPADES))
-//        tableCards.add(Card(EIGHT, HEARTS))
-//        tableCards.add(Card(EIGHT, SPADES))
     }
 
     /**
@@ -61,10 +50,7 @@ class Dealer {
     fun setTurnCard(tableCards: SnapshotStateList<Card>) {
 
         deck.dealCard()
-     //   tableCards.add(deck.dealCard())
-
-        // debug specific game
-        tableCards.add(Card(TWO, SPADES))
+        tableCards.add(deck.dealCard())
     }
 
     /**
@@ -73,9 +59,6 @@ class Dealer {
     fun setRiverCard(tableCards: SnapshotStateList<Card>) {
 
         deck.dealCard()
-        //tableCards.add(deck.dealCard())
-
-        // debug specific game
-        tableCards.add(Card(ACE, SPADES))
+        tableCards.add(deck.dealCard())
     }
 }

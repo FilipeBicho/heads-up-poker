@@ -36,11 +36,4 @@ class Deck {
      * Remove card from the top of the deck
      */
     fun dealCard() = deck.removeLast()
-
-    /**
-     * Get card from the top of the deck
-     */
-    fun getCard() = deck.last()
-
-    fun getCardAtIndex(index: Int) = deck[index]
 }

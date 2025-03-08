@@ -322,14 +322,6 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
         showdownOpponentOdds = ((player2.toDouble()/count) * 100).roundToInt()
     }
 
-    fun getFlopOdds() = flopOdds
-
-    fun getOpponentFlopOdds() = opponentFlopOdds
-
-    fun getTurnOdds() = turnOdds
-
-    fun getRiverOdds() = riverOdds
-
     fun getShowdownPlayerOdds() = showdownPlayerOdds
 
     fun getShowdownOpponentOdds() = showdownOpponentOdds
