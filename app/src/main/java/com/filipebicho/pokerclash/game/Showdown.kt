@@ -1,5 +1,6 @@
 package com.filipebicho.pokerclash.game
 
+import com.filipebicho.pokerclash.POT
 import com.filipebicho.pokerclash.cards.BOT
 import com.filipebicho.pokerclash.cards.FLOP
 import com.filipebicho.pokerclash.cards.PLAYER
@@ -118,6 +119,8 @@ class Showdown {
     }
 
     fun showdownCards() {
+        totalPotValue += pokerChips[POT]
+
         uiStateFlow.update { currentState -> currentState.copy(
             displayBotCards = true,
             showdown = true,
@@ -137,6 +140,7 @@ class Showdown {
      */
     fun calculateWinner() {
         uiStateFlow.update { currentState -> currentState.copy(
+            displayBetButtons = false,
             displayFoldButton = false,
             displayCheckButton = false,
             displayCallButton = false,

@@ -45,11 +45,11 @@ class Init {
 
     private fun initOdds() {
         odds = Odds(Combinations(tableCards.subList(0,3)).combinations)
-        odds.calculateFlopOdds(botCards, tableCards.subList(0,3))
-        odds.calculateTurnOdds(botCards, tableCards.subList(0,4))
-        odds.calculateRiverOdds(botCards, tableCards)
     }
 
+    /**
+     * Called at the begin of each new game iteration
+     */
     private fun initValues() {
         round = PRE_FLOP
 
@@ -91,6 +91,9 @@ class Init {
         opponent = blind
     }
 
+    /**
+     * Called at the begin of a new game
+     */
     fun initGame() {
         pokerChips[PLAYER] = playerMoney
         pokerChips[BOT] = botMoney
@@ -113,6 +116,7 @@ class Init {
             playerText = "0 €",
             botText = "0 €",
             gameSummary = gameSummaryMap,
+            displayBetButtons = player == PLAYER,
             showdown = false,
             newGame = false
         )}

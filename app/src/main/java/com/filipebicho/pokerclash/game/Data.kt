@@ -39,8 +39,6 @@ object Data {
     var dealer: Int = -1
     var blind: Int = -1
 
-    var botValidActions = BooleanArray(6){false}
-
     var playerCards: SnapshotStateList<Card> = mutableStateListOf()
     var botCards: SnapshotStateList<Card> = mutableStateListOf()
     var tableCards: SnapshotStateList<Card> = mutableStateListOf()

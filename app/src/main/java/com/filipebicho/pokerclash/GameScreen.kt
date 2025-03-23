@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -81,7 +82,7 @@ import kotlin.math.roundToInt
 @Preview
 fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
     val gameUiState by uiState.collectAsState()
-    val betValue by remember(key1 = gameUiState.playerBetValue) { mutableStateOf(gameUiState.playerBetValue) }
+    val betValue by remember(key1 = gameUiState.playerBetValue) { mutableIntStateOf(gameUiState.playerBetValue) }
     Background()
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -165,6 +166,10 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         )
                         Text(
                             text = "Total: ${gameUiState.totalPot} €",
+                            fontSize = 12.sp
+                        )
+                        Text(
+                            text = "Debug Total: ${gameUiState.debugTotal} €",
                             fontSize = 12.sp
                         )
                     }
@@ -350,7 +355,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                         .fillMaxHeight()
                         .weight(0.3f)
                 ) {
-                    if (player == PLAYER && gameUiState.playerMoney > 0 && !gameUiState.showdown) {
+                    if (gameUiState.displayBetButtons) {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {

@@ -22,7 +22,11 @@ data class GameUiState(
 
     val totalPot: Int = 0,
 
+    val debugTotal: Int = 0,
+
     val currentPot: Int = 0,
+
+    val displayBetButtons: Boolean = false,
 
     val displayFlop: Boolean = false,
 

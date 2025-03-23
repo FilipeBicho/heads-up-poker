@@ -1,5 +1,6 @@
 package com.filipebicho.pokerclash.bot
 
+import android.util.Log
 import com.filipebicho.pokerclash.cards.BOT
 import com.filipebicho.pokerclash.cards.FLOP
 import com.filipebicho.pokerclash.cards.PLAYER
@@ -70,6 +71,8 @@ class ChatgptBot {
             val actionString = jsonContent.get("action").toString()
             betValue = jsonContent.get("bet").toString().toInt()
 
+            Log.d("ChatgptBot", "Response: $jsonContent")
+
             return when (actionString) {
                 "Fold" -> FOLD
                 "Call" -> CALL
@@ -119,6 +122,24 @@ class ChatgptBot {
         val totalPot = totalPotValue + currentPot
 
         val dealer = if (dealer == BOT) "You" else "Opponent"
+
+        Log.d("ChatgptBot", "Request: \"Game type: Heads-up Texas hold'em\\n\" +\n" +
+                "                    \"Your hand: $botCard1, $botCard2\\n\" +\n" +
+                "                    \"Table cards: $tableCardsString\\n\" +\n" +
+                "                    \"Round: $roundString\\n\" +\n" +
+                "                    \"Dealer: $dealer\\n\" +\n" +
+                "                    \"Initial money: 1500\\n\" +\n" +
+                "                    \"Your money: ${pokerChips[BOT]}\\n\" +\n" +
+                "                    \"Opponent money: ${pokerChips[PLAYER]}\\n\" +\n" +
+                "                    \"Your previous bet: ${bet[BOT]}\\n\"+\n" +
+                "                    \"Opponent bet: ${bet[PLAYER]}\\n\"+\n" +
+                "                    \"Current pot round: $currentPot\\n\" +\n" +
+                "                    \"Total pot: $totalPot\\n\" +\n" +
+                "                    \"Opponent action: $playerAction \\n\" +\n" +
+                "                    \"Output: JSON containing only the action and bet\\n\" +\n" +
+                "                    \"Action types: Fold, Check, Call, Bet, Raise, All in\\n\" +\n" +
+                "                    \"Bet: value of the bet\\n\" +\n" +
+                "                    \"Question: What should be my action and Bet?\\n\"")
 
         return listOf(Message(
             role = "user",

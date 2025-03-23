@@ -48,53 +48,6 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun HomePage(modifier: Modifier = Modifier) {
-    
-    var shouldShowOnBoarding by rememberSaveable { mutableStateOf(true) }
-
-    Surface(modifier) {
-        Background()
-        if (shouldShowOnBoarding) {
-            OnboardingScreen(onContinueClick = { shouldShowOnBoarding = false })
-        } else {
-            GameScreen()
-        }
-    }
-}
-
-@Composable
-fun OnboardingScreen(
-    onContinueClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "Welcome to Head's Up Texas Hold'em")
-        Button(
-            onClick = onContinueClick,
-            modifier = Modifier.padding(vertical = 24.dp)
-        ) {
-            Text(text = "Start new game")
-        }
-    }
-}
-
-
-
-
-
-@Preview(showBackground = true, widthDp = 320)
-@Composable
-fun HomePagePreview(modifier: Modifier = Modifier) {
-    PokerTheme {
-        HomePage()
-    }
-}
-
-@Composable
 fun Background() {
     PokerTheme {
         Image(
@@ -105,14 +58,12 @@ fun Background() {
     }
 }
 
-
-
 private fun hideStatusBar(window: Window) {
 
     val windowInsetsController =
         WindowCompat.getInsetsController(window, window.decorView)
     // Configure the behavior of the hidden system bars.
     windowInsetsController.systemBarsBehavior =
-        WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_SWIPE
+        WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
     windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
 }
