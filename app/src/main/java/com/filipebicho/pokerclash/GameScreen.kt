@@ -30,7 +30,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -39,7 +39,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -82,7 +81,6 @@ import kotlin.math.roundToInt
 @Preview
 fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
     val gameUiState by uiState.collectAsState()
-    val betValue by remember(key1 = gameUiState.playerBetValue) { mutableIntStateOf(gameUiState.playerBetValue) }
     Background()
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -90,315 +88,332 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                 .fillMaxWidth()
                 .weight(0.3f)
         ) {
-            // top row
-            Row {
-                // top left side - empty
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(0.3f)
-                ) {}
-                // top center - computer cards
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(0.3f)
-                        .wrapContentWidth(Alignment.CenterHorizontally)
-                ) {
-
-                    Box(modifier = Modifier.align(Alignment.TopStart)) {
-                        if (dealer != PLAYER) {
-                            DealerChipImage()
-                        }
-                    }
-
-                    if (botCards.isNotEmpty()) {
-                        CardsSection(
-                            botCards,
-                            gameUiState.botName,
-                            gameUiState.botMoney,
-                            gameUiState.displayBotCards
-                        )
-                    }
-                }
-
-                // top right side - winner count
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(0.3f)
-                ) {
-                    Column (
-                        modifier = Modifier.align(Alignment.TopEnd).padding(16.dp   )
-                    ) {
-                        Text(
-                            text = "Player wins: ${gameUiState.playerWins}",
-                            fontSize = 12.sp,
-                        )
-                        Text(
-                            text = "Bot wins: ${gameUiState.botWins}",
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-            }
+            TopRow(gameUiState)
         }
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(0.4f)
         ) {
-            // middle row
-            Row {
-                // left center side - pot and current bet
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(0.2f)
-                ) {
-                    Column (
-                        modifier = Modifier.align(Alignment.CenterEnd)
-                    ) {
-                        Text(
-                            text = "Pot: ${gameUiState.currentPot} €",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp,
-                        )
-                        Text(
-                            text = "Total: ${gameUiState.totalPot} €",
-                            fontSize = 12.sp
-                        )
-                        Text(
-                            text = "Debug Total: ${gameUiState.debugTotal} €",
-                            fontSize = 12.sp
-                        )
-                    }
-
-                }
-                // middle center - table cards, hand result, winner text
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(0.5f)
-                        .wrapContentWidth(Alignment.CenterHorizontally)
-                ) {
-                    Column {
-                        // Computer text - odds, bet value
-                        Text(
-                            text = gameUiState.botText,
-                            modifier = Modifier
-                                .weight(0.2f)
-                                .align(Alignment.CenterHorizontally)
-                                .wrapContentHeight(Alignment.Top),
-                            fontSize = 15.sp,
-                        )
-
-                        // table cards
-                        if (tableCards.isNotEmpty() && !gameUiState.newGame) {
-                            Row(modifier = Modifier.weight(0.6f)) {
-
-                                AnimatedVisibility(
-                                    visible = gameUiState.displayFlop,
-                                    enter = expandHorizontally(tween(1000, 0))
-                                ) {
-                                    CardImage(card = tableCards[0], Modifier.padding(all = 5.dp), true)
-                                }
-
-                                AnimatedVisibility(
-                                    visible = gameUiState.displayFlop,
-                                    enter = expandHorizontally(tween(1000, 0))
-                                ) {
-                                    CardImage(card = tableCards[1], Modifier.padding(all = 5.dp), true)
-                                }
-
-                                AnimatedVisibility(
-                                    visible = gameUiState.displayFlop,
-                                    enter = expandHorizontally(tween(1000, 0))
-                                ) {
-                                    CardImage(card = tableCards[2], Modifier.padding(all = 5.dp), true)
-                                }
-
-                                AnimatedVisibility(
-                                    visible = gameUiState.displayTurn,
-                                    enter = expandHorizontally(tween(1000, 0))
-                                ) {
-                                    CardImage(card = tableCards[3], Modifier.padding(all = 5.dp), true)
-                                }
-                                AnimatedVisibility(
-                                    visible = gameUiState.displayRiver,
-                                    enter = expandHorizontally(tween(1000, 0))
-                                ) {
-                                    CardImage(card = tableCards[4], Modifier.padding(all = 5.dp), true)
-                                }
-                            }
-                        } else {
-                            Box(modifier = Modifier.fillMaxWidth()) {
-                                Column(modifier = Modifier.align(Alignment.Center)) {
-                                    NewGameButton { gameViewModel.newGame() }
-                                }
-                            }
-                        }
-
-                        // winner text
-                        if (gameUiState.actionText != "") {
-                            Text(
-                                text = gameUiState.actionText,
-                                modifier = Modifier
-                                    .weight(0.4f)
-                                    .align(Alignment.CenterHorizontally)
-                                    .wrapContentHeight(Alignment.Bottom)
-                            )
-                        }
-
-                        // Player text - odds, bet value
-                        Text(
-                            text = gameUiState.playerText,
-                            modifier = Modifier
-                                .weight(0.2f)
-                                .align(Alignment.CenterHorizontally)
-                                .wrapContentHeight(Alignment.Bottom),
-                            fontSize = 15.sp,
-                        )
-                    }
-                }
-                // middle left side - 2bb, pot and max betting
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(0.2f)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .height(25.dp),
-                        horizontalArrangement = Arrangement.spacedBy(1.dp)
-                    ) {
-                        if (player == PLAYER && !gameUiState.showdown && (gameUiState.displayBetButton || gameUiState.displayRaiseButton)) {
-                            if (2 * BIG_BLIND > minPlayerBet) {
-                                BetButton(text = "2 BB") { gameViewModel.updatePlayerBet(BIG_BLIND * 2) }
-                            }
-                            if (gameUiState.currentPot > minPlayerBet) {
-                                BetButton(text = "Pot") { gameViewModel.updatePlayerBet(gameUiState.currentPot) }
-                            }
-                            if (gameUiState.playerMoney > minPlayerBet) {
-                                BetButton(text = "All in") { gameViewModel.updatePlayerBet(gameUiState.playerMoney) }
-                            }
-                        }
-                    }
-                }
-            }
+            MiddleRow(gameUiState, gameViewModel)
         }
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(0.3f)
         ) {
-            // bottom row
-            Row {
-                // bottom left side - game summary
-                Box(
+           BottomRow(gameUiState, gameViewModel)
+        }
+    }
+}
+
+@Composable
+private fun TopRow(gameUiState: GameUiState) {
+    Row {
+        //left side - empty
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(0.3f)
+        ) {}
+        //computer cards
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(0.3f)
+                .wrapContentWidth(Alignment.CenterHorizontally)
+        ) {
+
+            Box(modifier = Modifier.align(Alignment.TopStart)) {
+                if (dealer != PLAYER) {
+                    DealerChipImage()
+                }
+            }
+
+            if (botCards.isNotEmpty()) {
+                CardsSection(
+                    botCards,
+                    gameUiState.botName,
+                    gameUiState.botMoney,
+                    gameUiState.displayBotCards
+                )
+            }
+        }
+
+        //right side - winner count
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(0.3f)
+
+        ) {
+            Column (
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "Player wins: ${gameUiState.playerWins}",
+                    fontSize = 12.sp,
+                )
+                Text(
+                    text = "Bot wins: ${gameUiState.botWins}",
+                    fontSize = 12.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun MiddleRow(gameUiState: GameUiState, gameViewModel: GameViewModel) {
+    Row {
+        // left side - pot and current bet
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(0.2f)
+        ) {
+            Column (
+                modifier = Modifier.align(Alignment.CenterEnd)
+            ) {
+                Text(
+                    text = "Pot: ${gameUiState.currentPot} €",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                )
+                Text(
+                    text = "Total: ${gameUiState.totalPot} €",
+                    fontSize = 12.sp
+                )
+                Text(
+                    text = "Debug Total: ${gameUiState.debugTotal} €",
+                    fontSize = 12.sp
+                )
+            }
+
+        }
+        // center - table cards, hand result, winner text
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(0.5f)
+                .wrapContentWidth(Alignment.CenterHorizontally)
+        ) {
+            Column {
+                // Computer text - odds, bet value
+                Text(
+                    text = gameUiState.botText,
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(0.3f)
-                ) {
+                        .weight(0.2f)
+                        .align(Alignment.CenterHorizontally)
+                        .wrapContentHeight(Alignment.Top),
+                    fontSize = 15.sp,
+                )
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .clip(shape = RoundedCornerShape(10.dp))
-                            .background(Color.White)
-                            .padding(10.dp)
-                            .verticalScroll(rememberScrollState(), true, null, true)
-                    ) {
+                // table cards
+                if (tableCards.isNotEmpty() && !gameUiState.newGame) {
+                    Row(modifier = Modifier.weight(0.6f)) {
 
-                        gameUiState.gameSummary.forEach { it ->
-                            it.forEach {
-                                Text(
-                                    text = it,
-                                    fontSize = 11.sp,
-                                    color = Color.Black
-                                )
-                            }
-                            Divider(
-                                thickness = 1.dp
-                            )
+                        AnimatedVisibility(
+                            visible = gameUiState.displayFlop,
+                            enter = expandHorizontally(tween(1000, 0))
+                        ) {
+                            CardImage(card = tableCards[0], Modifier.padding(all = 5.dp), true)
+                        }
+
+                        AnimatedVisibility(
+                            visible = gameUiState.displayFlop,
+                            enter = expandHorizontally(tween(1000, 0))
+                        ) {
+                            CardImage(card = tableCards[1], Modifier.padding(all = 5.dp), true)
+                        }
+
+                        AnimatedVisibility(
+                            visible = gameUiState.displayFlop,
+                            enter = expandHorizontally(tween(1000, 0))
+                        ) {
+                            CardImage(card = tableCards[2], Modifier.padding(all = 5.dp), true)
+                        }
+
+                        AnimatedVisibility(
+                            visible = gameUiState.displayTurn,
+                            enter = expandHorizontally(tween(1000, 0))
+                        ) {
+                            CardImage(card = tableCards[3], Modifier.padding(all = 5.dp), true)
+                        }
+                        AnimatedVisibility(
+                            visible = gameUiState.displayRiver,
+                            enter = expandHorizontally(tween(1000, 0))
+                        ) {
+                            CardImage(card = tableCards[4], Modifier.padding(all = 5.dp), true)
+                        }
+                    }
+                } else {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.align(Alignment.Center)) {
+                            NewGameButton { gameViewModel.newGame() }
                         }
                     }
                 }
-                // bottom center, player cards
-                Box(
+
+                // winner text
+                if (gameUiState.actionText != "") {
+                    Text(
+                        text = gameUiState.actionText,
+                        modifier = Modifier
+                            .weight(0.4f)
+                            .align(Alignment.CenterHorizontally)
+                            .wrapContentHeight(Alignment.Bottom)
+                    )
+                }
+
+                // Player text - odds, bet value
+                Text(
+                    text = gameUiState.playerText,
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(0.3f)
-                        .wrapContentWidth(Alignment.CenterHorizontally)
-                ) {
-
-                    Box(modifier = Modifier.align(Alignment.TopStart)) {
-                        if (dealer == PLAYER) {
-                            DealerChipImage()
-                        }
+                        .weight(0.2f)
+                        .align(Alignment.CenterHorizontally)
+                        .wrapContentHeight(Alignment.Bottom),
+                    fontSize = 15.sp,
+                )
+            }
+        }
+        // left side - 2bb, pot and max betting
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(0.2f)
+        ) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .height(25.dp),
+                horizontalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                if (gameUiState.displayBetButtons) {
+                    if (2 * BIG_BLIND > minPlayerBet) {
+                        BetButton(text = "2 BB") { gameViewModel.updatePlayerBet(BIG_BLIND * 2) }
                     }
+                    if (gameUiState.currentPot > minPlayerBet) {
+                        BetButton(text = "Pot") { gameViewModel.updatePlayerBet(gameUiState.currentPot) }
+                    }
+                    if (gameUiState.playerMoney > minPlayerBet) {
+                        BetButton(text = "All in") { gameViewModel.updatePlayerBet(gameUiState.playerMoney) }
+                    }
+                }
+            }
+        }
+    }
+}
 
-                    if (playerCards.isNotEmpty()) {
-                        CardsSection(
-                            playerCards,
-                            gameUiState.playerName,
-                            gameUiState.playerMoney,
-                            true
+@Composable
+private fun BottomRow(gameUiState: GameUiState, gameViewModel: GameViewModel) {
+    val betValue by remember(key1 = gameUiState.playerBetValue) { mutableIntStateOf(gameUiState.playerBetValue) }
+
+    Row {
+        // left side - game summary
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(0.3f)
+        ) {
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .clip(shape = RoundedCornerShape(10.dp))
+                    .background(Color.White)
+                    .padding(10.dp)
+                    .verticalScroll(rememberScrollState(), true, null, true)
+            ) {
+
+                gameUiState.gameSummary.forEach { it ->
+                    it.forEach {
+                        Text(
+                            text = it,
+                            fontSize = 11.sp,
+                            color = Color.Black
                         )
                     }
+                    HorizontalDivider(
+                        thickness = 1.dp
+                    )
                 }
-                // bottom right side - player bet buttons
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(0.3f)
+            }
+        }
+        // center, player cards
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(0.3f)
+                .wrapContentWidth(Alignment.CenterHorizontally)
+        ) {
+
+            Box(modifier = Modifier.align(Alignment.TopStart)) {
+                if (dealer == PLAYER) {
+                    DealerChipImage()
+                }
+            }
+
+            if (playerCards.isNotEmpty()) {
+                CardsSection(
+                    playerCards,
+                    gameUiState.playerName,
+                    gameUiState.playerMoney,
+                    true
+                )
+            }
+        }
+        // right side - player bet buttons
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(0.3f)
+        ) {
+            if (gameUiState.displayBetButtons) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    if (gameUiState.displayBetButtons) {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(0.4f)
-                            ) {
-                                if (gameUiState.displayBetButton || gameUiState.displayRaiseButton) {
-                                    BetSlider(gameUiState, gameViewModel)
-                                }
-                            }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(0.4f)
+                    ) {
+                        if (gameUiState.displayBetButton || gameUiState.displayRaiseButton) {
+                            BetSlider(gameUiState, gameViewModel)
+                        }
+                    }
 
-                            Row(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .weight(0.6f),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                            ) {
-                                if (gameUiState.displayFoldButton) {
-                                    GameActionButton("Fold") { gameViewModel.foldAction() }
-                                }
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .weight(0.6f),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        if (gameUiState.displayFoldButton) {
+                            GameActionButton("Fold") { gameViewModel.foldAction() }
+                        }
 
-                                if (gameUiState.displayCheckButton) {
-                                    GameActionButton("Check") { gameViewModel.checkAction() }
-                                }
+                        if (gameUiState.displayCheckButton) {
+                            GameActionButton("Check") { gameViewModel.checkAction() }
+                        }
 
-                                if (gameUiState.displayCallButton) {
-                                    GameActionButton("Call") { gameViewModel.callAction() }
-                                }
+                        if (gameUiState.displayCallButton) {
+                            GameActionButton("Call") { gameViewModel.callAction() }
+                        }
 
-                                if (gameUiState.displayBetButton && gameUiState.playerBetValue != pokerChips[PLAYER]) {
-                                    GameActionButton("Bet") { gameViewModel.betAction(betValue) }
-                                }
+                        if (gameUiState.displayBetButton && gameUiState.playerBetValue != pokerChips[PLAYER]) {
+                            GameActionButton("Bet") { gameViewModel.betAction(betValue) }
+                        }
 
-                                if (gameUiState.displayRaiseButton && gameUiState.playerBetValue != pokerChips[PLAYER]) {
-                                    GameActionButton("Raise") { gameViewModel.raiseAction(betValue)}
-                                }
+                        if (gameUiState.displayRaiseButton && gameUiState.playerBetValue != pokerChips[PLAYER]) {
+                            GameActionButton("Raise") { gameViewModel.raiseAction(betValue)}
+                        }
 
-                                if (gameUiState.displayAllInButton || gameUiState.playerBetValue == pokerChips[PLAYER]) {
-                                    GameActionButton("All n") { gameViewModel.allInAction() }
-                                }
-                            }
+                        if (gameUiState.displayAllInButton || gameUiState.playerBetValue == pokerChips[PLAYER]) {
+                            GameActionButton("All n") { gameViewModel.allInAction() }
                         }
                     }
                 }
@@ -447,7 +462,7 @@ private fun CardsSection(cards: MutableList<Card>, name: String, money: Int, dis
                 color = Color.White
             )
 
-            Divider(
+            HorizontalDivider(
                 color = Color.White,
                 thickness = 2.dp,
                 modifier = Modifier.padding(vertical = 5.dp)
@@ -527,7 +542,7 @@ private fun GameActionButton(text: String, onClick: () -> Unit) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun BetSlider(gameUiState: GameUiState, gameViewModel: GameViewModel) {
-    var bet by remember(key1 = gameUiState.playerBetValue) { mutableStateOf(gameUiState.playerBetValue) }
+    var bet by remember(key1 = gameUiState.playerBetValue) { mutableIntStateOf(gameUiState.playerBetValue) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
