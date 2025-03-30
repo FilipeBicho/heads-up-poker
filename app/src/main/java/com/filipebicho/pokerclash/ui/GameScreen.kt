@@ -409,7 +409,7 @@ private fun BottomRow(gameUiState: GameUiState, gameViewModel: GameViewModel) {
                         }
 
                         if (gameUiState.displayAllInButton || gameUiState.playerBetValue == pokerChips[PLAYER]) {
-                            GameActionButton("All n") { gameViewModel.allInAction() }
+                            GameActionButton("All in") { gameViewModel.allInAction() }
                         }
                     }
                 }
