@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">ChatGPT Poker Clash</string>
+    <string name="app_name">AI Poker Clash</string>
+    <string name="back_button">Back</string>
 </resources>

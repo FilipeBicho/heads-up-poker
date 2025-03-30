@@ -1,4 +1,4 @@
-package com.filipebicho.pokerclash.game
+package com.filipebicho.pokerclash.data
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -8,17 +8,19 @@ import com.filipebicho.pokerclash.bot.ChatgptBot
 import com.filipebicho.pokerclash.cards.Card
 import com.filipebicho.pokerclash.cards.Dealer
 import com.filipebicho.pokerclash.cards.PRE_FLOP
+import com.filipebicho.pokerclash.game.Betting
+import com.filipebicho.pokerclash.game.Init
+import com.filipebicho.pokerclash.game.Showdown
 import com.filipebicho.pokerclash.odds.Odds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.util.ArrayList
 
 object Data {
 
     val uiStateFlow = MutableStateFlow(GameUiState())
     val uiState: StateFlow<GameUiState> = uiStateFlow.asStateFlow()
-
-    val name: List<String> = listOf(uiStateFlow.value.playerName, uiStateFlow.value.botName)
 
     var playerMoney = 1500
     var botMoney = 1500

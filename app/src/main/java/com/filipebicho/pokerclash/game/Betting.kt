@@ -16,25 +16,24 @@ import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.cards.RIVER
 import com.filipebicho.pokerclash.cards.TURN
-import com.filipebicho.pokerclash.game.Data.action
-import com.filipebicho.pokerclash.game.Data.bet
-import com.filipebicho.pokerclash.game.Data.blind
-import com.filipebicho.pokerclash.game.Data.chatGptBot
-import com.filipebicho.pokerclash.game.Data.checkAvailable
-import com.filipebicho.pokerclash.game.Data.dealer
-import com.filipebicho.pokerclash.game.Data.gameNumber
-import com.filipebicho.pokerclash.game.Data.gameSummaryList
-import com.filipebicho.pokerclash.game.Data.gameSummaryMap
-import com.filipebicho.pokerclash.game.Data.init
-import com.filipebicho.pokerclash.game.Data.minPlayerBet
-import com.filipebicho.pokerclash.game.Data.name
-import com.filipebicho.pokerclash.game.Data.opponent
-import com.filipebicho.pokerclash.game.Data.player
-import com.filipebicho.pokerclash.game.Data.pokerChips
-import com.filipebicho.pokerclash.game.Data.round
-import com.filipebicho.pokerclash.game.Data.showdown
-import com.filipebicho.pokerclash.game.Data.totalPotValue
-import com.filipebicho.pokerclash.game.Data.uiStateFlow
+import com.filipebicho.pokerclash.data.Data.action
+import com.filipebicho.pokerclash.data.Data.bet
+import com.filipebicho.pokerclash.data.Data.blind
+import com.filipebicho.pokerclash.data.Data.chatGptBot
+import com.filipebicho.pokerclash.data.Data.checkAvailable
+import com.filipebicho.pokerclash.data.Data.dealer
+import com.filipebicho.pokerclash.data.Data.gameNumber
+import com.filipebicho.pokerclash.data.Data.gameSummaryList
+import com.filipebicho.pokerclash.data.Data.gameSummaryMap
+import com.filipebicho.pokerclash.data.Data.init
+import com.filipebicho.pokerclash.data.Data.minPlayerBet
+import com.filipebicho.pokerclash.data.Data.opponent
+import com.filipebicho.pokerclash.data.Data.player
+import com.filipebicho.pokerclash.data.Data.pokerChips
+import com.filipebicho.pokerclash.data.Data.round
+import com.filipebicho.pokerclash.data.Data.showdown
+import com.filipebicho.pokerclash.data.Data.totalPotValue
+import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -257,8 +256,8 @@ class Betting {
                  // calculate pot
                  pokerChips[POT] = bet[blind] + bet[dealer]
 
-                 gameSummaryList += "${name[blind]} makes all in ${bet[blind]} €"
-                 gameSummaryList += "${name[dealer]} pays all in ${bet[dealer]} €"
+                 gameSummaryList += "${uiStateFlow.value.name[blind]} makes all in ${bet[blind]} €"
+                 gameSummaryList += "${uiStateFlow.value.name[dealer]} pays all in ${bet[dealer]} €"
                  gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
                  updateStateFlowBets()
@@ -275,8 +274,8 @@ class Betting {
                  // calculate pot
                  pokerChips[POT] = bet[blind] + bet[dealer]
 
-                 gameSummaryList += "${name[blind]} makes all in ${bet[blind]} €"
-                 gameSummaryList += "${name[dealer]} pays small blind ${bet[dealer]} €"
+                 gameSummaryList += "${uiStateFlow.value.name[blind]} makes all in ${bet[blind]} €"
+                 gameSummaryList += "${uiStateFlow.value.name[dealer]} pays small blind ${bet[dealer]} €"
                  gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
                  player = dealer
@@ -296,8 +295,8 @@ class Betting {
              // calculate pot
              pokerChips[POT] = bet[blind] + bet[dealer]
 
-             gameSummaryList += "${name[blind]} makes all in ${bet[blind]} €"
-             gameSummaryList += "${name[dealer]} pays all in ${bet[dealer]} €"
+             gameSummaryList += "${uiStateFlow.value.name[blind]} makes all in ${bet[blind]} €"
+             gameSummaryList += "${uiStateFlow.value.name[dealer]} pays all in ${bet[dealer]} €"
              gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
              updateStateFlowBets()
@@ -314,8 +313,8 @@ class Betting {
              // calculate pot
              pokerChips[POT] = bet[blind] + bet[dealer]
 
-             gameSummaryList += "${name[dealer]} pays small blind ${bet[dealer]} €"
-             gameSummaryList += "${name[blind]} pays big blind ${bet[blind]} €"
+             gameSummaryList += "${uiStateFlow.value.name[dealer]} pays small blind ${bet[dealer]} €"
+             gameSummaryList += "${uiStateFlow.value.name[blind]} pays big blind ${bet[blind]} €"
              gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
              updateStateFlowBets()
@@ -328,8 +327,8 @@ class Betting {
         // opponent wins the pot
         pokerChips[opponent] += pokerChips[POT] + totalPotValue
 
-        gameSummaryList += "${name[player]} folds"
-        gameSummaryList += "${name[opponent]} wins ${pokerChips[POT]} €"
+        gameSummaryList += "${uiStateFlow.value.name[player]} folds"
+        gameSummaryList += "${uiStateFlow.value.name[opponent]} wins ${pokerChips[POT]} €"
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
         uiStateFlow.update { currentState ->
@@ -338,7 +337,7 @@ class Betting {
                 botMoney = pokerChips[BOT],
                 playerText = "${bet[PLAYER]} €",
                 botText = "${bet[BOT]} €",
-                actionText = "${name[player]} folds, ${name[opponent]} wins ${pokerChips[POT] + totalPotValue} €",
+                actionText = "${uiStateFlow.value.name[player]} folds, ${uiStateFlow.value.name[opponent]} wins ${pokerChips[POT] + totalPotValue} €",
                 gameSummary = gameSummaryMap,
                 displayBetButtons = false
             )
@@ -349,7 +348,7 @@ class Betting {
     }
 
     fun check() {
-        gameSummaryList += "${name[player]} checks"
+        gameSummaryList += "${uiStateFlow.value.name[player]} checks"
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
         uiStateFlow.update { currentState ->
@@ -386,7 +385,7 @@ class Betting {
             // calculate pot
             pokerChips[POT] = bet[player] + bet[opponent]
 
-            gameSummaryList += "${name[player]} calls $callValue €"
+            gameSummaryList += "${uiStateFlow.value.name[player]} calls $callValue €"
             gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
             updateStateFlowBets()
@@ -400,7 +399,7 @@ class Betting {
             // calculate pot
             pokerChips[POT] = bet[player] + bet[opponent]
 
-            gameSummaryList += "${name[player]} calls $callValue €"
+            gameSummaryList += "${uiStateFlow.value.name[player]} calls $callValue €"
             gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
             updateStateFlowBets()
@@ -440,7 +439,7 @@ class Betting {
         // calculate pot
         pokerChips[POT] = bet[player] + bet[opponent]
 
-        gameSummaryList += "${name[player]} bets ${bet[player]} €"
+        gameSummaryList += "${uiStateFlow.value.name[player]} bets ${bet[player]} €"
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
         updateStateFlowBets()
@@ -462,7 +461,7 @@ class Betting {
         bet[player] = value
         pokerChips[POT] = bet[player] + bet[opponent]
 
-        gameSummaryList += "${name[player]} raises to ${bet[player]} €"
+        gameSummaryList += "${uiStateFlow.value.name[player]} raises to ${bet[player]} €"
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
         updateStateFlowBets()
@@ -492,7 +491,7 @@ class Betting {
 
         pokerChips[POT] = bet[player] + bet[opponent]
 
-        gameSummaryList += "${name[player]} makes all in with ${bet[player]} €"
+        gameSummaryList += "${uiStateFlow.value.name[player]} makes all in with ${bet[player]} €"
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
         updateStateFlowBets()

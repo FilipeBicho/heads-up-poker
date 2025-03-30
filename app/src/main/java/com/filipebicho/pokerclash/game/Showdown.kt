@@ -7,22 +7,21 @@ import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.cards.RIVER
 import com.filipebicho.pokerclash.cards.TURN
-import com.filipebicho.pokerclash.game.Data.botCards
-import com.filipebicho.pokerclash.game.Data.gameNumber
-import com.filipebicho.pokerclash.game.Data.gameSummaryList
-import com.filipebicho.pokerclash.game.Data.gameSummaryMap
-import com.filipebicho.pokerclash.game.Data.init
-import com.filipebicho.pokerclash.game.Data.name
-import com.filipebicho.pokerclash.game.Data.odds
-import com.filipebicho.pokerclash.game.Data.opponent
-import com.filipebicho.pokerclash.game.Data.player
-import com.filipebicho.pokerclash.game.Data.playerCards
-import com.filipebicho.pokerclash.game.Data.pokerChips
-import com.filipebicho.pokerclash.game.Data.round
-import com.filipebicho.pokerclash.game.Data.tableCards
-import com.filipebicho.pokerclash.game.Data.totalPotValue
-import com.filipebicho.pokerclash.game.Data.uiStateFlow
-import com.filipebicho.pokerclash.game.Data.winnerCount
+import com.filipebicho.pokerclash.data.Data.botCards
+import com.filipebicho.pokerclash.data.Data.gameNumber
+import com.filipebicho.pokerclash.data.Data.gameSummaryList
+import com.filipebicho.pokerclash.data.Data.gameSummaryMap
+import com.filipebicho.pokerclash.data.Data.init
+import com.filipebicho.pokerclash.data.Data.odds
+import com.filipebicho.pokerclash.data.Data.opponent
+import com.filipebicho.pokerclash.data.Data.player
+import com.filipebicho.pokerclash.data.Data.playerCards
+import com.filipebicho.pokerclash.data.Data.pokerChips
+import com.filipebicho.pokerclash.data.Data.round
+import com.filipebicho.pokerclash.data.Data.tableCards
+import com.filipebicho.pokerclash.data.Data.totalPotValue
+import com.filipebicho.pokerclash.data.Data.uiStateFlow
+import com.filipebicho.pokerclash.data.Data.winnerCount
 import com.filipebicho.pokerclash.hand.Hand
 import com.filipebicho.pokerclash.hand.HandWinnerCalculator
 import kotlinx.coroutines.flow.update
@@ -165,13 +164,13 @@ class Showdown {
             computerHandString += it.cardString()+" "
         }
 
-        gameSummaryList += "${name[PLAYER]} hand: $playerHandString - ${playerHand.resultText}"
-        gameSummaryList += "${name[BOT]} hand: $computerHandString - ${computerHand.resultText}"
+        gameSummaryList += "${uiStateFlow.value.name[PLAYER]} hand: $playerHandString - ${playerHand.resultText}"
+        gameSummaryList += "${uiStateFlow.value.name[BOT]} hand: $computerHandString - ${computerHand.resultText}"
 
         when (winner) {
             PLAYER -> {
                 pokerChips[PLAYER] += totalPotValue
-                gameSummaryList += "${name[PLAYER]} wins $totalPotValue €"
+                gameSummaryList += "${uiStateFlow.value.name[PLAYER]} wins $totalPotValue €"
                 gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
                 uiStateFlow.update { currentState -> currentState.copy(
@@ -179,13 +178,13 @@ class Showdown {
                     botMoney = pokerChips[BOT],
                     playerText = "${playerHand.resultText} 100 %",
                     botText = "${computerHand.resultText} 0 %",
-                    actionText = "${name[PLAYER]} wins $totalPotValue €",
+                    actionText = "${uiStateFlow.value.name[PLAYER]} wins $totalPotValue €",
                     gameSummary = gameSummaryMap
                 )}
             }
             BOT -> {
                 pokerChips[BOT] += totalPotValue
-                gameSummaryList += "${name[BOT]} wins $totalPotValue €"
+                gameSummaryList += "${uiStateFlow.value.name[BOT]} wins $totalPotValue €"
                 gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
                 uiStateFlow.update { currentState -> currentState.copy(
@@ -193,7 +192,7 @@ class Showdown {
                     botMoney = pokerChips[BOT],
                     playerText = "${playerHand.resultText} 0 %",
                     botText = "${computerHand.resultText} 100 %",
-                    actionText = "${name[BOT]} wins $totalPotValue €",
+                    actionText = "${uiStateFlow.value.name[BOT]} wins $totalPotValue €",
                     gameSummary = gameSummaryMap
                 )}
             }
@@ -221,9 +220,9 @@ class Showdown {
             Timer().schedule(timerTask {
                 uiStateFlow.update { currentState -> currentState.copy(
                     newGame = true,
-                    actionText = "${name[winner]} wins the game",
-                    playerText = "${name[PLAYER]} has ${winnerCount[PLAYER]} win(s)",
-                    botText = "${name[BOT]} has ${winnerCount[BOT]} win(s)",
+                    actionText = "${uiStateFlow.value.name[winner]} wins the game",
+                    playerText = "${uiStateFlow.value.name[PLAYER]} has ${winnerCount[PLAYER]} win(s)",
+                    botText = "${uiStateFlow.value.name[BOT]} has ${winnerCount[BOT]} win(s)",
                     playerWins = winnerCount[PLAYER],
                     botWins = winnerCount[BOT]
                 )}

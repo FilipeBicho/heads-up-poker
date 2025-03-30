@@ -8,11 +8,13 @@ import com.filipebicho.pokerclash.bot.CHECK
 import com.filipebicho.pokerclash.bot.FOLD
 import com.filipebicho.pokerclash.bot.RAISE
 import com.filipebicho.pokerclash.cards.PLAYER
-import com.filipebicho.pokerclash.game.Data.action
-import com.filipebicho.pokerclash.game.Data.betting
-import com.filipebicho.pokerclash.game.Data.init
-import com.filipebicho.pokerclash.game.Data.pokerChips
-import com.filipebicho.pokerclash.game.Data.uiStateFlow
+import com.filipebicho.pokerclash.data.Data.action
+import com.filipebicho.pokerclash.data.Data.betting
+import com.filipebicho.pokerclash.data.Data.init
+import com.filipebicho.pokerclash.data.Data.pokerChips
+import com.filipebicho.pokerclash.data.Data.uiStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 
@@ -21,8 +23,18 @@ const val SMALL_BLIND = 20
 const val BIG_BLIND = 40
 
 class GameViewModel : ViewModel() {
+    val uiState: StateFlow<GameUiState> = uiStateFlow.asStateFlow()
 
-    init {
+    fun setPlayerName(playerName: String) {
+        uiStateFlow.update { currentState ->
+            currentState.copy(
+                playerName = playerName,
+                name = listOf(playerName, "Bot")
+            )
+        }
+    }
+
+    fun startGame() {
         init.initGame()
     }
 

@@ -59,27 +59,23 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.core.text.isDigitsOnly
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.filipebicho.pokerclash.cards.Card
 import com.filipebicho.pokerclash.cards.PLAYER
-import com.filipebicho.pokerclash.game.Data.botCards
-import com.filipebicho.pokerclash.game.Data.dealer
-import com.filipebicho.pokerclash.game.Data.minPlayerBet
-import com.filipebicho.pokerclash.game.Data.player
-import com.filipebicho.pokerclash.game.Data.playerCards
-import com.filipebicho.pokerclash.game.Data.pokerChips
-import com.filipebicho.pokerclash.game.Data.tableCards
-import com.filipebicho.pokerclash.game.Data.uiState
+import com.filipebicho.pokerclash.data.Data.botCards
+import com.filipebicho.pokerclash.data.Data.dealer
+import com.filipebicho.pokerclash.data.Data.minPlayerBet
+import com.filipebicho.pokerclash.data.Data.playerCards
+import com.filipebicho.pokerclash.data.Data.pokerChips
+import com.filipebicho.pokerclash.data.Data.tableCards
+import com.filipebicho.pokerclash.data.Data.uiState
 import kotlin.math.roundToInt
 
 @Composable
-@Preview
-fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
+fun GameScreen(gameViewModel: GameViewModel) {
     val gameUiState by uiState.collectAsState()
     Background()
     Column(modifier = Modifier.fillMaxSize()) {
