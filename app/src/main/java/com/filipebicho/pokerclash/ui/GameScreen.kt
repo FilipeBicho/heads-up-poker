@@ -182,10 +182,6 @@ private fun MiddleRow(gameUiState: GameUiState, gameViewModel: GameViewModel) {
                     text = "Total: ${gameUiState.totalPot} €",
                     fontSize = 12.sp
                 )
-                Text(
-                    text = "Debug Total: ${gameUiState.debugTotal} €",
-                    fontSize = 12.sp
-                )
             }
 
         }
