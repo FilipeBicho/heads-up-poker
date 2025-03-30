@@ -10,6 +10,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.filipebicho.pokerclash.data.Data.botOptions
+import com.filipebicho.pokerclash.ui.BotSelectionScreen
 import com.filipebicho.pokerclash.ui.StartGameScreen
 
 /**
@@ -17,6 +19,7 @@ import com.filipebicho.pokerclash.ui.StartGameScreen
  */
 enum class PokerScreen() {
     Start(),
+    BotSelection(),
     Game()
 }
 
@@ -36,9 +39,17 @@ fun PokerApp(
             StartGameScreen(
                 onStartButtonClicked = {
                     viewModel.setPlayerName(it)
+                    navController.navigate(PokerScreen.BotSelection.name)
+                },
+            )
+        }
+        composable(route = PokerScreen.BotSelection.name) {
+            BotSelectionScreen(
+                onBotButtonClicked = {
+                    viewModel.setBot(it)
                     viewModel.startGame()
                     navController.navigate(PokerScreen.Game.name)
-                },
+                }
             )
         }
 

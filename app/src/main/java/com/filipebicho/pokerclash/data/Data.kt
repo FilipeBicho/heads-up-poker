@@ -22,6 +22,13 @@ object Data {
     val uiStateFlow = MutableStateFlow(GameUiState())
     val uiState: StateFlow<GameUiState> = uiStateFlow.asStateFlow()
 
+    val botOptions = listOf(
+        Pair("GPT 4o latest", "chatgpt-4o-latest"),
+        Pair("GPT 4o", "gpt-4o"),
+        Pair("GPT 4o mini", "gpt-4o-mini"),
+        Pair("GPT 3 turbo", "gpt-3.5-turbo")
+    )
+
     var playerMoney = 1500
     var botMoney = 1500
     var minPlayerBet = BIG_BLIND

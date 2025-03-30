@@ -36,7 +36,6 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextGeometricTransform
 
 @Composable
 fun StartGameScreen(onStartButtonClicked: (String) -> Unit) {

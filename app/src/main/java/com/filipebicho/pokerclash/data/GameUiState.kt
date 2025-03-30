@@ -4,7 +4,9 @@ data class GameUiState(
 
     val playerName: String = "",
 
-    val botName: String = "Bot",
+    val botName: String = "",
+
+    val botModel: String = "",
 
     val name: List<String> = mutableListOf("", ""),
 

@@ -29,7 +29,17 @@ class GameViewModel : ViewModel() {
         uiStateFlow.update { currentState ->
             currentState.copy(
                 playerName = playerName,
-                name = listOf(playerName, "Bot")
+                name = listOf(playerName, "")
+            )
+        }
+    }
+
+    fun setBot(bot: Pair<String, String>) {
+        uiStateFlow.update { currentState ->
+            currentState.copy(
+                botName = bot.first,
+                botModel = bot.second,
+                name = listOf(uiStateFlow.value.playerName, bot.first)
             )
         }
     }

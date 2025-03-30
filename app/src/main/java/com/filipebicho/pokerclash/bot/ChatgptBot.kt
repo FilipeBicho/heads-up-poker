@@ -15,6 +15,7 @@ import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.totalPotValue
+import com.filipebicho.pokerclash.data.Data.uiState
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONObject
 import retrofit2.Call
@@ -37,7 +38,7 @@ class ChatgptBot {
     var betValue: Int = 0
 
     suspend fun getAction(): Int = suspendCancellableCoroutine { continuation ->
-        val request = ChatRequest(model = "gpt-4o", messages = getRequestMessage(), response_format = ResponseFormat(type = "json_object"))
+        val request = ChatRequest(model = uiState.value.botModel, messages = getRequestMessage(), response_format = ResponseFormat(type = "json_object"))
         retrofit.getChatCompletion(request).enqueue(object : Callback<ChatResponse> {
             override fun onResponse(call: Call<ChatResponse>, response: Response<ChatResponse>) {
                 if (response.isSuccessful) {
