@@ -2,13 +2,13 @@ package com.filipebicho.pokerclash
 
 data class GameUiState(
 
-    val playerName: String = "",
+    val playerName: String = "Filipe",
 
-    val botName: String = "",
+    val botName: String = "GPT 4o mini",
 
-    val botModel: String = "",
+    val botModel: String = "gpt-4o-mini",
 
-    val name: List<String> = mutableListOf("", ""),
+    val name: List<String> = mutableListOf("Filipe", "GPT 4o mini"),
 
     val playerMoney: Int = 1500,
 

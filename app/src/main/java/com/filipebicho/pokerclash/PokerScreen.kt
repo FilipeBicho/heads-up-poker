@@ -10,9 +10,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.filipebicho.pokerclash.data.Data.botOptions
 import com.filipebicho.pokerclash.ui.BotSelectionScreen
 import com.filipebicho.pokerclash.ui.StartGameScreen
+import com.filipebicho.pokerclash.ui.GameBoardScreen
 
 /**
  * enum values that represent the screens in the app
@@ -30,7 +30,7 @@ fun PokerApp(
 ) {
     NavHost(
         navController = navController,
-        startDestination = PokerScreen.Start.name,
+        startDestination = PokerScreen.Game.name,
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
@@ -54,7 +54,7 @@ fun PokerApp(
         }
 
         composable(route = PokerScreen.Game.name) {
-            GameScreen(viewModel)
+            GameBoardScreen(viewModel)
         }
     }
 }
