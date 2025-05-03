@@ -30,7 +30,6 @@ fun GameSection(modifier: Modifier = Modifier) {
         Pot()
         TableCards()
         Hand()
-
     }
 }
 
@@ -60,8 +59,7 @@ private fun TableCards() {
 
 @Composable
 fun Pot() {
-    Column(modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally, ) {
+    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             modifier = Modifier.background(Color.DarkGray.copy(alpha = 0.5f), shape = RoundedCornerShape(5.dp)),
             color = Color.White,

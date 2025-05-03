@@ -53,8 +53,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun PlayerSection(modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxWidth().border(1.dp, Color.White)) {
-        // Top part of BottomRow (60% of BottomRow height)
+    Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
