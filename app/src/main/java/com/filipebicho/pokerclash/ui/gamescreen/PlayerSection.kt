@@ -74,17 +74,16 @@ private fun InfoSection(modifier: Modifier = Modifier) {
     Box (modifier = modifier
         .fillMaxWidth()
         .fillMaxHeight()
-        .padding(0.dp, 0.dp, 4.dp, 4.dp
-        ),
+        .padding(0.dp, 0.dp, 4.dp, 4.dp),
         contentAlignment = Alignment.BottomCenter){
         Cards(modifier)
-        PlayerInfo(modifier)
+        PlayerInfo()
     }
 
 }
 
 @Composable
-private fun PlayerInfo(modifier: Modifier = Modifier) {
+private fun PlayerInfo() {
     Column(
         modifier = Modifier
             .zIndex(3f)
@@ -124,6 +123,7 @@ private fun Cards(modifier: Modifier) {
     Row(
         modifier.fillMaxWidth().zIndex(2f).fillMaxHeight(),
         verticalAlignment = Alignment.Bottom,
+        horizontalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         Box(modifier.fillMaxWidth().weight(.5f)) {
             CardImage(Card(1,1))

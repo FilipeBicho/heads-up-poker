@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.filipebicho.pokerclash.Background
 import com.filipebicho.pokerclash.GameViewModel
+import com.filipebicho.pokerclash.ui.gamescreen.GameSection
 import com.filipebicho.pokerclash.ui.gamescreen.PlayerSection
 
 @Composable
@@ -55,17 +56,7 @@ fun TopRow(modifier: Modifier = Modifier) {
 
 @Composable
 fun MiddleRow(modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .border(1.dp, Color.White)
-            .padding(8.dp), // Added padding inside the row
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // TODO: Add content for the middle row
-        Text(text = "Middle Row", color = Color.White)
-    }
+    GameSection(modifier)
 }
 
 @Composable
