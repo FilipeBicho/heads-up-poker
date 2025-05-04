@@ -30,7 +30,7 @@ class Card(var rank: Int, var suit: Int) {
     /**
      * Get Card image path
      */
-    fun getCardImagePath() = "card_${this.rankArray[this.rank]}_${this.suitArray[this.suit]}"
+    fun getCardImagePath() = "${this.suitArray[this.suit]}_${this.rankArray[this.rank]}"
 
     /**
      * output card rank_suit

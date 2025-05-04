@@ -2,6 +2,7 @@ package com.filipebicho.pokerclash.ui.gamescreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -73,7 +74,7 @@ private fun BotSection(modifier: Modifier = Modifier) {
 @Composable
 private fun Cards(modifier: Modifier) {
     Row(
-        modifier.fillMaxWidth().zIndex(2f).fillMaxHeight(),
+        modifier.fillMaxWidth().zIndex(2f).fillMaxHeight().padding(0.dp, 0.dp, 0.dp, 10.dp),
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.spacedBy(2.dp)
     ) {
@@ -81,7 +82,7 @@ private fun Cards(modifier: Modifier) {
             CardImage(Card(12,3))
         }
         Box(modifier.fillMaxWidth().weight(.5f)) {
-            CardImage(Card(11,2))
+            CardImage(Card(12,0))
         }
     }
 }
@@ -104,7 +105,7 @@ private fun BotInfo() {
         modifier = Modifier
             .zIndex(3f)
             .fillMaxWidth()
-            .background(Color.DarkGray, shape = RoundedCornerShape(2.dp)),
+            .border(1.dp, Color.White, RoundedCornerShape(5.dp)),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
@@ -115,12 +116,12 @@ private fun BotInfo() {
             textAlign = TextAlign.Center,
             color = Color.White,
             lineHeight = 1.5.em,
+            modifier = Modifier.background(Color.DarkGray,RoundedCornerShape(5.dp)).fillMaxWidth().fillMaxHeight()
         )
 
         HorizontalDivider(
             color = Color.White,
             thickness = 1.dp,
-            modifier = Modifier.padding(vertical = 5.dp)
         )
 
         Text(
@@ -129,6 +130,7 @@ private fun BotInfo() {
             textAlign = TextAlign.Center,
             color = Color.White,
             lineHeight = 1.5.em,
+            modifier = Modifier.background(Color.Black,RoundedCornerShape(5.dp)).fillMaxWidth().fillMaxHeight()
         )
     }
 }

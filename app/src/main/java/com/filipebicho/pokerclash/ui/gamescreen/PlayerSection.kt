@@ -87,7 +87,7 @@ private fun PlayerInfo() {
         modifier = Modifier
             .zIndex(3f)
             .fillMaxWidth()
-            .background(Color.DarkGray, shape = RoundedCornerShape(2.dp)),
+            .border(1.dp, Color.White, RoundedCornerShape(5.dp)),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
@@ -98,12 +98,12 @@ private fun PlayerInfo() {
             textAlign = TextAlign.Center,
             color = Color.White,
             lineHeight = 1.5.em,
+            modifier = Modifier.background(Color.DarkGray,RoundedCornerShape(5.dp)).fillMaxWidth()
         )
 
         HorizontalDivider(
             color = Color.White,
             thickness = 1.dp,
-            modifier = Modifier.padding(vertical = 5.dp)
         )
 
         Text(
@@ -112,6 +112,7 @@ private fun PlayerInfo() {
             textAlign = TextAlign.Center,
             color = Color.White,
             lineHeight = 1.5.em,
+            modifier = Modifier.background(Color.Black,RoundedCornerShape(5.dp)).fillMaxWidth()
         )
     }
 }
@@ -120,7 +121,7 @@ private fun PlayerInfo() {
 @Composable
 private fun Cards(modifier: Modifier) {
     Row(
-        modifier.fillMaxWidth().zIndex(2f).fillMaxHeight(),
+        modifier.fillMaxWidth().zIndex(2f).fillMaxHeight().padding(0.dp, 0.dp, 0.dp, 10.dp),
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.spacedBy(2.dp)
     ) {
@@ -143,7 +144,7 @@ private fun CardImage(card: Card) {
 
     Image(
         painter = painterResource(id = imageId),
-        contentScale = ContentScale.FillWidth,
+        contentScale = ContentScale.Fit,
         contentDescription = "card",
     )
 }
@@ -229,7 +230,7 @@ private fun BetSlider(modifier: Modifier = Modifier) {
                 Box(
                     modifier = Modifier
                         .padding(0.dp, 0.dp, 8.dp, 0.dp)
-                        .background(Color.DarkGray),
+                        .background(Color.DarkGray, shape = RoundedCornerShape(5.dp)),
                     contentAlignment = Alignment.Center) { innerTextField() }
             }
         )
