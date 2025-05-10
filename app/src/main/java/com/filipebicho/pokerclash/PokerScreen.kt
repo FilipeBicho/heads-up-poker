@@ -4,12 +4,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.filipebicho.pokerclash.data.Data.uiState
 import com.filipebicho.pokerclash.ui.BotSelectionScreen
 import com.filipebicho.pokerclash.ui.StartGameScreen
 import com.filipebicho.pokerclash.ui.GameBoardScreen
@@ -28,6 +31,11 @@ fun PokerApp(
     viewModel: GameViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
+    val gameUiState by uiState.collectAsState()
+    viewModel.setPlayerName("Filipe11")
+    viewModel.setBot(Pair("GPT 4o mini", "gpt-4o-mini"))
+    viewModel.startGame()
+
     NavHost(
         navController = navController,
         startDestination = PokerScreen.Game.name,
@@ -54,7 +62,7 @@ fun PokerApp(
         }
 
         composable(route = PokerScreen.Game.name) {
-            GameBoardScreen(viewModel)
+            GameBoardScreen(gameUiState)
         }
     }
 }

@@ -41,6 +41,12 @@ class Init {
         cardDealer.setFlopCards(tableCards)
         cardDealer.setTurnCard(tableCards)
         cardDealer.setRiverCard(tableCards)
+
+        uiStateFlow.update { currentState -> currentState.copy(
+            playerCards = playerCards.toList(),
+            botCards = botCards.toList(),
+            tableCards = tableCards.toList()
+        )}
     }
 
     private fun initOdds() {

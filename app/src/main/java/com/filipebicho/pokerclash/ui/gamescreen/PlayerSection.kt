@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -44,15 +44,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import com.filipebicho.pokerclash.GameViewModel
+import com.filipebicho.pokerclash.GameUiState
 import com.filipebicho.pokerclash.R
 import com.filipebicho.pokerclash.cards.Card
 import com.filipebicho.pokerclash.data.Data.minPlayerBet
+import com.filipebicho.pokerclash.data.Data.playerCards
 import com.filipebicho.pokerclash.ui.GameBoardScreen
 import kotlin.math.roundToInt
 
 @Composable
-fun PlayerSection(modifier: Modifier = Modifier) {
+fun PlayerSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
@@ -61,7 +62,7 @@ fun PlayerSection(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            InfoSection(modifier = Modifier.weight(0.35f))
+            InfoSection(gameUiState, modifier = Modifier.weight(0.35f))
             SliderSection(modifier = Modifier.weight(0.65f))
         }
         ButtonSection(modifier = Modifier.weight(0.3f))
@@ -69,20 +70,19 @@ fun PlayerSection(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun InfoSection(modifier: Modifier = Modifier) {
+private fun InfoSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
     Box (modifier = modifier
         .fillMaxWidth()
         .fillMaxHeight()
         .padding(0.dp, 0.dp, 4.dp, 4.dp),
         contentAlignment = Alignment.BottomCenter){
-        Cards(modifier)
-        PlayerInfo()
+        Cards(gameUiState, modifier)
+        PlayerInfo(gameUiState)
     }
-
 }
 
 @Composable
-private fun PlayerInfo() {
+private fun PlayerInfo(gameUiState: GameUiState) {
     Column(
         modifier = Modifier
             .zIndex(3f)
@@ -91,7 +91,7 @@ private fun PlayerInfo() {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = "Filipe",
+            text = gameUiState.playerName,
             fontSize = 12.sp,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
@@ -107,7 +107,7 @@ private fun PlayerInfo() {
         )
 
         Text(
-            text = "1300",
+            text = gameUiState.playerMoney.toString(),
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
             color = Color.White,
@@ -119,31 +119,25 @@ private fun PlayerInfo() {
 
 
 @Composable
-private fun Cards(modifier: Modifier) {
+private fun Cards(gameUiState: GameUiState, modifier: Modifier) {
     Row(
         modifier.fillMaxWidth().zIndex(2f).fillMaxHeight().padding(0.dp, 0.dp, 0.dp, 10.dp),
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         Box(modifier.fillMaxWidth().weight(.5f)) {
-            CardImage(Card(1,1))
+            CardImage(if (gameUiState.playerCards.isNotEmpty()) playerCards[0] else null)
         }
         Box(modifier.fillMaxWidth().weight(.5f)) {
-            CardImage(Card(1,2))
+            CardImage(if (gameUiState.playerCards.isNotEmpty()) playerCards[1] else null)
         }
     }
 }
 
 @Composable
-private fun CardImage(card: Card) {
-    val context = LocalContext.current
-    val imageId = context.resources.getIdentifier(
-            card.getCardImagePath(),
-            "drawable",
-            context.packageName)
-
+private fun CardImage(card: Card?) {
     Image(
-        painter = painterResource(id = imageId),
+        painter = painterResource(id = card?.getCardDrawableResource() ?: R.drawable.card_back),
         contentScale = ContentScale.Fit,
         contentDescription = "card",
     )
@@ -151,7 +145,11 @@ private fun CardImage(card: Card) {
 
 @Composable
 private fun SliderSection(modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxWidth().padding(0.dp, 60.dp, 0.dp, 0.dp)) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        Spacer(modifier = Modifier.weight(1f))
         SmallBetButtonsSection(modifier)
         BetSlider(modifier)
     }
@@ -184,7 +182,6 @@ private fun SmallBetButtonsSection(modifier: Modifier = Modifier) {
         )
     }
 }
-
 
 @Composable
 private fun SmallBetButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
@@ -300,7 +297,5 @@ private fun Button(text: String, onClick: () -> Unit, modifier: Modifier = Modif
 @Preview
 @Composable
 fun GameBoardScreenPreview() {
-    GameBoardScreen(
-        gameViewModel = GameViewModel()
-    )
+    GameBoardScreen(gameUiState = GameUiState())
 }

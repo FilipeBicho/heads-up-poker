@@ -8,13 +8,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.filipebicho.pokerclash.Background
-import com.filipebicho.pokerclash.GameViewModel
+import com.filipebicho.pokerclash.GameUiState
 import com.filipebicho.pokerclash.ui.gamescreen.BotSection
 import com.filipebicho.pokerclash.ui.gamescreen.GameSection
 import com.filipebicho.pokerclash.ui.gamescreen.PlayerSection
 
 @Composable
-fun GameBoardScreen(gameViewModel: GameViewModel) {
+fun GameBoardScreen(gameUiState: GameUiState) {
     Background()
 
     Column(
@@ -24,7 +24,7 @@ fun GameBoardScreen(gameViewModel: GameViewModel) {
     ) {
         TopRow(modifier = Modifier.weight(0.12f))
         MiddleRow(modifier = Modifier.weight(0.58f))
-        BottomRow(modifier = Modifier.weight(0.25f))
+        BottomRow(gameUiState, modifier = Modifier.weight(0.25f))
     }
 }
 
@@ -39,15 +39,13 @@ fun MiddleRow(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun BottomRow(modifier: Modifier = Modifier) {
-    PlayerSection(modifier)
+fun BottomRow(gameUiState: GameUiState, modifier: Modifier = Modifier) {
+    PlayerSection(gameUiState, modifier)
 }
 
 
 @Preview
 @Composable
 fun GameBoardScreenPreview() {
-    GameBoardScreen(
-        gameViewModel = GameViewModel()
-    )
+    GameBoardScreen(gameUiState = GameUiState())
 }

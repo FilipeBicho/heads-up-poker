@@ -23,8 +23,6 @@ const val SMALL_BLIND = 20
 const val BIG_BLIND = 40
 
 class GameViewModel : ViewModel() {
-    val uiState: StateFlow<GameUiState> = uiStateFlow.asStateFlow()
-
     fun setPlayerName(playerName: String) {
         uiStateFlow.update { currentState ->
             currentState.copy(

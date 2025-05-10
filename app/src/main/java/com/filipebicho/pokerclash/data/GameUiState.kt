@@ -1,5 +1,7 @@
 package com.filipebicho.pokerclash
 
+import com.filipebicho.pokerclash.cards.Card
+
 data class GameUiState(
 
     val playerName: String = "Filipe",
@@ -11,6 +13,12 @@ data class GameUiState(
     val name: List<String> = mutableListOf("Filipe", "GPT 4o mini"),
 
     val playerMoney: Int = 1500,
+
+    val playerCards: List<Card> = ArrayList(),
+
+    val botCards: List<Card> = ArrayList(),
+
+    val tableCards: List<Card> = ArrayList(),
 
     val botMoney: Int = 1500,
 
