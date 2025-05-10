@@ -26,7 +26,6 @@ import com.filipebicho.pokerclash.data.Data.gameNumber
 import com.filipebicho.pokerclash.data.Data.gameSummaryList
 import com.filipebicho.pokerclash.data.Data.gameSummaryMap
 import com.filipebicho.pokerclash.data.Data.init
-import com.filipebicho.pokerclash.data.Data.minPlayerBet
 import com.filipebicho.pokerclash.data.Data.opponent
 import com.filipebicho.pokerclash.data.Data.player
 import com.filipebicho.pokerclash.data.Data.pokerChips
@@ -50,10 +49,10 @@ class Betting {
      */
     private fun isBetAvailable(): Boolean {
         return if (bet[opponent] == 0 && pokerChips[player] > BIG_BLIND) {
-            minPlayerBet = BIG_BLIND
             uiStateFlow.update { currentState ->
                 currentState.copy(
-                    playerBetValue = BIG_BLIND
+                    playerBetValue = BIG_BLIND,
+                    minPlayerBet = BIG_BLIND
                 )
             }
             true
@@ -69,10 +68,10 @@ class Betting {
      */
     private fun isRaiseAvailable(): Boolean {
         return if (bet[opponent] > 0 && pokerChips[player] > bet[opponent] * 2) {
-            minPlayerBet = bet[opponent] * 2
             uiStateFlow.update { currentState ->
                 currentState.copy(
-                    playerBetValue = bet[opponent] * 2
+                    playerBetValue = bet[opponent] * 2,
+                    minPlayerBet = bet[opponent] * 2
                 )
             }
             true
@@ -133,7 +132,6 @@ class Betting {
                 playerBetValue = bet[dealer],
                 currentPot = pokerChips[POT],
                 totalPot = totalPotValue + pokerChips[POT],
-                debugTotal = pokerChips[PLAYER] + pokerChips[BOT] + pokerChips[POT] + totalPotValue,
                 playerText = "${bet[PLAYER]} €",
                 botText = "${bet[BOT]} €",
                 gameSummary = gameSummaryMap
@@ -203,7 +201,6 @@ class Betting {
         bet[BOT] = 0
         pokerChips[POT] = 0
         checkAvailable = true
-        minPlayerBet = BIG_BLIND
 
         uiStateFlow.update { currentState ->
             currentState.copy(
@@ -212,7 +209,8 @@ class Betting {
                 totalPot = totalPotValue,
                 playerText = "${bet[PLAYER]} €",
                 botText = "${bet[BOT]} €",
-                currentPot = 0
+                currentPot = 0,
+                minPlayerBet = BIG_BLIND
             )
         }
 

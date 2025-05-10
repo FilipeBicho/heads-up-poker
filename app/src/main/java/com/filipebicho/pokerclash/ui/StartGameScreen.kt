@@ -65,7 +65,7 @@ fun StartGameScreen(onStartButtonClicked: (String) -> Unit) {
 @Composable
 fun GameTitle() {
     Text(
-        text = "AI Poker Clash",
+        text = R.string.app_name.toString(),
         color = Color.White,
         fontSize = 40.sp,
         fontFamily = FontFamily.Serif,

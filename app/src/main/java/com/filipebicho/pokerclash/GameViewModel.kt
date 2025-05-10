@@ -10,6 +10,7 @@ import com.filipebicho.pokerclash.bot.RAISE
 import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.data.Data.action
 import com.filipebicho.pokerclash.data.Data.betting
+import com.filipebicho.pokerclash.data.Data.botModel
 import com.filipebicho.pokerclash.data.Data.init
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
@@ -36,10 +37,11 @@ class GameViewModel : ViewModel() {
         uiStateFlow.update { currentState ->
             currentState.copy(
                 botName = bot.first,
-                botModel = bot.second,
                 name = listOf(uiStateFlow.value.playerName, bot.first)
             )
         }
+
+        botModel = bot.second
     }
 
     fun startGame() {

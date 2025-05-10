@@ -47,8 +47,6 @@ import androidx.compose.ui.zIndex
 import com.filipebicho.pokerclash.GameUiState
 import com.filipebicho.pokerclash.R
 import com.filipebicho.pokerclash.cards.Card
-import com.filipebicho.pokerclash.data.Data.minPlayerBet
-import com.filipebicho.pokerclash.data.Data.playerCards
 import com.filipebicho.pokerclash.ui.GameBoardScreen
 import kotlin.math.roundToInt
 
@@ -63,7 +61,7 @@ fun PlayerSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             InfoSection(gameUiState, modifier = Modifier.weight(0.35f))
-            SliderSection(modifier = Modifier.weight(0.65f))
+            SliderSection(gameUiState, modifier = Modifier.weight(0.65f))
         }
         ButtonSection(modifier = Modifier.weight(0.3f))
     }
@@ -125,12 +123,16 @@ private fun Cards(gameUiState: GameUiState, modifier: Modifier) {
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        Box(modifier.fillMaxWidth().weight(.5f)) {
-            CardImage(if (gameUiState.playerCards.isNotEmpty()) playerCards[0] else null)
+
+        var card1: Card? = null
+        var card2: Card? = null
+        if (gameUiState.playerCards.isNotEmpty()) {
+            card1 = gameUiState.playerCards[0]
+            card2 = gameUiState.playerCards[1]
         }
-        Box(modifier.fillMaxWidth().weight(.5f)) {
-            CardImage(if (gameUiState.playerCards.isNotEmpty()) playerCards[1] else null)
-        }
+
+        Box(modifier.fillMaxWidth().weight(.5f)) { CardImage(card1) }
+        Box(modifier.fillMaxWidth().weight(.5f)) { CardImage(card2) }
     }
 }
 
@@ -144,14 +146,14 @@ private fun CardImage(card: Card?) {
 }
 
 @Composable
-private fun SliderSection(modifier: Modifier = Modifier) {
+private fun SliderSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Bottom
     ) {
         Spacer(modifier = Modifier.weight(1f))
         SmallBetButtonsSection(modifier)
-        BetSlider(modifier)
+        BetSlider(gameUiState, modifier)
     }
 }
 
@@ -206,8 +208,8 @@ private fun SmallBetButton(text: String, onClick: () -> Unit, modifier: Modifier
 }
 
 @Composable
-private fun BetSlider(modifier: Modifier = Modifier) {
-    var sliderPosition by remember { mutableIntStateOf(0) }
+private fun BetSlider(gameUiState: GameUiState, modifier: Modifier = Modifier) {
+    var sliderPosition by remember { mutableIntStateOf(gameUiState.minPlayerBet) }
 
     Row(modifier = modifier) {
         BasicTextField(
@@ -239,10 +241,8 @@ private fun BetSlider(modifier: Modifier = Modifier) {
                 activeTrackColor = colorResource(id = R.color.button_red),
                 inactiveTrackColor = Color.Black
             ),
-            valueRange = minPlayerBet.toFloat()..1500.toFloat(),
-            modifier = Modifier.weight(0.7f)
-                .height(30.dp)
-                .align(Alignment.CenterVertically)
+            valueRange = gameUiState.minPlayerBet.toFloat()..1500.toFloat(),
+            modifier = Modifier.weight(0.7f).height(30.dp).align(Alignment.CenterVertically)
         )
     }
 }

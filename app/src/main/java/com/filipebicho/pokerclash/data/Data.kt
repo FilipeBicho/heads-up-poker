@@ -22,44 +22,52 @@ object Data {
     val uiStateFlow = MutableStateFlow(GameUiState())
     val uiState: StateFlow<GameUiState> = uiStateFlow.asStateFlow()
 
+    // Classes
+    lateinit var odds: Odds
+    var init: Init = Init()
+    var betting: Betting = Betting()
+    lateinit var cardDealer: Dealer
+    var showdown: Showdown = Showdown()
+    val chatGptBot = ChatgptBot()
+
+    // Bot models
     val botOptions = listOf(
         Pair("GPT 4o latest", "chatgpt-4o-latest"),
         Pair("GPT 4o", "gpt-4o"),
         Pair("GPT 4o mini", "gpt-4o-mini"),
         Pair("GPT 3 turbo", "gpt-3.5-turbo")
     )
+    var botModel = ""
 
+    // Money
     var playerMoney = 1500
     var botMoney = 1500
     var minPlayerBet = BIG_BLIND
-
     var pokerChips: MutableList<Int> = mutableListOf(0,0,0)
     var bet: MutableList<Int> = mutableListOf(0,0,0)
     var totalPotValue: Int = 0
-    var action: Int = -1
-    var winnerCount: MutableList<Int> = mutableListOf(0,0)
 
-    var gameNumber: Int = 0
+    // Bet and turn type
+    var action: Int = -1
     var checkAvailable: Boolean = true
     var round: Int = PRE_FLOP
 
+    // Count variables
+    var winnerCount: MutableList<Int> = mutableListOf(0,0)
+    var gameNumber: Int = 0
+
+    // Player positions
     var player: Int = -1
     var opponent: Int = -1
     var dealer: Int = -1
     var blind: Int = -1
 
+    // Cards
     var playerCards: SnapshotStateList<Card> = mutableStateListOf()
     var botCards: SnapshotStateList<Card> = mutableStateListOf()
     var tableCards: SnapshotStateList<Card> = mutableStateListOf()
 
+    // Summary
     var gameSummaryMap: MutableList<List<String>> = ArrayList()
     var gameSummaryList: MutableList<String> = mutableListOf()
-
-    lateinit var odds: Odds
-    var init: Init = Init()
-    var betting: Betting = Betting()
-    lateinit var cardDealer: Dealer
-    var showdown: Showdown = Showdown()
-
-    val chatGptBot = ChatgptBot()
 }
