@@ -86,7 +86,7 @@ private fun DealerChipImage() {
     Image(
         painter = painterResource(id = R.drawable.dealer),
         contentDescription = "Dealer chip image",
-        modifier = Modifier.size(20.dp)
+        modifier = Modifier.padding(0.dp, 0.dp, 8.dp, 0.dp).size(20.dp)
     )
 }
 

@@ -22,15 +22,15 @@ fun GameBoardScreen(gameUiState: GameUiState) {
             .padding(horizontal = 16.dp, vertical = 4.dp)
             .fillMaxSize(),
     ) {
-        TopRow(modifier = Modifier.weight(0.12f))
+        TopRow(gameUiState, modifier = Modifier.weight(0.12f))
         MiddleRow(modifier = Modifier.weight(0.58f))
         BottomRow(gameUiState, modifier = Modifier.weight(0.25f))
     }
 }
 
 @Composable
-fun TopRow(modifier: Modifier = Modifier) {
-    BotSection(modifier)
+fun TopRow(gameUiState: GameUiState, modifier: Modifier = Modifier) {
+    BotSection(gameUiState, modifier)
 }
 
 @Composable
