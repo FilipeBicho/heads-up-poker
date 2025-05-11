@@ -23,7 +23,7 @@ fun GameBoardScreen(gameUiState: GameUiState) {
             .fillMaxSize(),
     ) {
         TopRow(gameUiState, modifier = Modifier.weight(0.12f))
-        MiddleRow(modifier = Modifier.weight(0.58f))
+        MiddleRow(gameUiState, modifier = Modifier.weight(0.58f))
         BottomRow(gameUiState, modifier = Modifier.weight(0.25f))
     }
 }
@@ -34,8 +34,8 @@ fun TopRow(gameUiState: GameUiState, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MiddleRow(modifier: Modifier = Modifier) {
-    GameSection(modifier)
+fun MiddleRow(gameUiState: GameUiState, modifier: Modifier = Modifier) {
+    GameSection(gameUiState, modifier)
 }
 
 @Composable

@@ -13,63 +13,73 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.filipebicho.pokerclash.GameUiState
+import com.filipebicho.pokerclash.R
 import com.filipebicho.pokerclash.cards.Card
 
 @Composable
-fun GameSection(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier,
+fun GameSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
+    Column(modifier = modifier,
         verticalArrangement = Arrangement.Center,
     ) {
-        Pot()
-        TableCards()
-        Hand()
+        Pot(gameUiState.totalPot)
+        TableCards(gameUiState)
+        Hand(gameUiState)
     }
 }
 
 @Composable
-private fun TableCards() {
-    Row (
-        modifier = Modifier.padding(30.dp),
+private fun TableCards(gameUiState: GameUiState) {
+    Row (modifier = Modifier.padding(30.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ){
         Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
-            CardImage(Card(1,1))
+            TableCardImage(gameUiState.tableCards[0], gameUiState.displayFlop)
         }
         Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
-            CardImage(Card(1,2))
+            TableCardImage(gameUiState.tableCards[1], gameUiState.displayFlop)
         }
         Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
-            CardImage(Card(1,1))
+            TableCardImage(gameUiState.tableCards[2], gameUiState.displayFlop)
         }
         Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
-            CardImage(Card(1,2))
+            TableCardImage(gameUiState.tableCards[3], gameUiState.displayTurn)
         }
         Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
-            CardImage(Card(1,1))
+            TableCardImage(gameUiState.tableCards[4], gameUiState.displayRiver)
         }
     }
 }
 
 @Composable
-fun Pot() {
+fun TableCardImage(card: Card?, display: Boolean) {
+    Image(
+        modifier = Modifier.alpha(if (display) 1f else 0f),
+        painter = painterResource(card?.getCardDrawableResource() ?: R.drawable.card_back),
+        contentScale = ContentScale.Fit,
+        contentDescription = "card",
+    )
+}
+
+@Composable
+fun Pot(totalPot: Int) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             modifier = Modifier.background(Color.DarkGray.copy(alpha = 0.5f), shape = RoundedCornerShape(5.dp)),
             color = Color.White,
-            text = "Pot: 300€"
+            text = "Pot: $totalPot"
         )
     }
 }
 
 @Composable
-fun Hand() {
+fun Hand(gameUiState: GameUiState) {
     Column(modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally, ) {
         Text(
@@ -78,19 +88,4 @@ fun Hand() {
             color = Color.White,
         )
     }
-}
-
-@Composable
-private fun CardImage(card: Card) {
-    val context = LocalContext.current
-    val imageId = context.resources.getIdentifier(
-        card.getCardImagePath(),
-        "drawable",
-        context.packageName)
-
-    Image(
-        painter = painterResource(id = imageId),
-        contentScale = ContentScale.FillWidth,
-        contentDescription = "card",
-    )
 }
