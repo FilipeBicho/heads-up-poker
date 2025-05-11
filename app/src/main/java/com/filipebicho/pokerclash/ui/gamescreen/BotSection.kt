@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.filipebicho.pokerclash.GameUiState
+import com.filipebicho.pokerclash.cards.BOT
 
 @Composable
 fun BotSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
@@ -33,8 +34,11 @@ private fun InfoSection(gameUiState: GameUiState, modifier: Modifier = Modifier)
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = "Model: ${gameUiState.botModel}", fontSize = 10.sp, color = Color.White)
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            DealerChipImage()
+
+        if (gameUiState.dealer == BOT) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                DealerChipImage()
+            }
         }
     }
 }

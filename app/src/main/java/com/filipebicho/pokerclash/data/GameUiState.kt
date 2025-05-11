@@ -4,6 +4,8 @@ import com.filipebicho.pokerclash.cards.Card
 
 data class GameUiState(
 
+    val dealer: Int = -1,
+
     // Names
     val playerName: String = "",
     val botName: String = "",

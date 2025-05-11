@@ -35,6 +35,12 @@ import kotlinx.coroutines.flow.update
 class Init {
 
     private fun dealCards() {
+        round = PRE_FLOP
+
+        playerCards.clear()
+        botCards.clear()
+        tableCards.clear()
+
         cardDealer = Dealer()
         cardDealer.shuffle()
         cardDealer.setPlayerCards(playerCards, botCards)
@@ -43,6 +49,11 @@ class Init {
         cardDealer.setRiverCard(tableCards)
 
         uiStateFlow.update { currentState -> currentState.copy(
+            showdown = false,
+            displayBotCards = false,
+            displayFlop = false,
+            displayTurn = false,
+            displayRiver = false,
             playerCards = playerCards.toList(),
             botCards = botCards.toList(),
             tableCards = tableCards.toList()
@@ -57,8 +68,6 @@ class Init {
      * Called at the begin of each new game iteration
      */
     private fun initValues() {
-        round = PRE_FLOP
-
         action = NO_ACTION
 
         // players
@@ -69,11 +78,6 @@ class Init {
         pokerChips[POT] = 0
         bet[POT] = 0
         totalPotValue = 0
-
-        // cards
-        playerCards.clear()
-        botCards.clear()
-        tableCards.clear()
 
         checkAvailable = true
         gameSummaryList.clear()
@@ -95,6 +99,20 @@ class Init {
 
         player = dealer
         opponent = blind
+
+        uiStateFlow.update { currentState -> currentState.copy(
+            playerBetValue = 0,
+            botBetValue = 0,
+            totalPot = 0,
+            currentPot = 0,
+            actionText = "",
+            playerText = "0 €",
+            botText = "0 €",
+            gameSummary = gameSummaryMap,
+            displayBetButtons = player == PLAYER,
+            newGame = false,
+            dealer = dealer,
+        )}
     }
 
     /**
@@ -108,25 +126,6 @@ class Init {
 
     fun newGame() {
         initValues()
-
-        uiStateFlow.update { currentState -> currentState.copy(
-            displayBotCards = false,
-            displayFlop = false,
-            displayTurn = false,
-            displayRiver = false,
-            playerBetValue = 0,
-            botBetValue = 0,
-            totalPot = 0,
-            currentPot = 0,
-            actionText = "",
-            playerText = "0 €",
-            botText = "0 €",
-            gameSummary = gameSummaryMap,
-            displayBetButtons = player == PLAYER,
-            showdown = false,
-            newGame = false
-        )}
-
         dealCards()
         initOdds()
         betting.preFlop()

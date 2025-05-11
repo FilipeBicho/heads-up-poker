@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.filipebicho.pokerclash.GameUiState
 import com.filipebicho.pokerclash.R
+import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.ui.GameBoardScreen
 import kotlin.math.roundToInt
 
@@ -65,7 +66,11 @@ private fun PlayerCards(gameUiState: GameUiState, modifier: Modifier = Modifier)
     ){
         Cards(modifier, gameUiState.playerCards, display = true)
         NameAndMoneySection(gameUiState.playerName, gameUiState.playerMoney)
-        Box(modifier = Modifier.align(Alignment.TopEnd)) { DealerChipImage() }
+        if (gameUiState.dealer == PLAYER) {
+            Box(modifier = Modifier.align(Alignment.TopEnd)) {
+                DealerChipImage()
+            }
+        }
     }
 }
 

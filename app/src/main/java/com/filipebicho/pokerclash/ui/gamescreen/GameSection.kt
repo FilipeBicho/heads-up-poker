@@ -109,8 +109,6 @@ private fun TableCardImage(card: Card?, display: Boolean) {
     )
 }
 
-
-
 @Composable
 private fun Hand(gameUiState: GameUiState) {
     Column(modifier = Modifier.fillMaxWidth(),
