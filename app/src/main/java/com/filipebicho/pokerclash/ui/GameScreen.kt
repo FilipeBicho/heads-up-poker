@@ -122,7 +122,7 @@ private fun TopRow(gameUiState: GameUiState) {
 
             Box(modifier = Modifier.align(Alignment.TopStart)) {
                 if (dealer != PLAYER) {
-                    DealerChipImage()
+                    DealerChipImage1()
                 }
             }
 
@@ -345,7 +345,7 @@ private fun BottomRow(gameUiState: GameUiState, gameViewModel: GameViewModel) {
 
             Box(modifier = Modifier.align(Alignment.TopStart)) {
                 if (dealer == PLAYER) {
-                    DealerChipImage()
+                    DealerChipImage1()
                 }
             }
 
@@ -470,7 +470,6 @@ private fun CardsSection(cards: MutableList<Card>, name: String, money: Int, dis
     }
 }
 
-@SuppressLint("DiscouragedApi")
 @Composable
 private fun CardImage(card: Card, modifier: Modifier, displayCards: Boolean) {
     val context = LocalContext.current
@@ -493,7 +492,7 @@ private fun CardImage(card: Card, modifier: Modifier, displayCards: Boolean) {
 }
 
 @Composable
-private fun DealerChipImage() {
+private fun DealerChipImage1() {
     Image(
         painter = painterResource(id = R.drawable.dealer),
         contentDescription = "Dealer chip image",
