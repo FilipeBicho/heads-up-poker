@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -30,22 +31,34 @@ import com.filipebicho.pokerclash.R
 import com.filipebicho.pokerclash.cards.Card
 
 @Composable
-fun BotSection() {
-    Row {
-        InformationSection(modifier = Modifier.weight(0.33f))
-        BotSection(modifier = Modifier.weight(0.33f))
+fun BotSection(modifier: Modifier = Modifier) {
+    Row(modifier = modifier.fillMaxHeight()) {
+        InfoSection(modifier = Modifier.weight(0.33f))
+        BotCards(modifier = Modifier.weight(0.33f))
         WinCountSection(modifier = Modifier.weight(0.33f))
     }
 }
 
 @Composable
-fun InformationSection(modifier: Modifier = Modifier) {
-    Column(modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Top
+fun InfoSection(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.fillMaxHeight(),
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = "Information Section", fontSize = 10.sp, color = Color.White)
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            DealerChipImage()
+        }
     }
+}
+
+@Composable
+private fun DealerChipImage() {
+    Image(
+        painter = painterResource(id = R.drawable.dealer),
+        contentDescription = "Dealer chip image",
+        modifier = Modifier.size(20.dp)
+    )
 }
 
 @Composable
@@ -59,16 +72,14 @@ fun WinCountSection(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun BotSection(modifier: Modifier = Modifier) {
-    Box (modifier = modifier
+private fun BotCards(modifier: Modifier = Modifier) {
+    Box(modifier = modifier
         .fillMaxWidth()
         .fillMaxHeight()
-        .padding(0.dp, 20.dp, 0.dp, 0.dp),
-        contentAlignment = Alignment.BottomCenter){
+        .padding(0.dp, 20.dp, 0.dp, 0.dp)){
         Cards(modifier)
         BotInfo()
     }
-
 }
 
 @Composable
@@ -103,13 +114,13 @@ private fun CardImage(card: Card) {
 private fun BotInfo() {
     Column(
         modifier = Modifier
-            .zIndex(3f)
+            .zIndex(4f)
             .fillMaxWidth()
             .border(1.dp, Color.White, RoundedCornerShape(5.dp)),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = "Bot",
+            text = "Bot1",
             fontSize = 12.sp,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,

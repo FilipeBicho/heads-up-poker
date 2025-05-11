@@ -30,7 +30,7 @@ fun GameBoardScreen(gameUiState: GameUiState) {
 
 @Composable
 fun TopRow(modifier: Modifier = Modifier) {
-    BotSection()
+    BotSection(modifier)
 }
 
 @Composable

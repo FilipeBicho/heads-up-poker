@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -32,9 +33,18 @@ fun PokerApp(
     navController: NavHostController = rememberNavController()
 ) {
     val gameUiState by uiState.collectAsState()
-    viewModel.setPlayerName("Filipe11")
-    viewModel.setBot(Pair("GPT 4o mini", "gpt-4o-mini"))
-    viewModel.startGame()
+    // Define a development flag (you'd likely get this from build config)
+    val isDevelopmentMode = true // Set to false for production
+
+    // Use a LaunchedEffect to run initialization only once when the key changes
+    LaunchedEffect(Unit) {
+        if (isDevelopmentMode) {
+            // Temporarily initialize for direct game access in development
+            viewModel.setPlayerName("Filipe11")
+            viewModel.setBot(Pair("GPT 4o mini", "gpt-4o-mini"))
+            viewModel.startGame()
+        }
+    }
 
     NavHost(
         navController = navController,

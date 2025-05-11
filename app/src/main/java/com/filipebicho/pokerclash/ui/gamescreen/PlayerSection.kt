@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -60,7 +61,7 @@ fun PlayerSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            InfoSection(gameUiState, modifier = Modifier.weight(0.35f))
+            PlayerCards(gameUiState, modifier = Modifier.weight(0.35f))
             SliderSection(gameUiState, modifier = Modifier.weight(0.65f))
         }
         ButtonSection(modifier = Modifier.weight(0.3f))
@@ -68,7 +69,7 @@ fun PlayerSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun InfoSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
+private fun PlayerCards(gameUiState: GameUiState, modifier: Modifier = Modifier) {
     Box (modifier = modifier
         .fillMaxWidth()
         .fillMaxHeight()
@@ -76,7 +77,17 @@ private fun InfoSection(gameUiState: GameUiState, modifier: Modifier = Modifier)
         contentAlignment = Alignment.BottomCenter){
         Cards(gameUiState, modifier)
         PlayerInfo(gameUiState)
+        Box(modifier = Modifier.align(Alignment.TopEnd)) { DealerChipImage() }
     }
+}
+
+@Composable
+private fun DealerChipImage() {
+    Image(
+        painter = painterResource(id = R.drawable.dealer),
+        contentDescription = "Dealer chip image",
+        modifier = Modifier.size(20.dp)
+    )
 }
 
 @Composable
