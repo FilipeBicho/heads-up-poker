@@ -26,11 +26,53 @@ import com.filipebicho.pokerclash.cards.Card
 @Composable
 fun GameSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
     Column(modifier = modifier,
-        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top,
     ) {
-        Pot(gameUiState.totalPot)
-        TableCards(gameUiState)
-        Hand(gameUiState)
+        Box(modifier = Modifier.padding(0.dp, 5.dp, 0.dp, 0.dp),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            Bet(gameUiState.botBetValue)
+        }
+
+        Box(modifier = Modifier.fillMaxWidth().weight(1f),
+            contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Pot(gameUiState.totalPot)
+                TableCards(gameUiState)
+                Hand(gameUiState)
+            }
+        }
+
+        Box(contentAlignment = Alignment.CenterEnd) { Bet(gameUiState.playerBetValue) }
+    }
+}
+
+@Composable
+private fun Bet(bet: Int) {
+    Column(modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            modifier = Modifier.background(Color.DarkGray.copy(alpha = 0.5f), shape = RoundedCornerShape(5.dp))
+                .padding(5.dp),
+            fontSize = 12.sp,
+            color = Color.White,
+            text = "Bet: $bet"
+        )
+    }
+}
+
+@Composable
+private fun Pot(totalPot: Int) {
+    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            modifier = Modifier.background(Color.DarkGray.copy(alpha = 0.5f), shape = RoundedCornerShape(5.dp))
+                .padding(5.dp),
+            color = Color.White,
+            text = "Pot: $totalPot"
+        )
     }
 }
 
@@ -58,7 +100,7 @@ private fun TableCards(gameUiState: GameUiState) {
 }
 
 @Composable
-fun TableCardImage(card: Card?, display: Boolean) {
+private fun TableCardImage(card: Card?, display: Boolean) {
     Image(
         modifier = Modifier.alpha(if (display) 1f else 0f),
         painter = painterResource(card?.getCardDrawableResource() ?: R.drawable.card_back),
@@ -67,19 +109,10 @@ fun TableCardImage(card: Card?, display: Boolean) {
     )
 }
 
-@Composable
-fun Pot(totalPot: Int) {
-    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            modifier = Modifier.background(Color.DarkGray.copy(alpha = 0.5f), shape = RoundedCornerShape(5.dp)),
-            color = Color.White,
-            text = "Pot: $totalPot"
-        )
-    }
-}
+
 
 @Composable
-fun Hand(gameUiState: GameUiState) {
+private fun Hand(gameUiState: GameUiState) {
     Column(modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally, ) {
         Text(
