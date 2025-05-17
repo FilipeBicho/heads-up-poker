@@ -101,4 +101,12 @@ class GameViewModel : ViewModel() {
     fun newGame() {
         init.initGame()
     }
+
+    fun toggleGameSummary() {
+        uiStateFlow.update { currentState ->
+            currentState.copy(
+                displaySummary = !currentState.displaySummary,
+            )
+        }
+    }
 }

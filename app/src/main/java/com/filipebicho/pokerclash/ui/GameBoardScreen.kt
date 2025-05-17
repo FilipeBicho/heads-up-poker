@@ -9,21 +9,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.filipebicho.pokerclash.Background
 import com.filipebicho.pokerclash.GameUiState
+import com.filipebicho.pokerclash.GameViewModel
 import com.filipebicho.pokerclash.ui.gamescreen.BotSection
 import com.filipebicho.pokerclash.ui.gamescreen.GameSection
 import com.filipebicho.pokerclash.ui.gamescreen.PlayerSection
 
 @Composable
-fun GameBoardScreen(gameUiState: GameUiState) {
+fun GameBoardScreen(gameUiState: GameUiState, gameViewModel: GameViewModel) {
     Background()
 
     Column(
         modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .padding(16.dp, 4.dp, 16.dp, 2.dp)
             .fillMaxSize(),
     ) {
         TopRow(gameUiState, modifier = Modifier.weight(0.12f))
-        MiddleRow(gameUiState, modifier = Modifier.weight(0.58f))
+        MiddleRow(gameUiState, gameViewModel, modifier = Modifier.weight(0.58f))
         BottomRow(gameUiState, modifier = Modifier.weight(0.25f))
     }
 }
@@ -34,8 +35,8 @@ fun TopRow(gameUiState: GameUiState, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MiddleRow(gameUiState: GameUiState, modifier: Modifier = Modifier) {
-    GameSection(gameUiState, modifier)
+fun MiddleRow(gameUiState: GameUiState, gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
+    GameSection(gameUiState, gameViewModel, modifier)
 }
 
 @Composable
@@ -47,5 +48,5 @@ fun BottomRow(gameUiState: GameUiState, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 fun GameBoardScreenPreview() {
-    GameBoardScreen(gameUiState = GameUiState())
+    GameBoardScreen(gameUiState = GameUiState(), gameViewModel = GameViewModel())
 }

@@ -2,6 +2,7 @@ package com.filipebicho.pokerclash.ui.gamescreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,11 +29,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.filipebicho.pokerclash.GameUiState
+import com.filipebicho.pokerclash.GameViewModel
 import com.filipebicho.pokerclash.R
 import com.filipebicho.pokerclash.cards.Card
 
 @Composable
-fun GameSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
+fun GameSection(gameUiState: GameUiState, gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
     Column(modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
@@ -45,7 +55,37 @@ fun GameSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
             }
         }
 
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart
+        ) {
+            SummaryToggleButton(gameUiState, gameViewModel)
+        }
+
+
         Box(contentAlignment = Alignment.CenterEnd) { Bet(gameUiState.playerBetValue) }
+    }
+}
+
+@Composable
+private fun SummaryToggleButton(gameUiState: GameUiState, gameViewModel: GameViewModel) {
+    Box(modifier = Modifier.clickable {
+        gameViewModel.toggleGameSummary()
+    }) {
+        if (gameUiState.displaySummary) {
+            Icon(
+                Icons.Filled.KeyboardArrowDown,
+                contentDescription = "Summary",
+                tint = Color.White,
+                modifier = Modifier.padding(0.dp)
+            )
+        } else {
+            Icon(
+                Icons.Filled.KeyboardArrowUp,
+                contentDescription = "Summary",
+                tint = Color.White,
+                modifier = Modifier.padding(0.dp)
+            )
+        }
+
     }
 }
 

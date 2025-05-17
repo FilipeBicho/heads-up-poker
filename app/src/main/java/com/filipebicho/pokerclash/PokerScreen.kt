@@ -72,7 +72,7 @@ fun PokerApp(
         }
 
         composable(route = PokerScreen.Game.name) {
-            GameBoardScreen(gameUiState)
+            GameBoardScreen(gameUiState, viewModel)
         }
     }
 }

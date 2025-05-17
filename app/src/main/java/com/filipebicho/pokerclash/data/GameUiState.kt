@@ -17,6 +17,7 @@ data class GameUiState(
     val botText: String = "",
     val actionText: String = "",
     val gameSummary: List<List<String>> = ArrayList(),
+    val displaySummary: Boolean = false,
 
     // Money
     val playerMoney: Int = 1500,
