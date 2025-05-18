@@ -139,7 +139,7 @@ class Showdown {
      */
     fun calculateWinner() {
         uiStateFlow.update { currentState -> currentState.copy(
-            displayBetButtons = false,
+            isPlayerTurn = false,
             displayFoldButton = false,
             displayCheckButton = false,
             displayCallButton = false,

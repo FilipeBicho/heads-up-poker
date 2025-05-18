@@ -51,27 +51,8 @@ class Betting {
         return if (bet[opponent] == 0 && pokerChips[player] > BIG_BLIND) {
             uiStateFlow.update { currentState ->
                 currentState.copy(
-                    playerBetValue = BIG_BLIND,
+                    playerBet = BIG_BLIND,
                     minPlayerBet = BIG_BLIND
-                )
-            }
-            true
-        } else {
-            false
-        }
-    }
-
-    /**
-     * raise is available if:
-     *  - there is a previous bet
-     *  - player chips and player bet (if any) is bigger than 2 times opponent bet
-     */
-    private fun isRaiseAvailable(): Boolean {
-        return if (bet[opponent] > 0 && pokerChips[player] > bet[opponent] * 2) {
-            uiStateFlow.update { currentState ->
-                currentState.copy(
-                    playerBetValue = bet[opponent] * 2,
-                    minPlayerBet = bet[opponent] * 2
                 )
             }
             true
@@ -99,7 +80,7 @@ class Betting {
         player = if (player == PLAYER) BOT else PLAYER
         opponent = if (player == BOT) PLAYER else BOT
         uiStateFlow.update { currentState -> currentState.copy(
-            displayBetButtons = player == PLAYER
+            isPlayerTurn = player == PLAYER
         )}
     }
 
@@ -129,11 +110,11 @@ class Betting {
             currentState.copy(
                 playerMoney = pokerChips[PLAYER],
                 botMoney = pokerChips[BOT],
-                playerBetValue = bet[dealer],
+                playerBet = bet[PLAYER],
+                playerRaiseBet = getMinRaise(),
+                botBet = bet[BOT],
                 currentPot = pokerChips[POT],
                 totalPot = totalPotValue + pokerChips[POT],
-                playerText = "${bet[PLAYER]} €",
-                botText = "${bet[BOT]} €",
                 gameSummary = gameSummaryMap
             )
         }
@@ -142,12 +123,11 @@ class Betting {
     private fun foldCall() {
         if (player == PLAYER) {
             uiStateFlow.update { currentState -> currentState.copy(
-                displayBetButtons = true,
+                isPlayerTurn = true,
                 displayFoldButton = true,
                 displayCheckButton = false,
                 displayCallButton = true,
                 displayBetButton = false,
-                displayRaiseButton = false,
                 displayAllInButton = false
             )}
         } else {
@@ -155,15 +135,43 @@ class Betting {
         }
     }
 
+    private fun getMinRaise(): Int {
+        val botBet = bet[BOT]
+        val playerBet = bet[PLAYER]
+
+        if (round == PRE_FLOP) {
+            return if (player == dealer) {
+                BIG_BLIND * 2
+            } else {
+                if (botBet == BIG_BLIND) {
+                    BIG_BLIND * 2
+                } else {
+                    val lastRaiseSize = botBet - BIG_BLIND
+                    botBet + lastRaiseSize
+                }
+            }
+        } else {
+            return if (botBet == 0 && playerBet == 0) {
+                BIG_BLIND
+            } else if (botBet > 0) {
+                val lastRaiseSize = botBet
+                botBet + lastRaiseSize
+            } else {
+                BIG_BLIND
+            }
+        }
+    }
+
     private fun foldCallBet() {
         if (player == PLAYER) {
             uiStateFlow.update { currentState -> currentState.copy(
-                displayBetButtons = true,
+                isPlayerTurn = true,
+                playerCall = bet[BOT] - bet[PLAYER],
+                playerRaiseBet = getMinRaise(),
                 displayFoldButton = true,
                 displayCheckButton = false,
                 displayCallButton = true,
                 displayBetButton = isBetAvailable(),
-                displayRaiseButton = isRaiseAvailable(),
                 displayAllInButton = isAllInAvailable()
             )}
         } else {
@@ -175,12 +183,12 @@ class Betting {
         if (player == PLAYER) {
             uiStateFlow.update { currentState ->
                 currentState.copy(
-                    displayBetButtons = true,
+                    isPlayerTurn = true,
+                    playerRaiseBet = getMinRaise(),
                     displayFoldButton = false,
                     displayCheckButton = true,
                     displayCallButton = false,
                     displayBetButton = isBetAvailable(),
-                    displayRaiseButton = isRaiseAvailable(),
                     displayAllInButton = isAllInAvailable()
                 )
             }
@@ -204,8 +212,9 @@ class Betting {
 
         uiStateFlow.update { currentState ->
             currentState.copy(
-                playerBetValue = bet[PLAYER],
-                botBetValue = bet[BOT],
+                playerBet = bet[PLAYER],
+                botBet = bet[BOT],
+                playerRaiseBet = getMinRaise(),
                 totalPot = totalPotValue,
                 playerText = "${bet[PLAYER]} €",
                 botText = "${bet[BOT]} €",
@@ -337,7 +346,7 @@ class Betting {
                 botText = "${bet[BOT]} €",
                 actionText = "${uiStateFlow.value.name[player]} folds, ${uiStateFlow.value.name[opponent]} wins ${pokerChips[POT] + totalPotValue} €",
                 gameSummary = gameSummaryMap,
-                displayBetButtons = false
+                isPlayerTurn = false
             )
         }
         Timer().schedule(timerTask {

@@ -67,21 +67,20 @@ class ChatgptBot {
     }
 
     fun getActionsFromResponse(response: Response<ChatResponse>): Int {
-        val content = response.body()?.choices?.first()?.message?.content
-        if (content != null) {
+        val content = response.body()?.choices?.first()?.message?.content.toString().lowercase()
+        if (content.isNotEmpty()) {
             val jsonContent = JSONObject(content)
+            Log.d("ChatgptBot", "Response: $jsonContent")
             val actionString = jsonContent.get("action").toString()
             betValue = jsonContent.get("bet").toString().toInt()
 
-            Log.d("ChatgptBot", "Response: $jsonContent")
-
             return when (actionString) {
-                "Fold" -> FOLD
-                "Call" -> CALL
-                "Check" -> CHECK
-                "Bet" -> BET
-                "Raise" -> RAISE
-                "All in" -> ALLIN
+                "fold" -> FOLD
+                "call" -> CALL
+                "check" -> CHECK
+                "bet" -> BET
+                "raise" -> RAISE
+                "all in" -> ALLIN
                 else -> -1
             }
         }

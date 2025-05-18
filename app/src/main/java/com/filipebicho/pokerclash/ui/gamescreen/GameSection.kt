@@ -44,7 +44,7 @@ fun GameSection(
             modifier = Modifier.padding(0.dp, 5.dp, 0.dp, 0.dp),
             contentAlignment = Alignment.TopCenter
         ) {
-            Bet(bet = gameUiState.botBetValue)
+            Bet(bet = gameUiState.botBet)
         }
 
         Box(
@@ -71,7 +71,7 @@ fun GameSection(
         }
 
         Box(contentAlignment = Alignment.CenterEnd) {
-            Bet(bet = gameUiState.playerBetValue)
+            Bet(bet = gameUiState.playerBet)
         }
     }
 }

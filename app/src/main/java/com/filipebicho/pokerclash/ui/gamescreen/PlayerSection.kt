@@ -68,15 +68,13 @@ fun PlayerSection(
                     gameUiState = gameUiState,
                     modifier = Modifier
                         .weight(0.65f)
-                        .alpha(if (gameUiState.displayBetButtons) 1f else 0f)
+                        .alpha(if (gameUiState.isPlayerTurn) 1f else 0f)
                 )
             }
             ButtonSection(
                 gameUiState = gameUiState,
                 gameViewModel = gameViewModel,
-                modifier = Modifier
-                    .weight(0.3f)
-                    .alpha(if (gameUiState.displayBetButtons) 1f else 0f)
+                modifier = Modifier.weight(0.3f)
             )
         }
     } else {
@@ -123,7 +121,7 @@ private fun SliderSection(gameUiState: GameUiState, modifier: Modifier = Modifie
 
 @Composable
 private fun SmallBetButtonsSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
-    val enabled = gameUiState.displayBetButtons
+    val enabled = gameUiState.isPlayerTurn
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -187,7 +185,7 @@ private fun SmallBetButton(
 @Composable
 private fun BetSlider(gameUiState: GameUiState, modifier: Modifier = Modifier) {
     var sliderPosition by remember { mutableIntStateOf(gameUiState.minPlayerBet) }
-    val enabled = gameUiState.displayBetButtons
+    val enabled = gameUiState.isPlayerTurn
 
     Row(modifier = modifier) {
         BasicTextField(
@@ -237,7 +235,7 @@ private fun ButtonSection(
     gameViewModel: GameViewModel,
     modifier: Modifier = Modifier
 ) {
-    val enabled = gameUiState.displayBetButtons
+    val enabled = gameUiState.isPlayerTurn
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -245,18 +243,31 @@ private fun ButtonSection(
         Button(
             text = "Fold",
             onClick = { gameViewModel.fold() },
-            enabled = enabled,
+            enabled = enabled && gameUiState.displayFoldButton,
             modifier = Modifier.weight(1f)
         )
+
+        if (gameUiState.displayCheckButton) {
+            Button(
+                text = "Check",
+                onClick = { gameViewModel.check() },
+                enabled = enabled,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        if (gameUiState.displayCallButton) {
+            Button(
+                text = "Call ${gameUiState.playerCall}",
+                onClick = { gameViewModel.call() },
+                enabled = enabled,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
         Button(
-            text = "Call",
-            onClick = { gameViewModel.call() },
-            enabled = enabled,
-            modifier = Modifier.weight(1f)
-        )
-        Button(
-            text = "Bet ${gameUiState.playerBetValue}",
-            onClick = { gameViewModel.bet(gameUiState.playerBetValue) },
+            text = "Bet ${gameUiState.playerRaiseBet}",
+            onClick = { gameViewModel.bet(gameUiState.playerRaiseBet) },
             enabled = enabled,
             modifier = Modifier.weight(1f)
         )
@@ -272,7 +283,7 @@ private fun Button(
 ) {
     OutlinedButton(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().alpha(if (enabled) 1f else 0f),
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = colorResource(id = R.color.button_red),

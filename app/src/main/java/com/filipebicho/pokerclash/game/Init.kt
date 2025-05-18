@@ -18,7 +18,6 @@ import com.filipebicho.pokerclash.data.Data.dealer
 import com.filipebicho.pokerclash.data.Data.gameNumber
 import com.filipebicho.pokerclash.data.Data.gameSummaryList
 import com.filipebicho.pokerclash.data.Data.gameSummaryMap
-import com.filipebicho.pokerclash.data.Data.odds
 import com.filipebicho.pokerclash.data.Data.opponent
 import com.filipebicho.pokerclash.data.Data.player
 import com.filipebicho.pokerclash.data.Data.playerCards
@@ -28,8 +27,6 @@ import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.totalPotValue
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
-import com.filipebicho.pokerclash.odds.Combinations
-import com.filipebicho.pokerclash.odds.Odds
 import kotlinx.coroutines.flow.update
 
 class Init {
@@ -49,19 +46,15 @@ class Init {
         cardDealer.setRiverCard(tableCards)
 
         uiStateFlow.update { currentState -> currentState.copy(
-            showdown = false,
             displayBotCards = false,
             displayFlop = false,
             displayTurn = false,
             displayRiver = false,
+            showdown = false,
             playerCards = playerCards.toList(),
             botCards = botCards.toList(),
             tableCards = tableCards.toList()
         )}
-    }
-
-    private fun initOdds() {
-        odds = Odds(Combinations(tableCards.subList(0,3)).combinations)
     }
 
     /**
@@ -89,23 +82,27 @@ class Init {
         gameSummaryMap.add(gameNumber, gameSummaryList.toList())
 
         // init or change dealer
-        dealer = BOT
+        dealer = if (dealer == -1) {
+            (0..1).random()
+        } else {
+            if (dealer == 0) 1 else 0
+        }
 
         blind = if (dealer == 0) 1 else 0
-
         player = dealer
         opponent = blind
 
         uiStateFlow.update { currentState -> currentState.copy(
-            playerBetValue = 0,
-            botBetValue = 0,
+            playerBet = 0,
+            playerRaiseBet = 0,
+            botBet = 0,
             totalPot = 0,
             currentPot = 0,
             actionText = "",
             playerText = "0 €",
             botText = "0 €",
             gameSummary = gameSummaryMap,
-            displayBetButtons = player == PLAYER,
+            isPlayerTurn = player == PLAYER,
             newGame = false,
             dealer = dealer,
         )}
@@ -123,7 +120,6 @@ class Init {
     fun newGame() {
         initValues()
         dealCards()
-        initOdds()
         betting.preFlop()
     }
 }

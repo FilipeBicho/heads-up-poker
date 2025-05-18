@@ -22,8 +22,10 @@ data class GameUiState(
     // Money
     val playerMoney: Int = 1500,
     val botMoney: Int = 1500,
-    val playerBetValue: Int = 0,
-    val botBetValue: Int = 0,
+    val playerBet: Int = 0,
+    val playerRaiseBet: Int = 0,
+    val playerCall: Int = 0,
+    val botBet: Int = 0,
     val totalPot: Int = 0,
     val currentPot: Int = 0,
     val minPlayerBet: Int = BIG_BLIND,
@@ -45,9 +47,8 @@ data class GameUiState(
     val displayFoldButton: Boolean = false,
     val displayCallButton: Boolean = false,
     val displayCheckButton: Boolean = false,
-    val displayBetButtons: Boolean = false,
+    val isPlayerTurn: Boolean = false,
     val displayBetButton: Boolean = false,
-    val displayRaiseButton: Boolean = false,
     val displayAllInButton: Boolean = false,
 
     // Count display
