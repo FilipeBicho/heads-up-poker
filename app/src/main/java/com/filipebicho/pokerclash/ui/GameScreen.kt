@@ -385,27 +385,27 @@ private fun BottomRow(gameUiState: GameUiState, gameViewModel: GameViewModel) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         if (gameUiState.displayFoldButton) {
-                            GameActionButton("Fold") { gameViewModel.foldAction() }
+                            GameActionButton("Fold") { gameViewModel.fold() }
                         }
 
                         if (gameUiState.displayCheckButton) {
-                            GameActionButton("Check") { gameViewModel.checkAction() }
+                            GameActionButton("Check") { gameViewModel.check() }
                         }
 
                         if (gameUiState.displayCallButton) {
-                            GameActionButton("Call") { gameViewModel.callAction() }
+                            GameActionButton("Call") { gameViewModel.call() }
                         }
 
                         if (gameUiState.displayBetButton && gameUiState.playerBetValue != pokerChips[PLAYER]) {
-                            GameActionButton("Bet") { gameViewModel.betAction(betValue) }
+                            GameActionButton("Bet") { gameViewModel.bet(betValue) }
                         }
 
                         if (gameUiState.displayRaiseButton && gameUiState.playerBetValue != pokerChips[PLAYER]) {
-                            GameActionButton("Raise") { gameViewModel.raiseAction(betValue)}
+                            GameActionButton("Raise") { gameViewModel.raise(betValue)}
                         }
 
                         if (gameUiState.displayAllInButton || gameUiState.playerBetValue == pokerChips[PLAYER]) {
-                            GameActionButton("All in") { gameViewModel.allInAction() }
+                            GameActionButton("All in") { gameViewModel.allIn() }
                         }
                     }
                 }

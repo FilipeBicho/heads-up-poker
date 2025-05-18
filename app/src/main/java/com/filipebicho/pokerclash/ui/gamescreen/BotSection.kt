@@ -1,6 +1,5 @@
 package com.filipebicho.pokerclash.ui.gamescreen
 
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,16 +20,18 @@ import com.filipebicho.pokerclash.cards.BOT
 @Composable
 fun BotSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
     Row(modifier = modifier.fillMaxHeight()) {
-        InfoSection(gameUiState, modifier = Modifier.weight(0.33f))
-        BotCards(gameUiState, modifier = Modifier.weight(0.33f))
-        WinCountSection(gameUiState, modifier = Modifier.weight(0.33f))
+        InfoSection(gameUiState = gameUiState, modifier = Modifier.weight(0.33f))
+        BotCards(gameUiState = gameUiState, modifier = Modifier.weight(0.33f))
+        WinCountSection(gameUiState = gameUiState, modifier = Modifier.weight(0.33f))
     }
 }
 
 @Composable
 private fun InfoSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier.fillMaxHeight().padding(0.dp, 5.dp, 0.dp, 0.dp),
+        modifier = modifier
+            .fillMaxHeight()
+            .padding(0.dp, 5.dp, 0.dp, 0.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = "Model: ${gameUiState.botModel}", fontSize = 10.sp, color = Color.White)
@@ -45,7 +46,10 @@ private fun InfoSection(gameUiState: GameUiState, modifier: Modifier = Modifier)
 
 @Composable
 fun WinCountSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
-    Column(modifier.fillMaxWidth().padding(5.dp),
+    Column(
+        modifier
+            .fillMaxWidth()
+            .padding(5.dp),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top
     ) {
@@ -56,13 +60,19 @@ fun WinCountSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
 
 @Composable
 private fun BotCards(gameUiState: GameUiState, modifier: Modifier = Modifier) {
-    Box (modifier = modifier
-        .fillMaxWidth()
-        .fillMaxHeight()
-        .padding(0.dp, 0.dp, 4.dp, 4.dp),
-        contentAlignment = Alignment.BottomCenter){
-        Cards(modifier, gameUiState.botCards, display = gameUiState.displayBotCards)
-        NameAndMoneySection(gameUiState.botName, gameUiState.botMoney)
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .padding(0.dp, 0.dp, 4.dp, 4.dp),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        Cards(
+            cards = gameUiState.botCards,
+            display = gameUiState.displayBotCards,
+            modifier = modifier
+        )
+        NameAndMoneySection(name = gameUiState.botName, money = gameUiState.botMoney)
     }
 }
 

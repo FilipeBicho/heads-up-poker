@@ -60,22 +60,22 @@ class GameViewModel : ViewModel() {
         }
     }
 
-    fun foldAction() {
+    fun fold() {
         action = FOLD
         betting.fold()
     }
 
-    fun checkAction() {
+    fun check() {
         action = CHECK
         betting.check()
     }
 
-    fun callAction() {
+    fun call() {
         action = CALL
         betting.call()
     }
 
-    fun betAction(value: Int) {
+    fun bet(value: Int) {
         action = BET
         if (pokerChips[PLAYER] - value == 0) {
             betting.allIn()
@@ -84,7 +84,7 @@ class GameViewModel : ViewModel() {
         }
     }
 
-    fun raiseAction(value: Int) {
+    fun raise(value: Int) {
         action = RAISE
         if (pokerChips[PLAYER] - value == 0) {
             betting.allIn()
@@ -93,7 +93,7 @@ class GameViewModel : ViewModel() {
         }
     }
 
-    fun allInAction() {
+    fun allIn() {
         action = ALLIN
         betting.allIn()
     }

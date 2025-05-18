@@ -315,7 +315,7 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
             count++
 
             // remove temporarily river card
-            tempTableCards.removeLast()
+            tempTableCards.removeAt(tempTableCards.lastIndex)
         }
 
         showdownPlayerOdds = ((player1.toDouble()/count) * 100).roundToInt()

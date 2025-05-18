@@ -13,11 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.rounded.KeyboardArrowUp
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,34 +30,49 @@ import com.filipebicho.pokerclash.R
 import com.filipebicho.pokerclash.cards.Card
 
 @Composable
-fun GameSection(gameUiState: GameUiState, gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
-    Column(modifier = modifier,
+fun GameSection(
+    gameUiState: GameUiState,
+    gameViewModel: GameViewModel,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
     ) {
-        Box(modifier = Modifier.padding(0.dp, 5.dp, 0.dp, 0.dp),
+        Box(
+            modifier = Modifier.padding(0.dp, 5.dp, 0.dp, 0.dp),
             contentAlignment = Alignment.TopCenter
         ) {
-            Bet(gameUiState.botBetValue)
+            Bet(bet = gameUiState.botBetValue)
         }
 
-        Box(modifier = Modifier.fillMaxWidth().weight(1f),
-            contentAlignment = Alignment.Center) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Pot(gameUiState.totalPot)
-                TableCards(gameUiState)
-                Hand(gameUiState)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Pot(totalPot = gameUiState.totalPot)
+                TableCards(gameUiState = gameUiState)
+                Hand(gameUiState = gameUiState)
             }
         }
 
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.CenterStart
         ) {
-            SummaryToggleButton(gameUiState, gameViewModel)
+            SummaryToggleButton(gameUiState = gameUiState, gameViewModel = gameViewModel)
         }
 
-
-        Box(contentAlignment = Alignment.CenterEnd) { Bet(gameUiState.playerBetValue) }
+        Box(contentAlignment = Alignment.CenterEnd) {
+            Bet(bet = gameUiState.playerBetValue)
+        }
     }
 }
 
@@ -91,11 +102,17 @@ private fun SummaryToggleButton(gameUiState: GameUiState, gameViewModel: GameVie
 
 @Composable
 private fun Bet(bet: Int) {
-    Column(modifier = Modifier.fillMaxWidth(),
+    Column(
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally) {
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(
-            modifier = Modifier.background(Color.DarkGray.copy(alpha = 0.5f), shape = RoundedCornerShape(5.dp))
+            modifier = Modifier
+                .background(
+                    Color.DarkGray.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(5.dp)
+                )
                 .padding(5.dp),
             fontSize = 12.sp,
             color = Color.White,
@@ -108,7 +125,11 @@ private fun Bet(bet: Int) {
 private fun Pot(totalPot: Int) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            modifier = Modifier.background(Color.DarkGray.copy(alpha = 0.5f), shape = RoundedCornerShape(5.dp))
+            modifier = Modifier
+                .background(
+                    Color.DarkGray.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(5.dp)
+                )
                 .padding(5.dp),
             color = Color.White,
             text = "Pot: $totalPot"
@@ -118,23 +139,34 @@ private fun Pot(totalPot: Int) {
 
 @Composable
 private fun TableCards(gameUiState: GameUiState) {
-    Row (modifier = Modifier.padding(30.dp),
+    Row(
+        modifier = Modifier.padding(30.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-    ){
-        Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
-            TableCardImage(gameUiState.tableCards[0], gameUiState.displayFlop)
+    ) {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.2f)) {
+            TableCardImage(card = gameUiState.tableCards[0], display = gameUiState.displayFlop)
         }
-        Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
-            TableCardImage(gameUiState.tableCards[1], gameUiState.displayFlop)
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.2f)) {
+            TableCardImage(card = gameUiState.tableCards[1], display = gameUiState.displayFlop)
         }
-        Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
-            TableCardImage(gameUiState.tableCards[2], gameUiState.displayFlop)
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.2f)) {
+            TableCardImage(card = gameUiState.tableCards[2], display = gameUiState.displayFlop)
         }
-        Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
-            TableCardImage(gameUiState.tableCards[3], gameUiState.displayTurn)
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.2f)) {
+            TableCardImage(card = gameUiState.tableCards[3], display = gameUiState.displayTurn)
         }
-        Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
-            TableCardImage(gameUiState.tableCards[4], gameUiState.displayRiver)
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.2f)) {
+            TableCardImage(card = gameUiState.tableCards[4], display = gameUiState.displayRiver)
         }
     }
 }
@@ -151,8 +183,10 @@ private fun TableCardImage(card: Card?, display: Boolean) {
 
 @Composable
 private fun Hand(gameUiState: GameUiState) {
-    Column(modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally, ) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         Text(
             text = "Pair of Two",
             fontSize = 12.sp,

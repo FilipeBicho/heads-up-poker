@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -48,69 +49,55 @@ import com.filipebicho.pokerclash.ui.GameBoardScreen
 import kotlin.math.roundToInt
 
 @Composable
-fun PlayerSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
+fun PlayerSection(
+    gameUiState: GameUiState,
+    gameViewModel: GameViewModel,
+    modifier: Modifier = Modifier
+) {
     if (!gameUiState.displaySummary) {
         Column(modifier = modifier.fillMaxWidth()) {
-            Row(modifier = Modifier.fillMaxWidth().weight(0.7f),
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.7f),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                PlayerCards(gameUiState, modifier = Modifier.weight(0.35f))
-                SliderSection(gameUiState, modifier = Modifier.weight(0.65f))
+                PlayerCards(gameUiState = gameUiState, modifier = Modifier.weight(0.35f))
+                SliderSection(
+                    gameUiState = gameUiState,
+                    modifier = Modifier
+                        .weight(0.65f)
+                        .alpha(if (gameUiState.displayBetButtons) 1f else 0f)
+                )
             }
-            ButtonSection(modifier = Modifier.weight(0.3f))
+            ButtonSection(
+                gameUiState = gameUiState,
+                gameViewModel = gameViewModel,
+                modifier = Modifier
+                    .weight(0.3f)
+                    .alpha(if (gameUiState.displayBetButtons) 1f else 0f)
+            )
         }
     } else {
         SummarySection(gameUiState, modifier)
     }
 }
 
-@Composable
-private fun SummarySection(gameUiState: GameUiState, modifier: Modifier = Modifier)
-{
-    Column(modifier = modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.fillMaxWidth().weight(0.7f),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .clip(shape = RoundedCornerShape(10.dp))
-                    .background(Color.White)
-                    .padding(10.dp)
-                    .verticalScroll(rememberScrollState(), true, null, true)
-            ) {
-
-                gameUiState.gameSummary.forEach { it ->
-                    it.forEach {
-                        Text(
-                            text = it,
-                            fontSize = 11.sp,
-                            color = Color.Black
-                        )
-                    }
-                    HorizontalDivider(
-                        thickness = 1.dp
-                    )
-                }
-            }
-        }
-    }
-}
-
+/**
+ * Display the player cards, name and money
+ */
 @Composable
 private fun PlayerCards(gameUiState: GameUiState, modifier: Modifier = Modifier) {
-    Box (modifier = modifier
-        .fillMaxWidth()
-        .fillMaxHeight()
-        .padding(0.dp, 0.dp, 4.dp, 4.dp),
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .padding(0.dp, 0.dp, 4.dp, 4.dp),
         contentAlignment = Alignment.BottomCenter
-    ){
-        Cards(modifier, gameUiState.playerCards, display = true)
-        NameAndMoneySection(gameUiState.playerName, gameUiState.playerMoney)
+    ) {
+        Cards(cards = gameUiState.playerCards, display = true, modifier = modifier)
+        NameAndMoneySection(name = gameUiState.playerName, money = gameUiState.playerMoney)
         if (gameUiState.dealer == PLAYER) {
             Box(modifier = Modifier.align(Alignment.TopEnd)) {
                 DealerChipImage()
@@ -119,6 +106,9 @@ private fun PlayerCards(gameUiState: GameUiState, modifier: Modifier = Modifier)
     }
 }
 
+/**
+ * Display the slider and small bet buttons
+ */
 @Composable
 private fun SliderSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
     Column(
@@ -126,41 +116,53 @@ private fun SliderSection(gameUiState: GameUiState, modifier: Modifier = Modifie
         verticalArrangement = Arrangement.Bottom
     ) {
         Spacer(modifier = Modifier.weight(1f))
-        SmallBetButtonsSection(modifier)
-        BetSlider(gameUiState, modifier)
+        SmallBetButtonsSection(gameUiState = gameUiState, modifier = modifier)
+        BetSlider(gameUiState = gameUiState, modifier = modifier)
     }
 }
 
 @Composable
-private fun SmallBetButtonsSection(modifier: Modifier = Modifier) {
-    Row(modifier = modifier.fillMaxWidth(),
+private fun SmallBetButtonsSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
+    val enabled = gameUiState.displayBetButtons
+    Row(
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.Bottom){
+        verticalAlignment = Alignment.Bottom
+    ) {
         SmallBetButton(
-            "Min",
-            {},
+            text = "Min",
+            onClick = {},
+            enabled = enabled,
             modifier = Modifier.weight(1f)
         )
         SmallBetButton(
-            "3 BB",
-            {},
+            text = "3 BB",
+            onClick = {},
+            enabled = enabled,
             modifier = Modifier.weight(1f)
         )
         SmallBetButton(
-            "Pot",
-            {},
+            text = "Pot",
+            onClick = {},
+            enabled = enabled,
             modifier = Modifier.weight(1f)
         )
         SmallBetButton(
-            "Max",
-            {},
+            text = "Max",
+            onClick = {},
+            enabled = enabled,
             modifier = Modifier.weight(1f)
         )
     }
 }
 
 @Composable
-private fun SmallBetButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun SmallBetButton(
+    text: String,
+    onClick: () -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier
+) {
     OutlinedButton(
         onClick = onClick,
         contentPadding = PaddingValues(2.dp, 0.dp),
@@ -170,6 +172,7 @@ private fun SmallBetButton(text: String, onClick: () -> Unit, modifier: Modifier
             containerColor = colorResource(id = R.color.button_red),
             contentColor = Color.White
         ),
+        enabled = enabled
     ) {
         Text(
             text = text,
@@ -184,6 +187,7 @@ private fun SmallBetButton(text: String, onClick: () -> Unit, modifier: Modifier
 @Composable
 private fun BetSlider(gameUiState: GameUiState, modifier: Modifier = Modifier) {
     var sliderPosition by remember { mutableIntStateOf(gameUiState.minPlayerBet) }
+    val enabled = gameUiState.displayBetButtons
 
     Row(modifier = modifier) {
         BasicTextField(
@@ -195,6 +199,7 @@ private fun BetSlider(gameUiState: GameUiState, modifier: Modifier = Modifier) {
             ),
             singleLine = true,
             textStyle = TextStyle(color = Color.White, textAlign = TextAlign.Center),
+            enabled = enabled,
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .weight(0.25f)
@@ -204,7 +209,8 @@ private fun BetSlider(gameUiState: GameUiState, modifier: Modifier = Modifier) {
                     modifier = Modifier
                         .padding(0.dp, 0.dp, 8.dp, 0.dp)
                         .background(Color.DarkGray, shape = RoundedCornerShape(5.dp)),
-                    contentAlignment = Alignment.Center) { innerTextField() }
+                    contentAlignment = Alignment.Center
+                ) { innerTextField() }
             }
         )
         Slider(
@@ -216,6 +222,7 @@ private fun BetSlider(gameUiState: GameUiState, modifier: Modifier = Modifier) {
                 inactiveTrackColor = Color.Black
             ),
             valueRange = gameUiState.minPlayerBet.toFloat()..1500.toFloat(),
+            enabled = enabled,
             modifier = Modifier
                 .weight(0.7f)
                 .height(30.dp)
@@ -225,31 +232,44 @@ private fun BetSlider(gameUiState: GameUiState, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ButtonSection(modifier: Modifier = Modifier) {
+private fun ButtonSection(
+    gameUiState: GameUiState,
+    gameViewModel: GameViewModel,
+    modifier: Modifier = Modifier
+) {
+    val enabled = gameUiState.displayBetButtons
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Button(
-            "Fold",
-            {},
+            text = "Fold",
+            onClick = { gameViewModel.fold() },
+            enabled = enabled,
             modifier = Modifier.weight(1f)
         )
         Button(
-            "Call",
-            {},
+            text = "Call",
+            onClick = { gameViewModel.call() },
+            enabled = enabled,
             modifier = Modifier.weight(1f)
         )
         Button(
-            "Bet",
-            {},
+            text = "Bet ${gameUiState.playerBetValue}",
+            onClick = { gameViewModel.bet(gameUiState.playerBetValue) },
+            enabled = enabled,
             modifier = Modifier.weight(1f)
         )
     }
 }
 
 @Composable
-private fun Button(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun Button(
+    text: String,
+    onClick: () -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier
+) {
     OutlinedButton(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
@@ -258,7 +278,8 @@ private fun Button(text: String, onClick: () -> Unit, modifier: Modifier = Modif
             containerColor = colorResource(id = R.color.button_red),
             contentColor = Color.White
         ),
-        contentPadding = PaddingValues(12.dp)
+        contentPadding = PaddingValues(12.dp),
+        enabled = enabled
     ) {
         Text(
             text = text,
@@ -268,6 +289,42 @@ private fun Button(text: String, onClick: () -> Unit, modifier: Modifier = Modif
             ),
             modifier = Modifier.padding(horizontal = 4.dp)
         )
+    }
+}
+
+@Composable
+private fun SummarySection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.7f),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .clip(shape = RoundedCornerShape(10.dp))
+                    .background(Color.White)
+                    .padding(10.dp)
+                    .verticalScroll(rememberScrollState(), true, null, true)
+            ) {
+                gameUiState.gameSummary.forEach { it ->
+                    it.forEach {
+                        Text(
+                            text = it,
+                            fontSize = 11.sp,
+                            color = Color.Black
+                        )
+                    }
+                    HorizontalDivider(
+                        thickness = 1.dp
+                    )
+                }
+            }
+        }
     }
 }
 

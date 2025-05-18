@@ -39,7 +39,7 @@ fun DealerChipImage() {
 }
 
 @Composable
-fun Cards(modifier: Modifier, cards: List<Card>, display: Boolean) {
+fun Cards(cards: List<Card>, display: Boolean, modifier: Modifier) {
     Row(
         modifier.fillMaxWidth().zIndex(2f).fillMaxHeight().padding(0.dp, 0.dp, 0.dp, 10.dp),
         verticalAlignment = Alignment.Bottom,

@@ -23,9 +23,17 @@ fun GameBoardScreen(gameUiState: GameUiState, gameViewModel: GameViewModel) {
             .padding(16.dp, 4.dp, 16.dp, 2.dp)
             .fillMaxSize(),
     ) {
-        TopRow(gameUiState, modifier = Modifier.weight(0.12f))
-        MiddleRow(gameUiState, gameViewModel, modifier = Modifier.weight(0.58f))
-        BottomRow(gameUiState, modifier = Modifier.weight(0.25f))
+        TopRow(gameUiState = gameUiState, modifier = Modifier.weight(0.12f))
+        MiddleRow(
+            gameUiState = gameUiState,
+            gameViewModel = gameViewModel,
+            modifier = Modifier.weight(0.58f)
+        )
+        BottomRow(
+            gameUiState = gameUiState,
+            gameViewModel = gameViewModel,
+            modifier = Modifier.weight(0.25f)
+        )
     }
 }
 
@@ -35,13 +43,29 @@ fun TopRow(gameUiState: GameUiState, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MiddleRow(gameUiState: GameUiState, gameViewModel: GameViewModel, modifier: Modifier = Modifier) {
-    GameSection(gameUiState, gameViewModel, modifier)
+fun MiddleRow(
+    gameUiState: GameUiState,
+    gameViewModel: GameViewModel,
+    modifier: Modifier = Modifier
+) {
+    GameSection(
+        gameUiState = gameUiState,
+        gameViewModel = gameViewModel,
+        modifier = modifier
+    )
 }
 
 @Composable
-fun BottomRow(gameUiState: GameUiState, modifier: Modifier = Modifier) {
-    PlayerSection(gameUiState, modifier)
+fun BottomRow(
+    gameUiState: GameUiState,
+    gameViewModel: GameViewModel,
+    modifier: Modifier = Modifier
+) {
+    PlayerSection(
+        gameUiState = gameUiState,
+        gameViewModel = gameViewModel,
+        modifier = modifier
+    )
 }
 
 
