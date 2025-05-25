@@ -118,12 +118,12 @@ class Showdown {
     }
 
     fun showdownCards() {
-        totalPotValue += pokerChips[POT]
+        totalPotValue = pokerChips[POT]
 
         uiStateFlow.update { currentState -> currentState.copy(
             displayBotCards = true,
             showdown = true,
-            totalPot = totalPotValue
+            pot = totalPotValue
         )}
 
         when (round) {

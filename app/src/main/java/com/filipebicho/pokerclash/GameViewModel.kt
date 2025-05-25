@@ -55,7 +55,7 @@ class GameViewModel : ViewModel() {
     fun updatePlayerBet(value: Int) {
         uiStateFlow.update { currentState ->
             currentState.copy(
-                playerRaiseBet = value,
+                playerCurrentRaise = value,
             )
         }
     }

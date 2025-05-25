@@ -23,12 +23,11 @@ data class GameUiState(
     val playerMoney: Int = 1500,
     val botMoney: Int = 1500,
     val playerBet: Int = 0,
-    val playerRaiseBet: Int = 0,
+    val playerMinRaise: Int = 0,
+    val playerCurrentRaise: Int = 0,
     val playerCall: Int = 0,
     val botBet: Int = 0,
-    val totalPot: Int = 0,
-    val currentPot: Int = 0,
-    val minPlayerBet: Int = BIG_BLIND,
+    val pot: Int = 0,
 
     // Cards
     val playerCards: List<Card> = ArrayList(),

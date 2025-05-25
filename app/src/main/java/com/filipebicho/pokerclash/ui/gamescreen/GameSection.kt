@@ -57,7 +57,7 @@ fun GameSection(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Pot(totalPot = gameUiState.totalPot)
+                Pot(totalPot = gameUiState.pot)
                 TableCards(gameUiState = gameUiState)
                 Hand(gameUiState = gameUiState)
             }

@@ -66,9 +66,10 @@ fun PlayerSection(
                 PlayerCards(gameUiState = gameUiState, modifier = Modifier.weight(0.35f))
                 SliderSection(
                     gameUiState = gameUiState,
+                    gameViewModel = gameViewModel,
                     modifier = Modifier
                         .weight(0.65f)
-                        .alpha(if (gameUiState.isPlayerTurn) 1f else 0f)
+                        .alpha(if (gameUiState.isPlayerTurn && !gameUiState.showdown) 1f else 0f)
                 )
             }
             ButtonSection(
@@ -108,14 +109,22 @@ private fun PlayerCards(gameUiState: GameUiState, modifier: Modifier = Modifier)
  * Display the slider and small bet buttons
  */
 @Composable
-private fun SliderSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
+private fun SliderSection(
+    gameUiState: GameUiState,
+    gameViewModel: GameViewModel,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Bottom
     ) {
         Spacer(modifier = Modifier.weight(1f))
         SmallBetButtonsSection(gameUiState = gameUiState, modifier = modifier)
-        BetSlider(gameUiState = gameUiState, modifier = modifier)
+        BetSlider(
+            gameUiState = gameUiState,
+            gameViewModel= gameViewModel,
+            modifier = modifier
+        )
     }
 }
 
@@ -183,9 +192,24 @@ private fun SmallBetButton(
 }
 
 @Composable
-private fun BetSlider(gameUiState: GameUiState, modifier: Modifier = Modifier) {
-    var sliderPosition by remember { mutableIntStateOf(gameUiState.minPlayerBet) }
+private fun BetSlider(
+    gameUiState: GameUiState,
+    gameViewModel: GameViewModel,
+    modifier: Modifier = Modifier
+) {
+
+    // Add gameUiState.minPlayerBet as a key to remember.
+    // This will cause sliderPosition to be re-initialized when minPlayerBet changes.
+    var sliderPosition by remember(gameUiState.playerCurrentRaise) {
+        mutableIntStateOf(gameUiState.playerCurrentRaise)
+    }
     val enabled = gameUiState.isPlayerTurn
+
+    var minValue = gameUiState.playerMinRaise.toFloat()
+    var maxValue = gameUiState.playerMoney.toFloat()
+
+    if (maxValue < minValue)
+        maxValue = minValue
 
     Row(modifier = modifier) {
         BasicTextField(
@@ -214,12 +238,13 @@ private fun BetSlider(gameUiState: GameUiState, modifier: Modifier = Modifier) {
         Slider(
             value = sliderPosition.toFloat(),
             onValueChange = { sliderPosition = it.roundToInt() },
+            onValueChangeFinished = { gameViewModel.updatePlayerBet(sliderPosition.toInt())},
             colors = SliderDefaults.colors(
                 thumbColor = Color.LightGray,
                 activeTrackColor = colorResource(id = R.color.button_red),
                 inactiveTrackColor = Color.Black
             ),
-            valueRange = gameUiState.minPlayerBet.toFloat()..1500.toFloat(),
+            valueRange = minValue..maxValue,
             enabled = enabled,
             modifier = Modifier
                 .weight(0.7f)
@@ -266,8 +291,8 @@ private fun ButtonSection(
         }
 
         Button(
-            text = "Bet ${gameUiState.playerRaiseBet}",
-            onClick = { gameViewModel.bet(gameUiState.playerRaiseBet) },
+            text = "Bet ${gameUiState.playerCurrentRaise}",
+            onClick = { gameViewModel.bet(gameUiState.playerCurrentRaise) },
             enabled = enabled,
             modifier = Modifier.weight(1f)
         )

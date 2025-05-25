@@ -42,9 +42,9 @@ object Data {
     // Money
     var playerMoney = 1500
     var botMoney = 1500
-    var minPlayerBet = BIG_BLIND
     var pokerChips: MutableList<Int> = mutableListOf(0,0,0)
     var bet: MutableList<Int> = mutableListOf(0,0,0)
+    var botLastRaise = 0
     var totalPotValue: Int = 0
 
     // Bet and turn type

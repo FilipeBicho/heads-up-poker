@@ -19,6 +19,7 @@ import com.filipebicho.pokerclash.cards.TURN
 import com.filipebicho.pokerclash.data.Data.action
 import com.filipebicho.pokerclash.data.Data.bet
 import com.filipebicho.pokerclash.data.Data.blind
+import com.filipebicho.pokerclash.data.Data.botLastRaise
 import com.filipebicho.pokerclash.data.Data.chatGptBot
 import com.filipebicho.pokerclash.data.Data.checkAvailable
 import com.filipebicho.pokerclash.data.Data.dealer
@@ -52,7 +53,6 @@ class Betting {
             uiStateFlow.update { currentState ->
                 currentState.copy(
                     playerBet = BIG_BLIND,
-                    minPlayerBet = BIG_BLIND
                 )
             }
             true
@@ -86,7 +86,7 @@ class Betting {
 
     private fun botAction() {
         CoroutineScope(Dispatchers.Main).launch {
-            val action = chatGptBot.calculateAction()
+            val action = CALL
             when (action) {
                 FOLD -> fold()
                 CHECK -> check()
@@ -111,10 +111,10 @@ class Betting {
                 playerMoney = pokerChips[PLAYER],
                 botMoney = pokerChips[BOT],
                 playerBet = bet[PLAYER],
-                playerRaiseBet = getMinRaise(),
+                playerMinRaise = getMinRaiseForPlayer(),
+                playerCurrentRaise = getMinRaiseForPlayer(),
                 botBet = bet[BOT],
-                currentPot = pokerChips[POT],
-                totalPot = totalPotValue + pokerChips[POT],
+                pot = pokerChips[POT],
                 gameSummary = gameSummaryMap
             )
         }
@@ -135,31 +135,22 @@ class Betting {
         }
     }
 
-    private fun getMinRaise(): Int {
+    private fun getMinRaiseForPlayer(): Int {
         val botBet = bet[BOT]
         val playerBet = bet[PLAYER]
 
-        if (round == PRE_FLOP) {
-            return if (player == dealer) {
-                BIG_BLIND * 2
-            } else {
-                if (botBet == BIG_BLIND) {
-                    BIG_BLIND * 2
-                } else {
-                    val lastRaiseSize = botBet - BIG_BLIND
-                    botBet + lastRaiseSize
-                }
-            }
-        } else {
-            return if (botBet == 0 && playerBet == 0) {
-                BIG_BLIND
-            } else if (botBet > 0) {
-                val lastRaiseSize = botBet
-                botBet + lastRaiseSize
-            } else {
-                BIG_BLIND
-            }
+        // Pre-flop: if both bets are zero (new hand)
+        if (botBet == 0 && playerBet == 0) {
+            return BIG_BLIND
         }
+
+        // No previous raise (bot just called BB)
+        if (botBet == BIG_BLIND) {
+            return BIG_BLIND * 2
+        }
+
+        // There was a previous raise — use lastRaiseAmount
+        return botBet + botLastRaise
     }
 
     private fun foldCallBet() {
@@ -167,7 +158,8 @@ class Betting {
             uiStateFlow.update { currentState -> currentState.copy(
                 isPlayerTurn = true,
                 playerCall = bet[BOT] - bet[PLAYER],
-                playerRaiseBet = getMinRaise(),
+                playerMinRaise = getMinRaiseForPlayer(),
+                playerCurrentRaise = getMinRaiseForPlayer(),
                 displayFoldButton = true,
                 displayCheckButton = false,
                 displayCallButton = true,
@@ -184,7 +176,7 @@ class Betting {
             uiStateFlow.update { currentState ->
                 currentState.copy(
                     isPlayerTurn = true,
-                    playerRaiseBet = getMinRaise(),
+                    playerMinRaise = getMinRaiseForPlayer(),
                     displayFoldButton = false,
                     displayCheckButton = true,
                     displayCallButton = false,
@@ -214,12 +206,11 @@ class Betting {
             currentState.copy(
                 playerBet = bet[PLAYER],
                 botBet = bet[BOT],
-                playerRaiseBet = getMinRaise(),
-                totalPot = totalPotValue,
+                playerMinRaise = getMinRaiseForPlayer(),
+                playerCurrentRaise = getMinRaiseForPlayer(),
+                pot = pokerChips[POT],
                 playerText = "${bet[PLAYER]} €",
-                botText = "${bet[BOT]} €",
-                currentPot = 0,
-                minPlayerBet = BIG_BLIND
+                botText = "${bet[BOT]} €"
             )
         }
 
@@ -431,6 +422,9 @@ class Betting {
     fun bet(value: Int) {
 
         checkAvailable = false
+
+        if (player == BOT)
+            botLastRaise = value - bet[BOT]
 
         if (value >= pokerChips[player]) {
             allIn()
