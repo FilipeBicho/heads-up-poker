@@ -27,7 +27,8 @@ data class GameUiState(
     val playerCurrentRaise: Int = 0,
     val playerCall: Int = 0,
     val botBet: Int = 0,
-    val pot: Int = 0,
+    val pot: Int = 0, // total pot value
+    val currentPot: Int = 0, // Pot value from the current round
 
     // Cards
     val playerCards: List<Card> = ArrayList(),

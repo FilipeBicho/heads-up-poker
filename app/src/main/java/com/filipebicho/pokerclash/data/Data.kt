@@ -44,8 +44,7 @@ object Data {
     var botMoney = 1500
     var pokerChips: MutableList<Int> = mutableListOf(0,0,0)
     var bet: MutableList<Int> = mutableListOf(0,0,0)
-    var botLastRaise = 0
-    var totalPotValue: Int = 0
+    var botLastRaise: Int = 0
 
     // Bet and turn type
     var action: Int = -1

@@ -1,6 +1,7 @@
 package com.filipebicho.pokerclash.bot
 
 import android.util.Log
+import com.filipebicho.pokerclash.POT
 import com.filipebicho.pokerclash.cards.BOT
 import com.filipebicho.pokerclash.cards.FLOP
 import com.filipebicho.pokerclash.cards.PLAYER
@@ -15,8 +16,6 @@ import com.filipebicho.pokerclash.data.Data.dealer
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.tableCards
-import com.filipebicho.pokerclash.data.Data.totalPotValue
-import com.filipebicho.pokerclash.data.Data.uiState
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONObject
 import retrofit2.Call
@@ -119,9 +118,6 @@ class ChatgptBot {
             else -> ""
         }
 
-        val currentPot = bet[PLAYER] + bet[BOT]
-        val totalPot = totalPotValue + currentPot
-
         val dealer = if (dealer == BOT) "You" else "Opponent"
 
         Log.d("ChatgptBot", "Request: \"Game type: Heads-up Texas hold'em\\n\" +\n" +
@@ -134,8 +130,8 @@ class ChatgptBot {
                 "                    \"Opponent money: ${pokerChips[PLAYER]}\\n\" +\n" +
                 "                    \"Your previous bet: ${bet[BOT]}\\n\"+\n" +
                 "                    \"Opponent bet: ${bet[PLAYER]}\\n\"+\n" +
-                "                    \"Current pot round: $currentPot\\n\" +\n" +
-                "                    \"Total pot: $totalPot\\n\" +\n" +
+                "                    \"Current pot round: ${bet[POT]}\\n\" +\n" +
+                "                    \"Total pot: ${pokerChips[POT]}\\n\" +\n" +
                 "                    \"Opponent action: $playerAction \\n\" +\n" +
                 "                    \"Output: JSON containing only the action and bet\\n\" +\n" +
                 "                    \"Action types: Fold, Check, Call, Bet, Raise, All in\\n\" +\n" +
@@ -154,8 +150,8 @@ class ChatgptBot {
                     "Opponent money: ${pokerChips[PLAYER]}\n" +
                     "Your previous bet: ${bet[BOT]}\n"+
                     "Opponent bet: ${bet[PLAYER]}\n"+
-                    "Current pot round: $currentPot\n" +
-                    "Total pot: $totalPot\n" +
+                    "Current pot round: ${bet[POT]}\n" +
+                    "Total pot: ${pokerChips[POT]}\n" +
                     "Opponent action: $playerAction \n" +
                     "Output: JSON containing only the action and bet\n" +
                     "Action types: Fold, Check, Call, Bet, Raise, All in\n" +

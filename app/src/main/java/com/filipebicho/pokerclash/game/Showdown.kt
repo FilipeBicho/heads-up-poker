@@ -7,6 +7,7 @@ import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.cards.RIVER
 import com.filipebicho.pokerclash.cards.TURN
+import com.filipebicho.pokerclash.data.Data.bet
 import com.filipebicho.pokerclash.data.Data.botCards
 import com.filipebicho.pokerclash.data.Data.gameNumber
 import com.filipebicho.pokerclash.data.Data.gameSummaryList
@@ -19,7 +20,6 @@ import com.filipebicho.pokerclash.data.Data.playerCards
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.tableCards
-import com.filipebicho.pokerclash.data.Data.totalPotValue
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.data.Data.winnerCount
 import com.filipebicho.pokerclash.hand.Hand
@@ -118,12 +118,10 @@ class Showdown {
     }
 
     fun showdownCards() {
-        totalPotValue = pokerChips[POT]
-
         uiStateFlow.update { currentState -> currentState.copy(
             displayBotCards = true,
             showdown = true,
-            pot = totalPotValue
+            pot = pokerChips[POT]
         )}
 
         when (round) {
@@ -169,8 +167,8 @@ class Showdown {
 
         when (winner) {
             PLAYER -> {
-                pokerChips[PLAYER] += totalPotValue
-                gameSummaryList += "${uiStateFlow.value.name[PLAYER]} wins $totalPotValue €"
+                pokerChips[PLAYER] += pokerChips[POT]
+                gameSummaryList += "${uiStateFlow.value.name[PLAYER]} wins $pokerChips[POT] €"
                 gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
                 uiStateFlow.update { currentState -> currentState.copy(
@@ -178,13 +176,13 @@ class Showdown {
                     botMoney = pokerChips[BOT],
                     playerText = "${playerHand.resultText} 100 %",
                     botText = "${computerHand.resultText} 0 %",
-                    actionText = "${uiStateFlow.value.name[PLAYER]} wins $totalPotValue €",
+                    actionText = "${uiStateFlow.value.name[PLAYER]} wins $pokerChips[POT] €",
                     gameSummary = gameSummaryMap
                 )}
             }
             BOT -> {
-                pokerChips[BOT] += totalPotValue
-                gameSummaryList += "${uiStateFlow.value.name[BOT]} wins $totalPotValue €"
+                pokerChips[BOT] += pokerChips[POT]
+                gameSummaryList += "${uiStateFlow.value.name[BOT]} wins $pokerChips[POT] €"
                 gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
                 uiStateFlow.update { currentState -> currentState.copy(
@@ -192,20 +190,20 @@ class Showdown {
                     botMoney = pokerChips[BOT],
                     playerText = "${playerHand.resultText} 0 %",
                     botText = "${computerHand.resultText} 100 %",
-                    actionText = "${uiStateFlow.value.name[BOT]} wins $totalPotValue €",
+                    actionText = "${uiStateFlow.value.name[BOT]} wins $pokerChips[POT] €",
                     gameSummary = gameSummaryMap
                 )}
             }
             else -> {
-                pokerChips[PLAYER] += totalPotValue / 2
-                pokerChips[BOT] += totalPotValue / 2
-                gameSummaryList += "Split pot with value $totalPotValue €"
+                pokerChips[PLAYER] += pokerChips[POT] / 2
+                pokerChips[BOT] += pokerChips[POT] / 2
+                gameSummaryList += "Split pot with value $pokerChips[POT] €"
                 gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
                 uiStateFlow.update { currentState -> currentState.copy(
                     playerText = "${playerHand.resultText} 0 %",
                     botText = "${computerHand.resultText} 0 %",
-                    actionText = "Draw, split $totalPotValue €",
+                    actionText = "Draw, split $pokerChips[POT] €",
                     gameSummary = gameSummaryMap
                 )}
             }

@@ -26,7 +26,6 @@ import com.filipebicho.pokerclash.data.Data.playerMoney
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.tableCards
-import com.filipebicho.pokerclash.data.Data.totalPotValue
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.odds.Combinations
 import com.filipebicho.pokerclash.odds.Odds
@@ -75,7 +74,6 @@ class Init {
         // pot
         pokerChips[POT] = 0
         bet[POT] = 0
-        totalPotValue = 0
 
         checkAvailable = true
         gameSummaryList.clear()
