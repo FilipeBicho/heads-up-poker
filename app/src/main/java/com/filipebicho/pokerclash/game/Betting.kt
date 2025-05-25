@@ -37,18 +37,47 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.temporal.IsoFields
 import java.util.Timer
 import kotlin.concurrent.timerTask
 
 class Betting {
 
-    /**
-     * bet is available if:
-     *  - there is no previous bet
-     *  - player chips value is bigger then big bling
-     */
+    private fun getMinRaiseForPlayer(): Int {
+        val botBet = bet[BOT]
+        val playerBet = bet[PLAYER]
+
+        // Pre-flop: if both bets are zero (new hand)
+        if (botBet == 0 && playerBet == 0) {
+            return BIG_BLIND
+        }
+
+        // No previous raise (bot just called BB)
+        if (botBet == BIG_BLIND) {
+            return BIG_BLIND * 2
+        }
+
+        // There was a previous raise — use lastRaiseAmount
+        return botBet + botLastRaise
+    }
+
     private fun isBetAvailable(): Boolean {
-        return bet[opponent] == 0 && pokerChips[player] > BIG_BLIND
+        return if (bet[BOT] == 0)
+            pokerChips[player] > BIG_BLIND
+        else
+            pokerChips[player] > getMinRaiseForPlayer()
+    }
+
+    private fun isMinBetAvailable(): Boolean {
+        return getMinRaiseForPlayer() < pokerChips[PLAYER]
+    }
+
+    private fun is3BBBetAvailable(): Boolean {
+        return getMinRaiseForPlayer() <= BIG_BLIND * 3
+    }
+
+    private fun isPotBetAvailable(): Boolean {
+        return getMinRaiseForPlayer() <= bet[POT] + pokerChips[POT]
     }
 
     /**
@@ -59,10 +88,10 @@ class Betting {
      *      - player chips are smaller or equal to big bling
      */
     private fun isAllInAvailable(): Boolean {
-        return if (bet[opponent] > 0 && pokerChips[player] <= bet[opponent] * 2) {
+        return if (bet[BOT] > 0 && pokerChips[PLAYER] <= bet[BOT] * 2) {
             true
         } else {
-            pokerChips[player] <= BIG_BLIND
+            pokerChips[PLAYER] >= BIG_BLIND
         }
     }
     
@@ -76,7 +105,7 @@ class Betting {
 
     private fun botAction() {
         CoroutineScope(Dispatchers.Main).launch {
-            val action = CALL
+            val action = chatGptBot.calculateAction()
             when (action) {
                 FOLD -> fold()
                 CHECK -> check()
@@ -119,29 +148,14 @@ class Betting {
                 displayCheckButton = false,
                 displayCallButton = true,
                 displayBetButton = false,
-                displayAllInButton = false
+                displayMinSmallButton = false,
+                display3BBSmallButton = false,
+                displayPotSmallButton = false,
+                displayAllInSmallButton = false
             )}
         } else {
             botAction()
         }
-    }
-
-    private fun getMinRaiseForPlayer(): Int {
-        val botBet = bet[BOT]
-        val playerBet = bet[PLAYER]
-
-        // Pre-flop: if both bets are zero (new hand)
-        if (botBet == 0 && playerBet == 0) {
-            return BIG_BLIND
-        }
-
-        // No previous raise (bot just called BB)
-        if (botBet == BIG_BLIND) {
-            return BIG_BLIND * 2
-        }
-
-        // There was a previous raise — use lastRaiseAmount
-        return botBet + botLastRaise
     }
 
     private fun foldCallBet() {
@@ -155,7 +169,10 @@ class Betting {
                 displayCheckButton = false,
                 displayCallButton = true,
                 displayBetButton = isBetAvailable(),
-                displayAllInButton = isAllInAvailable()
+                displayMinSmallButton = isMinBetAvailable(),
+                display3BBSmallButton = is3BBBetAvailable(),
+                displayPotSmallButton = isPotBetAvailable(),
+                displayAllInSmallButton = isAllInAvailable()
             )}
         } else {
             botAction()
@@ -172,7 +189,10 @@ class Betting {
                     displayCheckButton = true,
                     displayCallButton = false,
                     displayBetButton = isBetAvailable(),
-                    displayAllInButton = isAllInAvailable()
+                    displayMinSmallButton = isMinBetAvailable(),
+                    display3BBSmallButton = is3BBBetAvailable(),
+                    displayPotSmallButton = isPotBetAvailable(),
+                    displayAllInSmallButton = isAllInAvailable()
                 )
             }
         } else {

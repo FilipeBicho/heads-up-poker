@@ -142,7 +142,6 @@ class Showdown {
             displayCheckButton = false,
             displayCallButton = false,
             displayBetButton = false,
-            displayAllInButton = false,
             displayBotCards = true,
             showdown = true
         )}

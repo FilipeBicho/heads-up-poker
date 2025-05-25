@@ -47,9 +47,12 @@ data class GameUiState(
     val displayFoldButton: Boolean = false,
     val displayCallButton: Boolean = false,
     val displayCheckButton: Boolean = false,
-    val isPlayerTurn: Boolean = false,
     val displayBetButton: Boolean = false,
-    val displayAllInButton: Boolean = false,
+    val displayMinSmallButton: Boolean = false,
+    val display3BBSmallButton: Boolean = false,
+    val displayPotSmallButton: Boolean = false,
+    val displayAllInSmallButton: Boolean = false,
+    val isPlayerTurn: Boolean = false,
 
     // Count display
     val playerWins: Int = 0,

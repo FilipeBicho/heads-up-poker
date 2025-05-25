@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.filipebicho.pokerclash.BIG_BLIND
 import com.filipebicho.pokerclash.GameUiState
 import com.filipebicho.pokerclash.GameViewModel
 import com.filipebicho.pokerclash.R
@@ -119,7 +120,11 @@ private fun SliderSection(
         verticalArrangement = Arrangement.Bottom
     ) {
         Spacer(modifier = Modifier.weight(1f))
-        SmallBetButtonsSection(gameUiState = gameUiState, modifier = modifier)
+        SmallBetButtonsSection(
+            gameUiState = gameUiState,
+            gameViewModel = gameViewModel,
+            modifier = modifier
+        )
         BetSlider(
             gameUiState = gameUiState,
             gameViewModel= gameViewModel,
@@ -129,7 +134,11 @@ private fun SliderSection(
 }
 
 @Composable
-private fun SmallBetButtonsSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
+private fun SmallBetButtonsSection(
+    gameUiState: GameUiState,
+    gameViewModel: GameViewModel,
+    modifier: Modifier = Modifier
+) {
     val enabled = gameUiState.isPlayerTurn
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -138,26 +147,26 @@ private fun SmallBetButtonsSection(gameUiState: GameUiState, modifier: Modifier 
     ) {
         SmallBetButton(
             text = "Min",
-            onClick = {},
-            enabled = enabled,
+            onClick = {gameViewModel.updatePlayerBet(gameUiState.playerMinRaise)},
+            enabled = enabled && gameUiState.displayMinSmallButton,
             modifier = Modifier.weight(1f)
         )
         SmallBetButton(
             text = "3 BB",
-            onClick = {},
-            enabled = enabled,
+            onClick = {gameViewModel.updatePlayerBet(3 * BIG_BLIND)},
+            enabled = enabled && gameUiState.display3BBSmallButton,
             modifier = Modifier.weight(1f)
         )
         SmallBetButton(
             text = "Pot",
-            onClick = {},
-            enabled = enabled,
+            onClick = {gameViewModel.updatePlayerBet(gameUiState.pot)},
+            enabled = enabled && gameUiState.displayPotSmallButton,
             modifier = Modifier.weight(1f)
         )
         SmallBetButton(
             text = "Max",
-            onClick = {},
-            enabled = enabled,
+            onClick = {gameViewModel.updatePlayerBet(gameUiState.playerMoney)},
+            enabled = enabled && gameUiState.displayAllInSmallButton,
             modifier = Modifier.weight(1f)
         )
     }
@@ -293,7 +302,7 @@ private fun ButtonSection(
         Button(
             text = "Bet ${gameUiState.playerCurrentRaise}",
             onClick = { gameViewModel.bet(gameUiState.playerCurrentRaise) },
-            enabled = enabled,
+            enabled = enabled && gameUiState.displayBetButton,
             modifier = Modifier.weight(1f)
         )
     }
