@@ -1,24 +1,24 @@
 package com.filipebicho.pokerclash.game
 
-import com.filipebicho.pokerclash.POT
 import com.filipebicho.pokerclash.cards.BOT
 import com.filipebicho.pokerclash.cards.FLOP
 import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.cards.RIVER
 import com.filipebicho.pokerclash.cards.TURN
-import com.filipebicho.pokerclash.data.Data.bet
 import com.filipebicho.pokerclash.data.Data.botCards
 import com.filipebicho.pokerclash.data.Data.gameNumber
 import com.filipebicho.pokerclash.data.Data.gameSummaryList
 import com.filipebicho.pokerclash.data.Data.gameSummaryMap
 import com.filipebicho.pokerclash.data.Data.init
+import com.filipebicho.pokerclash.data.Data.mainPot
 import com.filipebicho.pokerclash.data.Data.odds
 import com.filipebicho.pokerclash.data.Data.opponent
 import com.filipebicho.pokerclash.data.Data.player
 import com.filipebicho.pokerclash.data.Data.playerCards
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
+import com.filipebicho.pokerclash.data.Data.roundPot
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.data.Data.winnerCount
@@ -118,10 +118,15 @@ class Showdown {
     }
 
     fun showdownCards() {
+
+        mainPot += roundPot
+        roundPot = 0
+
         uiStateFlow.update { currentState -> currentState.copy(
             displayBotCards = true,
             showdown = true,
-            pot = pokerChips[POT]
+            mainPot = mainPot,
+            roundPot = roundPot
         )}
 
         when (round) {
@@ -166,8 +171,8 @@ class Showdown {
 
         when (winner) {
             PLAYER -> {
-                pokerChips[PLAYER] += pokerChips[POT]
-                gameSummaryList += "${uiStateFlow.value.name[PLAYER]} wins $pokerChips[POT] €"
+                pokerChips[PLAYER] += mainPot
+                gameSummaryList += "${uiStateFlow.value.name[PLAYER]} wins $mainPot €"
                 gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
                 uiStateFlow.update { currentState -> currentState.copy(
@@ -175,13 +180,13 @@ class Showdown {
                     botMoney = pokerChips[BOT],
                     playerText = "${playerHand.resultText} 100 %",
                     botText = "${computerHand.resultText} 0 %",
-                    actionText = "${uiStateFlow.value.name[PLAYER]} wins $pokerChips[POT] €",
+                    actionText = "${uiStateFlow.value.name[PLAYER]} wins $mainPot €",
                     gameSummary = gameSummaryMap
                 )}
             }
             BOT -> {
-                pokerChips[BOT] += pokerChips[POT]
-                gameSummaryList += "${uiStateFlow.value.name[BOT]} wins $pokerChips[POT] €"
+                pokerChips[BOT] += mainPot
+                gameSummaryList += "${uiStateFlow.value.name[BOT]} wins $mainPot €"
                 gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
                 uiStateFlow.update { currentState -> currentState.copy(
@@ -189,20 +194,20 @@ class Showdown {
                     botMoney = pokerChips[BOT],
                     playerText = "${playerHand.resultText} 0 %",
                     botText = "${computerHand.resultText} 100 %",
-                    actionText = "${uiStateFlow.value.name[BOT]} wins $pokerChips[POT] €",
+                    actionText = "${uiStateFlow.value.name[BOT]} wins $mainPot €",
                     gameSummary = gameSummaryMap
                 )}
             }
             else -> {
-                pokerChips[PLAYER] += pokerChips[POT] / 2
-                pokerChips[BOT] += pokerChips[POT] / 2
-                gameSummaryList += "Split pot with value $pokerChips[POT] €"
+                pokerChips[PLAYER] += mainPot / 2
+                pokerChips[BOT] += mainPot / 2
+                gameSummaryList += "Split pot with value $mainPot €"
                 gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
                 uiStateFlow.update { currentState -> currentState.copy(
                     playerText = "${playerHand.resultText} 0 %",
                     botText = "${computerHand.resultText} 0 %",
-                    actionText = "Draw, split $pokerChips[POT] €",
+                    actionText = "Draw, split $mainPot €",
                     gameSummary = gameSummaryMap
                 )}
             }

@@ -1,6 +1,5 @@
 package com.filipebicho.pokerclash.game
 
-import com.filipebicho.pokerclash.POT
 import com.filipebicho.pokerclash.bot.NO_ACTION
 import com.filipebicho.pokerclash.cards.BOT
 import com.filipebicho.pokerclash.cards.Dealer
@@ -18,6 +17,7 @@ import com.filipebicho.pokerclash.data.Data.dealer
 import com.filipebicho.pokerclash.data.Data.gameNumber
 import com.filipebicho.pokerclash.data.Data.gameSummaryList
 import com.filipebicho.pokerclash.data.Data.gameSummaryMap
+import com.filipebicho.pokerclash.data.Data.mainPot
 import com.filipebicho.pokerclash.data.Data.odds
 import com.filipebicho.pokerclash.data.Data.opponent
 import com.filipebicho.pokerclash.data.Data.player
@@ -25,6 +25,7 @@ import com.filipebicho.pokerclash.data.Data.playerCards
 import com.filipebicho.pokerclash.data.Data.playerMoney
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
+import com.filipebicho.pokerclash.data.Data.roundPot
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.odds.Combinations
@@ -72,29 +73,35 @@ class Init {
         bet[BOT] = 0
 
         // pot
-        pokerChips[POT] = 0
-        bet[POT] = 0
+        roundPot = 0
+        mainPot = 0
 
         checkAvailable = true
         gameSummaryList.clear()
 
-        if (gameSummaryMap.isNotEmpty()) {
+        if (gameSummaryMap.isNotEmpty())
             gameNumber += 1
-        }
+
         gameSummaryList.add("Game ${gameNumber+1}")
         gameSummaryMap.add(gameNumber, gameSummaryList.toList())
 
         // init or change dealer
-        dealer = BOT
+//        dealer = if (dealer == -1) {
+//            (0..1).random()
+//        } else {
+//            if (dealer == 0) 1 else 0
+//        }
+        dealer = PLAYER
         blind = if (dealer == 0) 1 else 0
         player = dealer
         opponent = blind
 
         uiStateFlow.update { currentState -> currentState.copy(
             playerBet = 0,
-            playerMinRaise = 0,
             botBet = 0,
-            pot = 0,
+            playerMinRaise = 0,
+            mainPot = 0,
+            roundPot = 0,
             actionText = "",
             playerText = "0 €",
             botText = "0 €",

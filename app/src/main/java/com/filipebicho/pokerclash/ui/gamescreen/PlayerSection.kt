@@ -159,7 +159,7 @@ private fun SmallBetButtonsSection(
         )
         SmallBetButton(
             text = "Pot",
-            onClick = {gameViewModel.updatePlayerBet(gameUiState.pot)},
+            onClick = {gameViewModel.updatePlayerBet(gameUiState.mainPot)},
             enabled = enabled && gameUiState.displayPotSmallButton,
             modifier = Modifier.weight(1f)
         )

@@ -1,7 +1,6 @@
 package com.filipebicho.pokerclash.bot
 
 import android.util.Log
-import com.filipebicho.pokerclash.POT
 import com.filipebicho.pokerclash.cards.BOT
 import com.filipebicho.pokerclash.cards.FLOP
 import com.filipebicho.pokerclash.cards.PLAYER
@@ -13,8 +12,10 @@ import com.filipebicho.pokerclash.data.Data.bet
 import com.filipebicho.pokerclash.data.Data.botCards
 import com.filipebicho.pokerclash.data.Data.botModel
 import com.filipebicho.pokerclash.data.Data.dealer
+import com.filipebicho.pokerclash.data.Data.mainPot
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
+import com.filipebicho.pokerclash.data.Data.roundPot
 import com.filipebicho.pokerclash.data.Data.tableCards
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONObject
@@ -78,7 +79,6 @@ class ChatgptBot {
                 "call" -> CALL
                 "check" -> CHECK
                 "bet" -> BET
-                "raise" -> RAISE
                 "all in" -> ALLIN
                 else -> -1
             }
@@ -105,7 +105,6 @@ class ChatgptBot {
             CHECK -> "Check"
             CALL -> "Call"
             BET -> "Bet ${bet[PLAYER]}"
-            RAISE -> "Raise ${bet[PLAYER]}"
             ALLIN -> "All in"
             else -> ""
         }
@@ -130,11 +129,11 @@ class ChatgptBot {
                 "                    \"Opponent money: ${pokerChips[PLAYER]}\\n\" +\n" +
                 "                    \"Your previous bet: ${bet[BOT]}\\n\"+\n" +
                 "                    \"Opponent bet: ${bet[PLAYER]}\\n\"+\n" +
-                "                    \"Current pot round: ${bet[POT]}\\n\" +\n" +
-                "                    \"Total pot: ${pokerChips[POT]}\\n\" +\n" +
+                "                    \"Current pot round: $roundPot\\n\" +\n" +
+                "                    \"Total pot: $mainPot\\n\" +\n" +
                 "                    \"Opponent action: $playerAction \\n\" +\n" +
                 "                    \"Output: JSON containing only the action and bet\\n\" +\n" +
-                "                    \"Action types: Fold, Check, Call, Bet, Raise, All in\\n\" +\n" +
+                "                    \"Action types: Fold, Check, Call, Bet, All in\\n\" +\n" +
                 "                    \"Bet: value of the bet\\n\" +\n" +
                 "                    \"Question: What should be my action and Bet?\\n\"")
 
@@ -150,11 +149,11 @@ class ChatgptBot {
                     "Opponent money: ${pokerChips[PLAYER]}\n" +
                     "Your previous bet: ${bet[BOT]}\n"+
                     "Opponent bet: ${bet[PLAYER]}\n"+
-                    "Current pot round: ${bet[POT]}\n" +
-                    "Total pot: ${pokerChips[POT]}\n" +
+                    "Current pot round: $roundPot\n" +
+                    "Total pot: $mainPot\n" +
                     "Opponent action: $playerAction \n" +
                     "Output: JSON containing only the action and bet\n" +
-                    "Action types: Fold, Check, Call, Bet, Raise, All in\n" +
+                    "Action types: Fold, Check, Call, Bet, All in\n" +
                     "Bet: value of the bet\n" +
                     "Question: What should be my action and Bet?\n"
         ))

@@ -57,9 +57,23 @@ fun GameSection(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Pot(totalPot = gameUiState.pot)
+                MainPot(value = gameUiState.mainPot)
                 TableCards(gameUiState = gameUiState)
+                RoundPot(roundPot = gameUiState.roundPot)
                 Hand(gameUiState = gameUiState)
+                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        modifier = Modifier
+                            .background(
+                                Color.DarkGray.copy(alpha = 0.5f),
+                                shape = RoundedCornerShape(5.dp)
+                            )
+                            .padding(5.dp),
+                        color = Color.White,
+                        fontSize = 10.sp,
+                        text = "Debug: ${gameUiState.playerMoney + gameUiState.botMoney + gameUiState.mainPot}"
+                    )
+                }
             }
         }
 
@@ -122,7 +136,7 @@ private fun Bet(bet: Int) {
 }
 
 @Composable
-private fun Pot(totalPot: Int) {
+private fun MainPot(value: Int) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             modifier = Modifier
@@ -132,7 +146,24 @@ private fun Pot(totalPot: Int) {
                 )
                 .padding(5.dp),
             color = Color.White,
-            text = "Pot: $totalPot"
+            text = "Pot: $value"
+        )
+    }
+}
+
+@Composable
+private fun RoundPot(roundPot: Int) {
+    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            modifier = Modifier
+                .background(
+                    Color.DarkGray.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(5.dp)
+                )
+                .padding(5.dp),
+            color = Color.White,
+            fontSize = 10.sp,
+            text = "Round Pot: $roundPot"
         )
     }
 }

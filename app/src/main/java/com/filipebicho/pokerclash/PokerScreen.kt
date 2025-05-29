@@ -40,8 +40,8 @@ fun PokerApp(
     LaunchedEffect(Unit) {
         if (isDevelopmentMode) {
             // Temporarily initialize for direct game access in development
-            viewModel.setPlayerName("Filipe11")
-            viewModel.setBot(Pair("GPT 4o mini", "gpt-4o-mini"))
+            viewModel.setPlayerName("Filipe")
+            viewModel.setBot(Pair("GPT 4o mini", "gpt-4o"))
             viewModel.startGame()
         }
     }
