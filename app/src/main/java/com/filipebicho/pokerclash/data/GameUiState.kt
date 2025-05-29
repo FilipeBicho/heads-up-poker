@@ -11,11 +11,11 @@ data class GameUiState(
     val botName: String = "",
     val botModel: String = "",
 
+    // Actions
+    val actions: List<String> = mutableListOf(),
+
     // Summary Text
     val name: List<String> = mutableListOf(),
-    val playerText: String = "",
-    val botText: String = "",
-    val actionText: String = "",
     val gameSummary: List<List<String>> = ArrayList(),
     val displaySummary: Boolean = false,
 

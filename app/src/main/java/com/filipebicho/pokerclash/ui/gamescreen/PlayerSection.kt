@@ -23,8 +23,10 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,9 +47,12 @@ import com.filipebicho.pokerclash.BIG_BLIND
 import com.filipebicho.pokerclash.GameUiState
 import com.filipebicho.pokerclash.GameViewModel
 import com.filipebicho.pokerclash.R
+import com.filipebicho.pokerclash.cards.BOT
 import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.ui.GameBoardScreen
+import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
+import kotlin.text.get
 
 @Composable
 fun PlayerSection(
@@ -97,7 +102,11 @@ private fun PlayerCards(gameUiState: GameUiState, modifier: Modifier = Modifier)
         contentAlignment = Alignment.BottomCenter
     ) {
         Cards(cards = gameUiState.playerCards, display = true, modifier = modifier)
-        NameAndMoneySection(name = gameUiState.playerName, money = gameUiState.playerMoney)
+        NameAndMoneySection(
+            name = gameUiState.playerName,
+            action = gameUiState.actions[PLAYER],
+            money = gameUiState.playerMoney
+        )
         if (gameUiState.dealer == PLAYER) {
             Box(modifier = Modifier.align(Alignment.TopEnd)) {
                 DealerChipImage()
@@ -298,7 +307,6 @@ private fun ButtonSection(
                 modifier = Modifier.weight(1f)
             )
         }
-
         Button(
             text = "Bet ${gameUiState.playerCurrentRaise}",
             onClick = { gameViewModel.bet(gameUiState.playerCurrentRaise) },
@@ -317,7 +325,9 @@ private fun Button(
 ) {
     OutlinedButton(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth().alpha(if (enabled) 1f else 0f),
+        modifier = modifier
+            .fillMaxWidth()
+            .alpha(if (enabled) 1f else 0f),
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = colorResource(id = R.color.button_red),
@@ -330,9 +340,10 @@ private fun Button(
             text = text,
             style = TextStyle(
                 fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center
             ),
-            modifier = Modifier.padding(horizontal = 4.dp)
+            modifier = Modifier.padding(horizontal = 2.dp)
         )
     }
 }

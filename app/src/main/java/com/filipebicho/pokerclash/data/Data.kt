@@ -39,6 +39,9 @@ object Data {
     )
     var botModel = ""
 
+    // Actions
+    var actionText : MutableList<String> = mutableListOf("", "")
+
     // Money
     var playerMoney = 1500
     var botMoney = 1500

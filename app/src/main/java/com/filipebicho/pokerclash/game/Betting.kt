@@ -15,6 +15,7 @@ import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.cards.RIVER
 import com.filipebicho.pokerclash.cards.TURN
 import com.filipebicho.pokerclash.data.Data.action
+import com.filipebicho.pokerclash.data.Data.actionText
 import com.filipebicho.pokerclash.data.Data.bet
 import com.filipebicho.pokerclash.data.Data.blind
 import com.filipebicho.pokerclash.data.Data.botLastRaise
@@ -38,9 +39,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Timer
-import kotlin.compareTo
 import kotlin.concurrent.timerTask
-import kotlin.text.get
 
 class Betting {
 
@@ -66,6 +65,9 @@ class Betting {
                  gameSummaryList += "$blindName makes all in ${bet[blind]}"
                  gameSummaryList += "$dealerName pays all in ${bet[dealer]}"
 
+                 actionText[blind] = "All in ${bet[blind]}"
+                 actionText[dealer] = "Call ${bet[dealer]}"
+
                  updateStateFlowBets()
                  showdown.showdownCards()
              } else {
@@ -83,6 +85,9 @@ class Betting {
                  gameSummaryList += "$blindName makes all in ${bet[blind]}"
                  gameSummaryList += "$dealerName pays all in ${bet[dealer]}"
 
+                 actionText[blind] = "All in ${bet[blind]}"
+                 actionText[dealer] = "Call ${bet[dealer]}"
+
                  player = dealer
                  updateStateFlowBets()
                  foldCall()
@@ -99,8 +104,11 @@ class Betting {
              // calculate pot
              roundPot = bet[blind] + bet[dealer]
 
-             gameSummaryList += "$blindName makes all in ${bet[blind]}"
-             gameSummaryList += "$dealerName pays all in ${bet[dealer]}"
+             gameSummaryList += "$blindName makes all in ${bet[dealer]}"
+             gameSummaryList += "$dealerName pays all in ${bet[blind]}"
+
+             actionText[dealer] = "All in ${bet[dealer]}"
+             actionText[blind] = "Call ${bet[blind]}"
 
              updateStateFlowBets()
              showdown.showdownCards()
@@ -119,6 +127,9 @@ class Betting {
              gameSummaryList += "$dealerName pays small blind ${bet[dealer]}"
              gameSummaryList += "$blindName pays big blind ${bet[blind]}"
 
+             actionText[dealer] = "SB"
+             actionText[blind] = "BB"
+
              updateStateFlowBets()
              player = dealer
              foldCallBet()
@@ -135,16 +146,18 @@ class Betting {
 
         gameSummaryList += "$playerName folds"
         gameSummaryList += "$opponentName wins $totalPotWonByOpponent"
+
+        actionText[player] = "Fold"
+        actionText[opponent] = "Win $totalPotWonByOpponent"
+
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
         uiStateFlow.update { currentState ->
             currentState.copy(
                 playerMoney = pokerChips[PLAYER],
                 botMoney = pokerChips[BOT],
-                playerText = "0",
-                botText = "0",
-                actionText = "$playerName folds, opponentName wins $totalPotWonByOpponent",
                 gameSummary = gameSummaryMap,
+                actions = actionText,
                 isPlayerTurn = false
             )
         }
@@ -158,8 +171,11 @@ class Betting {
         gameSummaryList += "$playerName checks"
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
+        actionText[player] = "Check"
+
         uiStateFlow.update { currentState ->
             currentState.copy(
+                actions = actionText,
                 gameSummary = gameSummaryMap
             )
         }
@@ -193,6 +209,8 @@ class Betting {
             }
 
             roundPot = bet[player] + bet[opponent]
+            actionText[player] = "All in $allInAmount"
+            
             updateStateFlowBets()
             showdown.showdownCards()
         } else {
@@ -202,6 +220,8 @@ class Betting {
             bet[player] = bet[opponent]
 
             roundPot = bet[player] + bet[opponent]
+            actionText[player] = "Call $amountToCall"
+            
             updateStateFlowBets()
 
             if (round == RIVER || (pokerChips[player] == 0 || pokerChips[opponent] == 0)) {
@@ -244,6 +264,8 @@ class Betting {
             roundPot = bet[player] + bet[opponent]
 
             gameSummaryList += "$playerName bets ${bet[player]}"
+            actionText[player] = "Bet ${bet[player]}"
+            
             updateStateFlowBets()
             switchPlayerTurn()
 
@@ -275,7 +297,8 @@ class Betting {
         roundPot = bet[player] + bet[opponent]
 
         gameSummaryList += "$playerName makes all in with ${bet[player]}"
-
+        actionText[player] = "All in ${bet[player]}"
+        
         updateStateFlowBets()
         switchPlayerTurn()
 
@@ -300,6 +323,8 @@ class Betting {
         bet[BOT] = 0
         checkAvailable = true
 
+        actionText[player] = ""
+
         uiStateFlow.update { currentState ->
             currentState.copy(
                 playerBet = bet[PLAYER],
@@ -308,8 +333,6 @@ class Betting {
                 playerCurrentRaise = getMinRaiseForPlayer(),
                 mainPot = mainPot,
                 roundPot = roundPot,
-                playerText = "${bet[PLAYER]} €",
-                botText = "${bet[BOT]} €"
             )
         }
 
@@ -429,6 +452,7 @@ class Betting {
                 botBet = bet[BOT],
                 playerMinRaise = getMinRaiseForPlayer(),
                 playerCurrentRaise = getMinRaiseForPlayer(),
+                actions = actionText,
                 roundPot = roundPot,
                 mainPot = mainPot + roundPot,
                 gameSummary = gameSummaryMap

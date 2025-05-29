@@ -6,6 +6,7 @@ import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.cards.RIVER
 import com.filipebicho.pokerclash.cards.TURN
+import com.filipebicho.pokerclash.data.Data.actionText
 import com.filipebicho.pokerclash.data.Data.botCards
 import com.filipebicho.pokerclash.data.Data.gameNumber
 import com.filipebicho.pokerclash.data.Data.gameSummaryList
@@ -47,8 +48,6 @@ class Showdown {
 
             uiStateFlow.update { currentState -> currentState.copy(
                 displayFlop = true,
-                playerText = "${odds.getShowdownPlayerOdds()} %",
-                botText = "${odds.getShowdownOpponentOdds()} %",
                 gameSummary = gameSummaryMap
             )}
             showdownCards()
@@ -77,8 +76,6 @@ class Showdown {
 
             uiStateFlow.update { currentState -> currentState.copy(
                 displayTurn = true,
-                playerText = "${odds.getShowdownPlayerOdds()} %",
-                botText = "${odds.getShowdownOpponentOdds()} %",
                 gameSummary = gameSummaryMap
             )}
 
@@ -102,23 +99,18 @@ class Showdown {
         if (showdownCards) {
             uiStateFlow.update { currentState -> currentState.copy(
                 displayRiver = true,
-                playerText = "${odds.getShowdownPlayerOdds()} %",
-                botText = "${odds.getShowdownOpponentOdds()} %",
                 gameSummary = gameSummaryMap
             )}
-
             showdownCards()
         } else {
             uiStateFlow.update { currentState -> currentState.copy(
                 displayRiver = true,
                 gameSummary = gameSummaryMap
             )}
-
         }
     }
 
     fun showdownCards() {
-
         mainPot += roundPot
         roundPot = 0
 
@@ -137,9 +129,6 @@ class Showdown {
         }
     }
 
-    /**
-     * Calculate winner
-     */
     fun calculateWinner() {
         uiStateFlow.update { currentState -> currentState.copy(
             isPlayerTurn = false,
@@ -172,46 +161,32 @@ class Showdown {
         when (winner) {
             PLAYER -> {
                 pokerChips[PLAYER] += mainPot
-                gameSummaryList += "${uiStateFlow.value.name[PLAYER]} wins $mainPot €"
+                actionText[PLAYER] = "wins $mainPot"
+                gameSummaryList += "${uiStateFlow.value.name[PLAYER]} wins $mainPot"
                 gameSummaryMap[gameNumber] = gameSummaryList.toList()
-
-                uiStateFlow.update { currentState -> currentState.copy(
-                    playerMoney = pokerChips[PLAYER],
-                    botMoney = pokerChips[BOT],
-                    playerText = "${playerHand.resultText} 100 %",
-                    botText = "${computerHand.resultText} 0 %",
-                    actionText = "${uiStateFlow.value.name[PLAYER]} wins $mainPot €",
-                    gameSummary = gameSummaryMap
-                )}
             }
             BOT -> {
                 pokerChips[BOT] += mainPot
-                gameSummaryList += "${uiStateFlow.value.name[BOT]} wins $mainPot €"
+                actionText[BOT] = "wins $mainPot"
+                gameSummaryList += "${uiStateFlow.value.name[BOT]} wins $mainPot"
                 gameSummaryMap[gameNumber] = gameSummaryList.toList()
-
-                uiStateFlow.update { currentState -> currentState.copy(
-                    playerMoney = pokerChips[PLAYER],
-                    botMoney = pokerChips[BOT],
-                    playerText = "${playerHand.resultText} 0 %",
-                    botText = "${computerHand.resultText} 100 %",
-                    actionText = "${uiStateFlow.value.name[BOT]} wins $mainPot €",
-                    gameSummary = gameSummaryMap
-                )}
             }
             else -> {
                 pokerChips[PLAYER] += mainPot / 2
                 pokerChips[BOT] += mainPot / 2
-                gameSummaryList += "Split pot with value $mainPot €"
+                actionText[PLAYER] = "wins ${mainPot / 2}"
+                actionText[BOT] = "wins ${mainPot / 2}"
+                gameSummaryList += "Split pot with value $mainPot"
                 gameSummaryMap[gameNumber] = gameSummaryList.toList()
-
-                uiStateFlow.update { currentState -> currentState.copy(
-                    playerText = "${playerHand.resultText} 0 %",
-                    botText = "${computerHand.resultText} 0 %",
-                    actionText = "Draw, split $mainPot €",
-                    gameSummary = gameSummaryMap
-                )}
             }
         }
+
+        uiStateFlow.update { currentState -> currentState.copy(
+            playerMoney = pokerChips[PLAYER],
+            botMoney = pokerChips[BOT],
+            actions = actionText,
+            gameSummary = gameSummaryMap
+        )}
 
         if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
             Timer().schedule(timerTask {
@@ -222,9 +197,6 @@ class Showdown {
             Timer().schedule(timerTask {
                 uiStateFlow.update { currentState -> currentState.copy(
                     newGame = true,
-                    actionText = "${uiStateFlow.value.name[winner]} wins the game",
-                    playerText = "${uiStateFlow.value.name[PLAYER]} has ${winnerCount[PLAYER]} win(s)",
-                    botText = "${uiStateFlow.value.name[BOT]} has ${winnerCount[BOT]} win(s)",
                     playerWins = winnerCount[PLAYER],
                     botWins = winnerCount[BOT]
                 )}
