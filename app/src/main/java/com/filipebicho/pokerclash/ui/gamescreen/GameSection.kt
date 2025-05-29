@@ -60,7 +60,7 @@ fun GameSection(
                 MainPot(value = gameUiState.mainPot)
                 TableCards(gameUiState = gameUiState)
                 RoundPot(roundPot = gameUiState.roundPot)
-                Hand(gameUiState = gameUiState)
+                Hand(hand = gameUiState.playerHandResult)
                 Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         modifier = Modifier
@@ -213,13 +213,13 @@ private fun TableCardImage(card: Card?, display: Boolean) {
 }
 
 @Composable
-private fun Hand(gameUiState: GameUiState) {
+private fun Hand(hand: String) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = "Pair of Two",
+            text = hand,
             fontSize = 12.sp,
             color = Color.White,
         )

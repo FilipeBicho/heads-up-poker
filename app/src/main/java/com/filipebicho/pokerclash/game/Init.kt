@@ -86,12 +86,11 @@ class Init {
         gameSummaryMap.add(gameNumber, gameSummaryList.toList())
 
         // init or change dealer
-//        dealer = if (dealer == -1) {
-//            (0..1).random()
-//        } else {
-//            if (dealer == 0) 1 else 0
-//        }
-        dealer = PLAYER
+        dealer = if (dealer == -1) {
+            (0..1).random()
+        } else {
+            if (dealer == 0) 1 else 0
+        }
         blind = if (dealer == 0) 1 else 0
         player = dealer
         opponent = blind
@@ -103,6 +102,7 @@ class Init {
             mainPot = 0,
             roundPot = 0,
             gameSummary = gameSummaryMap,
+            playerHandResult = "",
             isPlayerTurn = player == PLAYER,
             newGame = false,
             dealer = dealer,

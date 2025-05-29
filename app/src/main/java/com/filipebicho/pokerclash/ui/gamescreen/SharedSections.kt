@@ -31,11 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import com.filipebicho.pokerclash.GameUiState
 import com.filipebicho.pokerclash.R
-import com.filipebicho.pokerclash.cards.BOT
 import com.filipebicho.pokerclash.cards.Card
-import com.filipebicho.pokerclash.cards.PLAYER
 import kotlinx.coroutines.delay
 import kotlin.text.isNotEmpty
 

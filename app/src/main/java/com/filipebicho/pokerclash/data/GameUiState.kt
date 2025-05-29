@@ -14,6 +14,9 @@ data class GameUiState(
     // Actions
     val actions: List<String> = mutableListOf(),
 
+    // Hand
+    val playerHandResult: String = "",
+
     // Summary Text
     val name: List<String> = mutableListOf(),
     val gameSummary: List<List<String>> = ArrayList(),

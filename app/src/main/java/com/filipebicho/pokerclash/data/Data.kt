@@ -2,7 +2,6 @@ package com.filipebicho.pokerclash.data
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.filipebicho.pokerclash.BIG_BLIND
 import com.filipebicho.pokerclash.GameUiState
 import com.filipebicho.pokerclash.bot.ChatgptBot
 import com.filipebicho.pokerclash.cards.Card
@@ -10,7 +9,7 @@ import com.filipebicho.pokerclash.cards.Dealer
 import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.game.Betting
 import com.filipebicho.pokerclash.game.Init
-import com.filipebicho.pokerclash.game.Showdown
+import com.filipebicho.pokerclash.game.Round
 import com.filipebicho.pokerclash.odds.Odds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,7 +26,7 @@ object Data {
     var init: Init = Init()
     var betting: Betting = Betting()
     lateinit var cardDealer: Dealer
-    var showdown: Showdown = Showdown()
+    var showdown: Round = Round()
     val chatGptBot = ChatgptBot()
 
     // Bot models

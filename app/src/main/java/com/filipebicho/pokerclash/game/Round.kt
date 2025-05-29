@@ -29,13 +29,16 @@ import kotlinx.coroutines.flow.update
 import java.util.Timer
 import kotlin.concurrent.timerTask
 
-class Showdown {
+class Round {
 
     fun flop(showdownCards: Boolean = false) {
         round = FLOP
 
         var flopString = ""
-        tableCards.subList(0,3).forEach { flopString += it.cardString()+" " }
+        var flopCards = tableCards.subList(0,3)
+        val playerHand = Hand(playerCards = playerCards, tableCards = flopCards)
+
+        flopCards.forEach { flopString += it.cardString()+" " }
         gameSummaryList.add("---- $flopString ----")
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
@@ -43,18 +46,20 @@ class Showdown {
             odds.calculateShowdownFlopOdds(
                 playerCards = playerCards,
                 opponentCards = botCards,
-                tableCards = tableCards.subList(0, 3)
+                tableCards = flopCards
             )
 
             uiStateFlow.update { currentState -> currentState.copy(
                 displayFlop = true,
-                gameSummary = gameSummaryMap
+                gameSummary = gameSummaryMap,
+                playerHandResult = playerHand.resultText
             )}
             showdownCards()
         } else {
             uiStateFlow.update { currentState -> currentState.copy(
                 displayFlop = true,
-                gameSummary = gameSummaryMap
+                gameSummary = gameSummaryMap,
+                playerHandResult = playerHand.resultText
             )}
         }
     }
@@ -63,7 +68,11 @@ class Showdown {
         round = TURN
 
         var turnString = ""
-        tableCards.subList(0,4).forEach { turnString += it.cardString()+" " }
+        var turnCards = tableCards.subList(0,4)
+        val playerHand = Hand(playerCards = playerCards, tableCards = turnCards)
+
+
+        turnCards.forEach { turnString += it.cardString()+" " }
         gameSummaryList.add("---- $turnString ----")
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
@@ -71,19 +80,21 @@ class Showdown {
             odds.calculateShowdownTurnOdds(
                 playerCards = playerCards,
                 opponentCards = botCards,
-                tableCards = tableCards.subList(0, 4)
+                tableCards = turnCards
             )
 
             uiStateFlow.update { currentState -> currentState.copy(
                 displayTurn = true,
-                gameSummary = gameSummaryMap
+                gameSummary = gameSummaryMap,
+                playerHandResult = playerHand.resultText
             )}
 
             showdownCards()
         } else {
             uiStateFlow.update { currentState -> currentState.copy(
                 displayTurn = true,
-                gameSummary = gameSummaryMap
+                gameSummary = gameSummaryMap,
+                playerHandResult = playerHand.resultText
             )}
         }
     }
@@ -92,6 +103,8 @@ class Showdown {
         round = RIVER
 
         var riverString = ""
+        val playerHand = Hand(playerCards = playerCards, tableCards = tableCards)
+
         tableCards.forEach { riverString += it.cardString()+" " }
         gameSummaryList.add("---- $riverString ----")
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
@@ -99,13 +112,15 @@ class Showdown {
         if (showdownCards) {
             uiStateFlow.update { currentState -> currentState.copy(
                 displayRiver = true,
-                gameSummary = gameSummaryMap
+                gameSummary = gameSummaryMap,
+                playerHandResult = playerHand.resultText
             )}
             showdownCards()
         } else {
             uiStateFlow.update { currentState -> currentState.copy(
                 displayRiver = true,
-                gameSummary = gameSummaryMap
+                gameSummary = gameSummaryMap,
+                playerHandResult = playerHand.resultText
             )}
         }
     }
