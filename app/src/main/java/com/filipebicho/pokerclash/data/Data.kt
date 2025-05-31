@@ -54,6 +54,7 @@ object Data {
     var action: Int = -1
     var checkAvailable: Boolean = true
     var round: Int = PRE_FLOP
+    var validActions = listOf("")
 
     // Count variables
     var winnerCount: MutableList<Int> = mutableListOf(0,0)

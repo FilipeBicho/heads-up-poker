@@ -1,6 +1,7 @@
 package com.filipebicho.pokerclash.cards
 
 import android.annotation.SuppressLint
+import androidx.compose.material3.Card
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
 
@@ -31,6 +32,11 @@ class Dealer {
         botCards.add(deck.dealCard())
         playerCards.add(deck.dealCard())
         botCards.add(deck.dealCard())
+
+//        playerCards.add(Card(TWO, HEARTS))
+//        playerCards.add(Card(TEN, CLUBS))
+//        botCards.add(Card(ACE, SPADES))
+//        botCards.add(Card(JACK, CLUBS))
     }
 
     /**
@@ -42,23 +48,28 @@ class Dealer {
         for (i in 0 until 3) {
             tableCards.add(deck.dealCard())
         }
+//
+//        tableCards.add(Card(SIX, HEARTS))
+//        tableCards.add(Card(JACK, DIAMONDS))
+//        tableCards.add(Card(FIVE, DIAMONDS))
     }
 
     /**
      * Set turn
      */
     fun setTurnCard(tableCards: SnapshotStateList<Card>) {
-
         deck.dealCard()
         tableCards.add(deck.dealCard())
+
+//        tableCards.add(Card(ACE, HEARTS))
     }
 
     /**
      * Set river
      */
     fun setRiverCard(tableCards: SnapshotStateList<Card>) {
-
         deck.dealCard()
         tableCards.add(deck.dealCard())
+//        tableCards.add(Card(KING, HEARTS))
     }
 }

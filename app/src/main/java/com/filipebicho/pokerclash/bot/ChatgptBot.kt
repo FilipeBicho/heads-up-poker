@@ -17,6 +17,7 @@ import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
 import com.filipebicho.pokerclash.data.Data.tableCards
+import com.filipebicho.pokerclash.data.Data.validActions
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONObject
 import retrofit2.Call
@@ -126,12 +127,15 @@ class ChatgptBot {
                 "                    \"Dealer: $dealer\\n\" +\n" +
                 "                    \"Initial money: 1500\\n\" +\n" +
                 "                    \"Your money: ${pokerChips[BOT]}\\n\" +\n" +
+                "                    \"Your money + current bet: ${pokerChips[BOT] + bet[BOT]}\\n\" +\n" +
                 "                    \"Opponent money: ${pokerChips[PLAYER]}\\n\" +\n" +
+                "                    \"Opponent money + opponent current bet: ${pokerChips[PLAYER] + bet[PLAYER]}\\n\" +\n" +
                 "                    \"Your previous bet: ${bet[BOT]}\\n\"+\n" +
                 "                    \"Opponent bet: ${bet[PLAYER]}\\n\"+\n" +
                 "                    \"Current pot round: $roundPot\\n\" +\n" +
                 "                    \"Total pot: $mainPot\\n\" +\n" +
                 "                    \"Opponent action: $playerAction \\n\" +\n" +
+                "                    \"Valid actions: $validActions \\n\" +\n" +
                 "                    \"Output: JSON containing only the action and bet\\n\" +\n" +
                 "                    \"Action types: Fold, Check, Call, Bet, All in\\n\" +\n" +
                 "                    \"Bet: value of the bet\\n\" +\n" +
@@ -146,12 +150,15 @@ class ChatgptBot {
                     "Dealer: $dealer\n" +
                     "Initial money: 1500\n" +
                     "Your money: ${pokerChips[BOT]}\n" +
+                    "Your money + your current bet: ${pokerChips[BOT] + bet[BOT]}\n" +
                     "Opponent money: ${pokerChips[PLAYER]}\n" +
+                    "Opponent money + Opponent current bet: ${pokerChips[PLAYER] + bet[PLAYER]}\n" +
                     "Your previous bet: ${bet[BOT]}\n"+
                     "Opponent bet: ${bet[PLAYER]}\n"+
                     "Current pot round: $roundPot\n" +
                     "Total pot: $mainPot\n" +
                     "Opponent action: $playerAction \n" +
+                    "Valid actions: $validActions \n" +
                     "Output: JSON containing only the action and bet\n" +
                     "Action types: Fold, Check, Call, Bet, All in\n" +
                     "Bet: value of the bet\n" +

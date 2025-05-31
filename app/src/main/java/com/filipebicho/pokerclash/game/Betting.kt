@@ -1,5 +1,6 @@
 package com.filipebicho.pokerclash.game
 
+import android.util.Log
 import com.filipebicho.pokerclash.BIG_BLIND
 import com.filipebicho.pokerclash.SMALL_BLIND
 import com.filipebicho.pokerclash.bot.ALLIN
@@ -34,6 +35,7 @@ import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
 import com.filipebicho.pokerclash.data.Data.showdown
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
+import com.filipebicho.pokerclash.data.Data.validActions
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,6 +52,8 @@ class Betting {
 
          if (pokerChips[blind] <= BIG_BLIND) {
              if (pokerChips[blind] <= SMALL_BLIND) {
+
+                 bettingLog("--- BEFORE BLIND (small blind) All in ---")
 
                  // blind makes all in
                  bet[blind] = pokerChips[blind]
@@ -68,9 +72,14 @@ class Betting {
                  actionText[blind] = "All in ${bet[blind]}"
                  actionText[dealer] = "Call ${bet[dealer]}"
 
+                 bettingLog("--- AFTER BLIND (small blind) All in ---")
+
                  updateStateFlowBets()
                  showdown.showdownCards()
              } else {
+
+                 bettingLog("--- BEFORE BLIND (big blind) All in ---")
+
                  // blind makes all in
                  bet[blind] = pokerChips[blind]
                  pokerChips[blind] = 0
@@ -88,11 +97,16 @@ class Betting {
                  actionText[blind] = "All in ${bet[blind]}"
                  actionText[dealer] = "Call ${bet[dealer]}"
 
+                 bettingLog("--- AFTER BLIND (big blind) All in ---")
+
                  player = dealer
                  updateStateFlowBets()
                  foldCall()
              }
          } else if (pokerChips[dealer] <= SMALL_BLIND) {
+
+             bettingLog("--- BEFORE DEALER (small blind) All in ---")
+
              // dealer makes all in
              bet[dealer] = pokerChips[dealer]
              pokerChips[dealer] = 0
@@ -110,9 +124,14 @@ class Betting {
              actionText[dealer] = "All in ${bet[dealer]}"
              actionText[blind] = "Call ${bet[blind]}"
 
+             bettingLog("--- AFTER DEALER (small blind) All in ---")
+
              updateStateFlowBets()
              showdown.showdownCards()
          } else {
+
+             bettingLog("--- BEFORE PRE FLOP ---")
+
              // dealer pay small blind
              bet[dealer] = SMALL_BLIND
              pokerChips[dealer] -= bet[dealer]
@@ -130,6 +149,8 @@ class Betting {
              actionText[dealer] = "SB"
              actionText[blind] = "BB"
 
+             bettingLog("--- AFTER PRE FLOP ---")
+
              updateStateFlowBets()
              player = dealer
              foldCallBet()
@@ -140,6 +161,8 @@ class Betting {
         val playerName = uiStateFlow.value.name[player]
         val opponentName = uiStateFlow.value.name[opponent]
 
+        bettingLog("--- BEFORE FOLD $playerName ---")
+
         // opponent wins the pot
         val totalPotWonByOpponent = mainPot + roundPot
         pokerChips[opponent] += totalPotWonByOpponent
@@ -149,6 +172,8 @@ class Betting {
 
         actionText[player] = "Fold"
         actionText[opponent] = "Win $totalPotWonByOpponent"
+
+        bettingLog("--- AFTER FOLD $playerName ---")
 
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
@@ -168,11 +193,15 @@ class Betting {
 
     fun check() {
         val playerName = uiStateFlow.value.name[player]
-        gameSummaryList += "$playerName checks"
-        gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
+        bettingLog("--- BEFORE CHECK $playerName ---")
+
+        gameSummaryList += "$playerName checks"
         actionText[player] = "Check"
 
+        bettingLog("--- AFTER CHECK $playerName ---")
+
+        gameSummaryMap[gameNumber] = gameSummaryList.toList()
         uiStateFlow.update { currentState ->
             currentState.copy(
                 actions = actionText,
@@ -196,24 +225,37 @@ class Betting {
         gameSummaryList += "$playerName calls $amountToCall"
 
         if (pokerChips[player] <= amountToCall) {
+
+            bettingLog("--- BEFORE CALL (all in) $playerName ---")
+            Log.d("MONEY DEBUG", "Amount to call: $amountToCall")
+
+
             // Player is all-in by calling
             val allInAmount = pokerChips[player]
+            Log.d("MONEY DEBUG", "All in amount: $allInAmount")
+
             bet[player] += allInAmount
             pokerChips[player] = 0
 
             // Opponent's bet might need to be adjusted if player's all-in is less than opponent's bet
             if (bet[opponent] > bet[player]) {
                 val excessBet = bet[opponent] - bet[player]
+                Log.d("MONEY DEBUG", "Excess bet: $excessBet")
                 pokerChips[opponent] += excessBet // Return excess to opponent's chips
                 bet[opponent] = bet[player]     // Opponent's bet now matches player's all-in bet
             }
 
             roundPot = bet[player] + bet[opponent]
             actionText[player] = "All in $allInAmount"
-            
+
+            bettingLog("--- AFTER CALL (all in) $playerName ---")
+
             updateStateFlowBets()
             showdown.showdownCards()
         } else {
+
+            bettingLog("--- BEFORE CALL $playerName ---")
+            Log.d("MONEY DEBUG", "Amount to call: $amountToCall")
 
             // Player has enough chips to call normally
             pokerChips[player] -= amountToCall
@@ -221,7 +263,9 @@ class Betting {
 
             roundPot = bet[player] + bet[opponent]
             actionText[player] = "Call $amountToCall"
-            
+
+            bettingLog("--- AFTER CALL $playerName ---")
+
             updateStateFlowBets()
 
             if (round == RIVER || (pokerChips[player] == 0 || pokerChips[opponent] == 0)) {
@@ -238,20 +282,27 @@ class Betting {
 
     fun bet(newBetAmount: Int) {
         val playerName = uiStateFlow.value.name[player]
-        checkAvailable = false
-
         val previousBetAmount = bet[player]
+        val playerTotalStake = pokerChips[player] + previousBetAmount
 
+        bettingLog("--- BEFORE BET $playerName ---")
+        Log.d("MONEY DEBUG", "New bet amount: $newBetAmount")
+        Log.d("MONEY DEBUG", "Previous bet amount: $previousBetAmount")
+        Log.d("MONEY DEBUG", "Player total stake: $playerTotalStake")
+
+        checkAvailable = false
         if (player == BOT)
             botLastRaise = newBetAmount - bet[BOT]
 
-        val playerTotalStake = pokerChips[player] + previousBetAmount
         if (newBetAmount > playerTotalStake) {
+            Log.d("MONEY DEBUG", "All in: $playerTotalStake")
             allIn()
         } else {
             val opponentTotalStake = pokerChips[opponent] + bet[opponent]
+            Log.d("MONEY DEBUG", "Opponent total stake: $playerTotalStake")
             if (newBetAmount >= opponentTotalStake) {
                 // Player bets more than or equal to opponent's total stack, opponent will be all-in if they call
+                Log.d("MONEY DEBUG", "Bet equals opponent total stack: $playerTotalStake")
                 bet[player] = opponentTotalStake
             } else {
                 bet[player] = newBetAmount
@@ -265,7 +316,9 @@ class Betting {
 
             gameSummaryList += "$playerName bets ${bet[player]}"
             actionText[player] = "Bet ${bet[player]}"
-            
+
+            bettingLog("--- AFTER BET $playerName ---")
+
             updateStateFlowBets()
             switchPlayerTurn()
 
@@ -279,18 +332,25 @@ class Betting {
 
     fun allIn() {
         val playerName = uiStateFlow.value.name[player]
+        val previousBetAmount = bet[player]
+        val playerTotalStake = pokerChips[player] + bet[player]
+        val opponentTotalStake = pokerChips[opponent] + bet[opponent]
+
         checkAvailable = false
 
-        val previousBet = bet[player]
+        bettingLog("--- BEFORE ALL IN $playerName ---")
+        Log.d("MONEY DEBUG", "Previous bet amount: $previousBetAmount")
 
         // bet all chips
-        bet[player] = if (pokerChips[player] + bet[player] > pokerChips[opponent] + bet[opponent]) {
-            pokerChips[opponent] + bet[opponent]
+        bet[player] = if (playerTotalStake > opponentTotalStake) {
+            Log.d("MONEY DEBUG", "ALL IN equals opponent total stack: $opponentTotalStake")
+            opponentTotalStake
         } else {
-            pokerChips[player] + bet[player]
+            Log.d("MONEY DEBUG", "ALL IN equals player total stack: $playerTotalStake")
+            playerTotalStake
         }
 
-        pokerChips[player] += previousBet
+        pokerChips[player] += previousBetAmount
         pokerChips[player] -= bet[player]
 
         // calculate pot
@@ -298,7 +358,9 @@ class Betting {
 
         gameSummaryList += "$playerName makes all in with ${bet[player]}"
         actionText[player] = "All in ${bet[player]}"
-        
+
+        bettingLog("--- AFTER ALL IN $playerName ---")
+
         updateStateFlowBets()
         switchPlayerTurn()
 
@@ -394,7 +456,7 @@ class Betting {
     }
 
     private fun is3BBBetAvailable(): Boolean {
-        return getMinRaiseForPlayer() <= BIG_BLIND * 3
+        return getMinRaiseForPlayer() <= BIG_BLIND * 3 && pokerChips[PLAYER] >= BIG_BLIND * 3
     }
 
     private fun isPotBetAvailable(): Boolean {
@@ -475,6 +537,7 @@ class Betting {
                 displayAllInSmallButton = false
             )}
         } else {
+            validActions = listOf("Fold, Call")
             botAction()
         }
     }
@@ -496,6 +559,7 @@ class Betting {
                 displayAllInSmallButton = isAllInAvailable()
             )}
         } else {
+            validActions = listOf("Fold, Call and Bet")
             botAction()
         }
     }
@@ -517,7 +581,16 @@ class Betting {
                 )
             }
         } else {
+            validActions = listOf("Check and Bet")
             botAction()
         }
+    }
+
+    private fun bettingLog(title: String) {
+        Log.d("MONEY DEBUG", title)
+        Log.d("MONEY DEBUG", "PokerChips: ${pokerChips[PLAYER]} - ${pokerChips[BOT]}")
+        Log.d("MONEY DEBUG", "Bet: ${bet[PLAYER]} - ${bet[BOT]}")
+        Log.d("MONEY DEBUG", "RoundPot: $roundPot")
+        Log.d("MONEY DEBUG", "MainPot: $mainPot")
     }
 }
