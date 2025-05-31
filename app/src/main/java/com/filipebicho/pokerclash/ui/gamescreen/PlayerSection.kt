@@ -307,12 +307,23 @@ private fun ButtonSection(
                 modifier = Modifier.weight(1f)
             )
         }
-        Button(
-            text = "Bet ${gameUiState.playerCurrentRaise}",
-            onClick = { gameViewModel.bet(gameUiState.playerCurrentRaise) },
-            enabled = enabled && gameUiState.displayBetButton,
-            modifier = Modifier.weight(1f)
-        )
+
+        if (gameUiState.playerBet == 0 && gameUiState.botBet == 0) {
+            Button(
+                text = "Bet ${gameUiState.playerCurrentRaise}",
+                onClick = { gameViewModel.bet(gameUiState.playerCurrentRaise) },
+                enabled = enabled && gameUiState.displayBetButton,
+                modifier = Modifier.weight(1f)
+            )
+        } else {
+            Button(
+                text = "Raise ${gameUiState.playerCurrentRaise}",
+                onClick = { gameViewModel.bet(gameUiState.playerCurrentRaise) },
+                enabled = enabled && gameUiState.displayBetButton,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
     }
 }
 
