@@ -1,5 +1,9 @@
 package com.filipebicho.pokerclash.ui.gamescreen
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,10 +20,16 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -28,6 +38,8 @@ import com.filipebicho.pokerclash.GameUiState
 import com.filipebicho.pokerclash.GameViewModel
 import com.filipebicho.pokerclash.R
 import com.filipebicho.pokerclash.cards.Card
+import kotlinx.coroutines.delay
+import kotlin.collections.get
 
 @Composable
 fun GameSection(
@@ -170,6 +182,30 @@ private fun RoundPot(roundPot: Int) {
 
 @Composable
 private fun TableCards(gameUiState: GameUiState) {
+
+    // Local states to control individual card appearance
+    var showFlopCard1 by remember { mutableStateOf(false) }
+    var showFlopCard2 by remember { mutableStateOf(false) }
+    var showFlopCard3 by remember { mutableStateOf(false) }
+
+    val cardDisplayDelay = 500L
+
+    // Effect for Flop cards
+    LaunchedEffect(gameUiState.displayFlop) {
+        if (gameUiState.displayFlop) {
+            showFlopCard1 = true
+            delay(cardDisplayDelay)
+            showFlopCard2 = true
+            delay(cardDisplayDelay)
+            showFlopCard3 = true
+        } else {
+            // Optionally reset if displayFlop becomes false (e.g., new round)
+            showFlopCard1 = false
+            showFlopCard2 = false
+            showFlopCard3 = false
+        }
+    }
+
     Row(
         modifier = Modifier.padding(30.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -177,17 +213,17 @@ private fun TableCards(gameUiState: GameUiState) {
         Box(modifier = Modifier
             .fillMaxWidth()
             .weight(0.2f)) {
-            TableCardImage(card = gameUiState.tableCards[0], display = gameUiState.displayFlop)
+            TableCardImage(card = gameUiState.tableCards[0], display = showFlopCard1)
         }
         Box(modifier = Modifier
             .fillMaxWidth()
             .weight(0.2f)) {
-            TableCardImage(card = gameUiState.tableCards[1], display = gameUiState.displayFlop)
+            TableCardImage(card = gameUiState.tableCards[1], display = showFlopCard2)
         }
         Box(modifier = Modifier
             .fillMaxWidth()
             .weight(0.2f)) {
-            TableCardImage(card = gameUiState.tableCards[2], display = gameUiState.displayFlop)
+            TableCardImage(card = gameUiState.tableCards[2], display = showFlopCard3)
         }
         Box(modifier = Modifier
             .fillMaxWidth()
@@ -204,8 +240,29 @@ private fun TableCards(gameUiState: GameUiState) {
 
 @Composable
 private fun TableCardImage(card: Card?, display: Boolean) {
+
+    // Scale/Pop In Animation
+    val scale by animateFloatAsState(
+        targetValue = if (display) 1f else 0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "cardScale"
+    )
+    val alpha by animateFloatAsState(
+        targetValue = if (display) 1f else 0f,
+        animationSpec = tween(durationMillis = 300),
+        label = "cardAlpha"
+    )
+
     Image(
-        modifier = Modifier.alpha(if (display) 1f else 0f),
+        modifier = Modifier
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+                this.alpha = alpha
+            },
         painter = painterResource(card?.getCardDrawableResource() ?: R.drawable.card_back),
         contentScale = ContentScale.Fit,
         contentDescription = "card",
