@@ -1,6 +1,7 @@
 package com.filipebicho.pokerclash.ui.gamescreen
 
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -30,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -40,6 +43,8 @@ import com.filipebicho.pokerclash.R
 import com.filipebicho.pokerclash.cards.Card
 import kotlinx.coroutines.delay
 import kotlin.collections.get
+import kotlin.compareTo
+import kotlin.toString
 
 @Composable
 fun GameSection(
@@ -240,32 +245,32 @@ private fun TableCards(gameUiState: GameUiState) {
 
 @Composable
 private fun TableCardImage(card: Card?, display: Boolean) {
-
-    // Scale/Pop In Animation
-    val scale by animateFloatAsState(
-        targetValue = if (display) 1f else 0f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ),
-        label = "cardScale"
+    // Animate rotation from 90 (edge-on from one side) to 0 (face forward)
+    val rotationY by animateFloatAsState(
+        targetValue = if (display) 0f else 90f,
+        animationSpec = tween(durationMillis = 600),
+        label = "cardFlipRotation"
     )
-    val alpha by animateFloatAsState(
+
+    // Animate scaleX to make it appear like it's unfolding
+    // When not displayed, scaleX is 0. When displayed, scaleX is 1.
+    val scaleX by animateFloatAsState(
         targetValue = if (display) 1f else 0f,
-        animationSpec = tween(durationMillis = 300),
-        label = "cardAlpha"
+        animationSpec = tween(durationMillis = 600),
+        label = "cardScaleX"
     )
 
     Image(
+        painter = painterResource(card?.getCardDrawableResource() ?: R.drawable.card_back),
+        contentDescription = "Playing Card - ${card?.toString() ?: "Face"}",
         modifier = Modifier
             .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-                this.alpha = alpha
-            },
-        painter = painterResource(card?.getCardDrawableResource() ?: R.drawable.card_back),
-        contentScale = ContentScale.Fit,
-        contentDescription = "card",
+                this.rotationY = rotationY
+                this.scaleX = scaleX // Apply horizontal scale
+                cameraDistance = 12 * density
+                // Ensure the pivot point for rotation and scaling makes sense.
+                // Default is center, which should work for this.
+            }
     )
 }
 
