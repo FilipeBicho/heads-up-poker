@@ -30,9 +30,14 @@ import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.odds.Combinations
 import com.filipebicho.pokerclash.odds.Odds
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.update
 
-class Init {
+class Init(coroutineScope: CoroutineScope) {
+
+    init {
+        betting = Betting(coroutineScope)
+    }
 
     private fun dealCards() {
         round = PRE_FLOP

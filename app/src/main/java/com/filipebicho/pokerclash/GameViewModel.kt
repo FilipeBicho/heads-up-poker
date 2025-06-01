@@ -1,6 +1,7 @@
 package com.filipebicho.pokerclash
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.filipebicho.pokerclash.bot.BET
 import com.filipebicho.pokerclash.bot.CALL
 import com.filipebicho.pokerclash.bot.CHECK
@@ -12,6 +13,8 @@ import com.filipebicho.pokerclash.data.Data.botModel
 import com.filipebicho.pokerclash.data.Data.init
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
+import com.filipebicho.pokerclash.game.Betting
+import com.filipebicho.pokerclash.game.Init
 import kotlinx.coroutines.flow.update
 
 
@@ -19,6 +22,11 @@ const val SMALL_BLIND = 20
 const val BIG_BLIND = 40
 
 class GameViewModel : ViewModel() {
+
+    init {
+        init = Init(viewModelScope)
+    }
+
     fun setPlayerName(playerName: String) {
         uiStateFlow.update { currentState ->
             currentState.copy(

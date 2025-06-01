@@ -23,10 +23,10 @@ object Data {
 
     // Classes
     lateinit var odds: Odds
-    var init: Init = Init()
-    var betting: Betting = Betting()
+    lateinit var init: Init
+    lateinit var betting: Betting
     lateinit var cardDealer: Dealer
-    var gameRound: Round = Round()
+    lateinit var gameRound: Round
     val chatGptBot = ChatgptBot()
 
     // Bot models

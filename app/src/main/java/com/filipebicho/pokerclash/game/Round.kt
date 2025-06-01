@@ -26,13 +26,13 @@ import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.data.Data.winnerCount
 import com.filipebicho.pokerclash.hand.Hand
 import com.filipebicho.pokerclash.hand.HandWinnerCalculator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
-import java.util.Timer
 import kotlin.concurrent.timerTask
+import kotlinx.coroutines.launch
 
-class Round {
-
-    val timer = Timer()
+class Round(var coroutineScope: CoroutineScope) {
 
     fun flop(showdownCards: Boolean = false) {
         round = FLOP
@@ -84,11 +84,14 @@ class Round {
             roundPot = roundPot
         )}
 
-        when (round) {
-            PRE_FLOP -> timer.schedule(timerTask {flop(true)}, 2000)
-            FLOP -> timer.schedule(timerTask {turn(true)}, 2000)
-            TURN -> timer.schedule(timerTask {river(true)}, 2000)
-            RIVER -> calculateWinner()
+        coroutineScope.launch {
+            delay(2000)
+            when (round) {
+                PRE_FLOP -> flop(true)
+                FLOP -> turn(true)
+                TURN -> river(true)
+                RIVER -> calculateWinner()
+            }
         }
     }
 
@@ -146,18 +149,20 @@ class Round {
         )}
 
         if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
-            timer.schedule(timerTask {
+            coroutineScope.launch {
+                delay(2000)
                 init.newGame()
-            }, 2000)
+            }
         } else {
             winnerCount[winner]++
-            timer.schedule(timerTask {
+            coroutineScope.launch {
                 uiStateFlow.update { currentState -> currentState.copy(
                     newGame = true,
                     playerWins = winnerCount[PLAYER],
                     botWins = winnerCount[BOT]
                 )}
-            }, 4000)
+                delay(4000)
+            }
         }
     }
 

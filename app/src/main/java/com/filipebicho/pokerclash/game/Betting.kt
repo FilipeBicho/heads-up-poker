@@ -39,11 +39,14 @@ import com.filipebicho.pokerclash.data.Data.validActions
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.Timer
-import kotlin.concurrent.timerTask
 
-class Betting {
+class Betting(var coroutineScope: CoroutineScope) {
+
+    init {
+        gameRound = Round(coroutineScope)
+    }
 
     fun preFlop() {
 
@@ -186,9 +189,10 @@ class Betting {
                 isPlayerTurn = false
             )
         }
-        Timer().schedule(timerTask {
+        coroutineScope.launch {
+            delay(3000)
             init.newGame()
-        }, 3000L)
+        }
     }
 
     fun check() {
