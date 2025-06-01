@@ -38,6 +38,10 @@ data class GameUiState(
     val botCards: List<Card> = ArrayList(),
     val tableCards: List<Card> = ArrayList(),
 
+    // Odds
+    val playerOdds: Int = -1,
+    val botOdds: Int = -1,
+
     // Display cards
     val displayFlop: Boolean = false,
     val displayTurn: Boolean = false,

@@ -494,7 +494,7 @@ class Betting(var coroutineScope: CoroutineScope) {
 
     private fun botAction() {
         coroutineScope.launch {
-            val action = BET
+            val action = CALL
             when (action) {
                 FOLD -> fold()
                 CHECK -> check()

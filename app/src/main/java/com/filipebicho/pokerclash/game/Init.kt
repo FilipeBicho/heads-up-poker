@@ -108,6 +108,8 @@ class Init(coroutineScope: CoroutineScope) {
             roundPot = 0,
             gameSummary = gameSummaryMap,
             playerHandResult = "",
+            playerOdds = -1,
+            botOdds = -1,
             isPlayerTurn = player == PLAYER,
             newGame = false,
             dealer = dealer,

@@ -116,5 +116,5 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
 
     fun getShowdownPlayerOdds() = showdownPlayerOdds
 
-    fun getShowdownOpponentOdds() = showdownOpponentOdds
+    fun getShowdownBotOdds() = showdownOpponentOdds
 }

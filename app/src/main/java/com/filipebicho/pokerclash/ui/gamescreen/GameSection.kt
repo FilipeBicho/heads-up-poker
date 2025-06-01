@@ -51,8 +51,17 @@ fun GameSection(
             modifier = Modifier.padding(0.dp, 5.dp, 0.dp, 0.dp),
             contentAlignment = Alignment.TopCenter
         ) {
-            if (gameUiState.botBet > 0)
+            if (gameUiState.showdown && gameUiState.playerOdds != -1 && gameUiState.botOdds != -1) {
+                val oddsColor = if (gameUiState.botOdds > gameUiState.playerOdds)
+                    Color.Green.copy(alpha = 0.5f)
+                else if (gameUiState.botOdds < gameUiState.playerOdds)
+                    Color.Red.copy(alpha = 0.5f)
+                else
+                    Color.Yellow.copy(alpha = 0.5f)
+                Odds(odds = "${gameUiState.botOdds} %", color = oddsColor)
+            } else if(gameUiState.botBet > 0) {
                 Bet(bet = "Bet ${gameUiState.botBet}")
+            }
         }
 
         Box(
@@ -93,8 +102,18 @@ fun GameSection(
         }
 
         Box(contentAlignment = Alignment.CenterEnd) {
-            if (gameUiState.playerBet > 0)
+
+            if (gameUiState.showdown && gameUiState.playerOdds != -1 && gameUiState.botOdds != -1) {
+                val oddsColor = if (gameUiState.playerOdds > gameUiState.botOdds)
+                    Color.Green.copy(alpha = 0.5f)
+                else if (gameUiState.playerOdds < gameUiState.botOdds)
+                    Color.Red.copy(alpha = 0.5f)
+                else
+                    Color.Yellow.copy(alpha = 0.5f)
+                Odds(odds = "${gameUiState.playerOdds} %", color = oddsColor)
+            } else if(gameUiState.playerBet > 0) {
                 Bet(bet = "Bet ${gameUiState.playerBet}")
+            }
         }
     }
 }
@@ -140,6 +159,27 @@ private fun Bet(bet: String) {
             fontSize = 12.sp,
             color = Color.White,
             text = bet
+        )
+    }
+}
+
+@Composable
+private fun Odds(odds: String, color: Color) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            modifier = Modifier
+                .background(
+                    color,
+                    shape = RoundedCornerShape(5.dp)
+                )
+                .padding(5.dp),
+            fontSize = 12.sp,
+            color = Color.White,
+            text = odds
         )
     }
 }

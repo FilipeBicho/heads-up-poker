@@ -29,7 +29,6 @@ import com.filipebicho.pokerclash.hand.HandWinnerCalculator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
-import kotlin.concurrent.timerTask
 import kotlinx.coroutines.launch
 
 class Round(var coroutineScope: CoroutineScope) {
@@ -44,6 +43,11 @@ class Round(var coroutineScope: CoroutineScope) {
                 opponentCards = botCards,
                 tableCards = flopCards
             )
+
+            uiStateFlow.update { currentState -> currentState.copy(
+                playerOdds = odds.getShowdownPlayerOdds(),
+                botOdds = odds.getShowdownBotOdds()
+            )}
             showdownCards()
         }
 
@@ -60,6 +64,12 @@ class Round(var coroutineScope: CoroutineScope) {
                 opponentCards = botCards,
                 tableCards = turnCards
             )
+
+            uiStateFlow.update { currentState -> currentState.copy(
+                playerOdds = odds.getShowdownPlayerOdds(),
+                botOdds = odds.getShowdownBotOdds()
+            )}
+
             showdownCards()
         }
         updateStateFlowRound(tableCards = turnCards, round = round)
@@ -67,8 +77,20 @@ class Round(var coroutineScope: CoroutineScope) {
 
     fun river(showdownCards: Boolean = false) {
         round = RIVER
-        if (showdownCards)
+        if (showdownCards) {
+            odds.calculateShowdownTurnOdds(
+                playerCards = playerCards,
+                opponentCards = botCards,
+                tableCards = tableCards
+            )
+
+            uiStateFlow.update { currentState -> currentState.copy(
+                playerOdds = odds.getShowdownPlayerOdds(),
+                botOdds = odds.getShowdownBotOdds()
+            )}
+
             showdownCards()
+        }
 
         updateStateFlowRound(tableCards = tableCards, round = round)
     }
