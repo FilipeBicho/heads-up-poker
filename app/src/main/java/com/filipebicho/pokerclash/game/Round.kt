@@ -1,6 +1,7 @@
 package com.filipebicho.pokerclash.game
 
 import com.filipebicho.pokerclash.cards.BOT
+import com.filipebicho.pokerclash.cards.Card
 import com.filipebicho.pokerclash.cards.FLOP
 import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.cards.PRE_FLOP
@@ -31,98 +32,45 @@ import kotlin.concurrent.timerTask
 
 class Round {
 
+    val timer = Timer()
+
     fun flop(showdownCards: Boolean = false) {
         round = FLOP
 
-        var flopString = ""
         var flopCards = tableCards.subList(0,3)
-        val playerHand = Hand(playerCards = playerCards, tableCards = flopCards)
-
-        flopCards.forEach { flopString += it.cardString()+" " }
-        gameSummaryList.add("---- $flopString ----")
-        gameSummaryMap[gameNumber] = gameSummaryList.toList()
-
         if (showdownCards) {
             odds.calculateShowdownFlopOdds(
                 playerCards = playerCards,
                 opponentCards = botCards,
                 tableCards = flopCards
             )
-
-            uiStateFlow.update { currentState -> currentState.copy(
-                displayFlop = true,
-                gameSummary = gameSummaryMap,
-                playerHandResult = playerHand.resultText
-            )}
             showdownCards()
-        } else {
-            uiStateFlow.update { currentState -> currentState.copy(
-                displayFlop = true,
-                gameSummary = gameSummaryMap,
-                playerHandResult = playerHand.resultText
-            )}
         }
+
+        updateStateFlowRound(tableCards = flopCards, round = round)
     }
 
     fun turn(showdownCards: Boolean = false) {
         round = TURN
 
-        var turnString = ""
         var turnCards = tableCards.subList(0,4)
-        val playerHand = Hand(playerCards = playerCards, tableCards = turnCards)
-
-
-        turnCards.forEach { turnString += it.cardString()+" " }
-        gameSummaryList.add("---- $turnString ----")
-        gameSummaryMap[gameNumber] = gameSummaryList.toList()
-
         if (showdownCards) {
             odds.calculateShowdownTurnOdds(
                 playerCards = playerCards,
                 opponentCards = botCards,
                 tableCards = turnCards
             )
-
-            uiStateFlow.update { currentState -> currentState.copy(
-                displayTurn = true,
-                gameSummary = gameSummaryMap,
-                playerHandResult = playerHand.resultText
-            )}
-
             showdownCards()
-        } else {
-            uiStateFlow.update { currentState -> currentState.copy(
-                displayTurn = true,
-                gameSummary = gameSummaryMap,
-                playerHandResult = playerHand.resultText
-            )}
         }
+        updateStateFlowRound(tableCards = turnCards, round = round)
     }
 
     fun river(showdownCards: Boolean = false) {
         round = RIVER
-
-        var riverString = ""
-        val playerHand = Hand(playerCards = playerCards, tableCards = tableCards)
-
-        tableCards.forEach { riverString += it.cardString()+" " }
-        gameSummaryList.add("---- $riverString ----")
-        gameSummaryMap[gameNumber] = gameSummaryList.toList()
-
-        if (showdownCards) {
-            uiStateFlow.update { currentState -> currentState.copy(
-                displayRiver = true,
-                gameSummary = gameSummaryMap,
-                playerHandResult = playerHand.resultText
-            )}
+        if (showdownCards)
             showdownCards()
-        } else {
-            uiStateFlow.update { currentState -> currentState.copy(
-                displayRiver = true,
-                gameSummary = gameSummaryMap,
-                playerHandResult = playerHand.resultText
-            )}
-        }
+
+        updateStateFlowRound(tableCards = tableCards, round = round)
     }
 
     fun showdownCards() {
@@ -137,9 +85,9 @@ class Round {
         )}
 
         when (round) {
-            PRE_FLOP -> Timer().schedule(timerTask {flop(true)}, 2000)
-            FLOP -> Timer().schedule(timerTask {turn(true)}, 2000)
-            TURN -> Timer().schedule(timerTask {river(true)}, 2000)
+            PRE_FLOP -> timer.schedule(timerTask {flop(true)}, 2000)
+            FLOP -> timer.schedule(timerTask {turn(true)}, 2000)
+            TURN -> timer.schedule(timerTask {river(true)}, 2000)
             RIVER -> calculateWinner()
         }
     }
@@ -156,35 +104,28 @@ class Round {
         )}
 
         val playerHand = Hand(playerCards = playerCards, tableCards = tableCards)
-        val computerHand = Hand(playerCards = botCards, tableCards = tableCards)
-        val winnerCalculator = HandWinnerCalculator(player1Hand = playerHand, player2Hand = computerHand)
+        val botHand = Hand(playerCards = botCards, tableCards = tableCards)
+        val winnerCalculator = HandWinnerCalculator(player1Hand = playerHand, player2Hand = botHand)
         val winner = winnerCalculator.getWinner()
+        val playerName = uiStateFlow.value.name[PLAYER]
+        val botName = uiStateFlow.value.name[BOT]
 
-        var playerHandString = ""
-        playerHand.getHand().forEach {
-            playerHandString += it.cardString()+" "
-        }
+        var playerHandString = playerHand.getHand().joinToString(" ") { it.cardString() }
+        var botHandString = botHand.getHand().joinToString(" ") { it.cardString() }
 
-        var computerHandString = ""
-        computerHand.getHand().forEach {
-            computerHandString += it.cardString()+" "
-        }
-
-        gameSummaryList += "${uiStateFlow.value.name[PLAYER]} hand: $playerHandString - ${playerHand.resultText}"
-        gameSummaryList += "${uiStateFlow.value.name[BOT]} hand: $computerHandString - ${computerHand.resultText}"
+        gameSummaryList += "$playerName hand: $playerHandString - ${playerHand.resultText}"
+        gameSummaryList += "$botName hand: $botHandString - ${botHand.resultText}"
 
         when (winner) {
             PLAYER -> {
                 pokerChips[PLAYER] += mainPot
                 actionText[PLAYER] = "wins $mainPot"
-                gameSummaryList += "${uiStateFlow.value.name[PLAYER]} wins $mainPot"
-                gameSummaryMap[gameNumber] = gameSummaryList.toList()
+                gameSummaryList += "$playerName wins $mainPot"
             }
             BOT -> {
                 pokerChips[BOT] += mainPot
                 actionText[BOT] = "wins $mainPot"
-                gameSummaryList += "${uiStateFlow.value.name[BOT]} wins $mainPot"
-                gameSummaryMap[gameNumber] = gameSummaryList.toList()
+                gameSummaryList += "$botName wins $mainPot"
             }
             else -> {
                 pokerChips[PLAYER] += mainPot / 2
@@ -192,9 +133,10 @@ class Round {
                 actionText[PLAYER] = "wins ${mainPot / 2}"
                 actionText[BOT] = "wins ${mainPot / 2}"
                 gameSummaryList += "Split pot with value $mainPot"
-                gameSummaryMap[gameNumber] = gameSummaryList.toList()
             }
         }
+
+        gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
         uiStateFlow.update { currentState -> currentState.copy(
             playerMoney = pokerChips[PLAYER],
@@ -204,12 +146,12 @@ class Round {
         )}
 
         if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
-            Timer().schedule(timerTask {
+            timer.schedule(timerTask {
                 init.newGame()
             }, 2000)
         } else {
             winnerCount[winner]++
-            Timer().schedule(timerTask {
+            timer.schedule(timerTask {
                 uiStateFlow.update { currentState -> currentState.copy(
                     newGame = true,
                     playerWins = winnerCount[PLAYER],
@@ -217,5 +159,21 @@ class Round {
                 )}
             }, 4000)
         }
+    }
+
+    private fun updateStateFlowRound(tableCards: List<Card>, round: Int)
+    {
+        var cardsString = tableCards.joinToString(" ") { it.cardString() }
+        gameSummaryList.add("---- $cardsString ----")
+        gameSummaryMap[gameNumber] = gameSummaryList.toList()
+
+        val playerHand = Hand(playerCards = playerCards, tableCards = tableCards)
+        uiStateFlow.update { currentState -> currentState.copy(
+            displayFlop = round >= FLOP,
+            displayTurn = round >= TURN,
+            displayRiver = round == RIVER,
+            gameSummary = gameSummaryMap,
+            playerHandResult = playerHand.resultText
+        )}
     }
 }

@@ -24,6 +24,7 @@ import com.filipebicho.pokerclash.data.Data.chatGptBot
 import com.filipebicho.pokerclash.data.Data.checkAvailable
 import com.filipebicho.pokerclash.data.Data.dealer
 import com.filipebicho.pokerclash.data.Data.gameNumber
+import com.filipebicho.pokerclash.data.Data.gameRound
 import com.filipebicho.pokerclash.data.Data.gameSummaryList
 import com.filipebicho.pokerclash.data.Data.gameSummaryMap
 import com.filipebicho.pokerclash.data.Data.init
@@ -33,7 +34,6 @@ import com.filipebicho.pokerclash.data.Data.player
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
-import com.filipebicho.pokerclash.data.Data.showdown
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.data.Data.validActions
 import kotlinx.coroutines.flow.update
@@ -75,7 +75,7 @@ class Betting {
                  bettingLog("--- AFTER BLIND (small blind) All in ---")
 
                  updateStateFlowBets()
-                 showdown.showdownCards()
+                 gameRound.showdownCards()
              } else {
 
                  bettingLog("--- BEFORE BLIND (big blind) All in ---")
@@ -127,7 +127,7 @@ class Betting {
              bettingLog("--- AFTER DEALER (small blind) All in ---")
 
              updateStateFlowBets()
-             showdown.showdownCards()
+             gameRound.showdownCards()
          } else {
 
              bettingLog("--- BEFORE PRE FLOP ---")
@@ -251,7 +251,7 @@ class Betting {
             bettingLog("--- AFTER CALL (all in) $playerName ---")
 
             updateStateFlowBets()
-            showdown.showdownCards()
+            gameRound.showdownCards()
         } else {
 
             bettingLog("--- BEFORE CALL $playerName ---")
@@ -269,7 +269,7 @@ class Betting {
             updateStateFlowBets()
 
             if (round == RIVER || (pokerChips[player] == 0 || pokerChips[opponent] == 0)) {
-                showdown.showdownCards()
+                gameRound.showdownCards()
             } else {
                 switchPlayerTurn()
                 if (checkAvailable && round == PRE_FLOP)
@@ -367,7 +367,7 @@ class Betting {
         if (pokerChips[player] > 0) {
             foldCall()
         } else {
-            showdown.showdownCards()
+            gameRound.showdownCards()
         }
     }
 
@@ -401,24 +401,24 @@ class Betting {
         when (round) {
             PRE_FLOP -> {
                 round = FLOP
-                showdown.flop()
+                gameRound.flop()
                 checkBet()
             }
 
             FLOP -> {
                 round = TURN
-                showdown.turn()
+                gameRound.turn()
                 checkBet()
             }
 
             TURN -> {
                 round = RIVER
-                showdown.river()
+                gameRound.river()
                 checkBet()
             }
 
             RIVER -> {
-                showdown.calculateWinner()
+                gameRound.calculateWinner()
             }
         }
     }

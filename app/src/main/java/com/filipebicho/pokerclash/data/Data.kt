@@ -26,7 +26,7 @@ object Data {
     var init: Init = Init()
     var betting: Betting = Betting()
     lateinit var cardDealer: Dealer
-    var showdown: Round = Round()
+    var gameRound: Round = Round()
     val chatGptBot = ChatgptBot()
 
     // Bot models
