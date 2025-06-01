@@ -118,7 +118,7 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
     private fun compareOnePair(): Int {
         return when {
             player1Cards[0].rank == ACE && player2Cards[0].rank != ACE -> PLAYER
-            player1Cards[0].rank != ACE && player2Cards[0].rank == ACE -> PLAYER
+            player1Cards[0].rank != ACE && player2Cards[0].rank == ACE -> BOT
             player1Cards[0].rank == player2Cards[0].rank -> compareHigherKicker(2)
             else ->  if (player1Cards[0].rank > player2Cards[0].rank) PLAYER else BOT
         }

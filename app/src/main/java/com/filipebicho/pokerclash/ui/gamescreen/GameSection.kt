@@ -1,9 +1,6 @@
 package com.filipebicho.pokerclash.ui.gamescreen
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -29,11 +25,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,9 +35,6 @@ import com.filipebicho.pokerclash.GameViewModel
 import com.filipebicho.pokerclash.R
 import com.filipebicho.pokerclash.cards.Card
 import kotlinx.coroutines.delay
-import kotlin.collections.get
-import kotlin.compareTo
-import kotlin.toString
 
 @Composable
 fun GameSection(
@@ -61,7 +51,8 @@ fun GameSection(
             modifier = Modifier.padding(0.dp, 5.dp, 0.dp, 0.dp),
             contentAlignment = Alignment.TopCenter
         ) {
-            Bet(bet = gameUiState.botBet)
+            if (gameUiState.botBet > 0)
+                Bet(bet = "Bet ${gameUiState.botBet}")
         }
 
         Box(
@@ -102,7 +93,8 @@ fun GameSection(
         }
 
         Box(contentAlignment = Alignment.CenterEnd) {
-            Bet(bet = gameUiState.playerBet)
+            if (gameUiState.playerBet > 0)
+                Bet(bet = "Bet ${gameUiState.playerBet}")
         }
     }
 }
@@ -132,7 +124,7 @@ private fun SummaryToggleButton(gameUiState: GameUiState, gameViewModel: GameVie
 }
 
 @Composable
-private fun Bet(bet: Int) {
+private fun Bet(bet: String) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Top,
@@ -147,7 +139,7 @@ private fun Bet(bet: Int) {
                 .padding(5.dp),
             fontSize = 12.sp,
             color = Color.White,
-            text = "Bet: $bet"
+            text = bet
         )
     }
 }
@@ -215,29 +207,19 @@ private fun TableCards(gameUiState: GameUiState) {
         modifier = Modifier.padding(30.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .weight(0.2f)) {
+        Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
             TableCardImage(card = gameUiState.tableCards[0], display = showFlopCard1)
         }
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .weight(0.2f)) {
+        Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
             TableCardImage(card = gameUiState.tableCards[1], display = showFlopCard2)
         }
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .weight(0.2f)) {
+        Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
             TableCardImage(card = gameUiState.tableCards[2], display = showFlopCard3)
         }
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .weight(0.2f)) {
+        Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
             TableCardImage(card = gameUiState.tableCards[3], display = gameUiState.displayTurn)
         }
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .weight(0.2f)) {
+        Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
             TableCardImage(card = gameUiState.tableCards[4], display = gameUiState.displayRiver)
         }
     }

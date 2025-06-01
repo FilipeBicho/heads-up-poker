@@ -272,7 +272,9 @@ class Betting(var coroutineScope: CoroutineScope) {
 
             updateStateFlowBets()
 
-            if (round == RIVER || (pokerChips[player] == 0 || pokerChips[opponent] == 0)) {
+            if (round == RIVER) {
+                gameRound.calculateWinner()
+            } else if(pokerChips[player] == 0 || pokerChips[opponent] == 0) {
                 gameRound.showdownCards()
             } else {
                 switchPlayerTurn()
@@ -491,14 +493,14 @@ class Betting(var coroutineScope: CoroutineScope) {
     }
 
     private fun botAction() {
-        CoroutineScope(Dispatchers.Main).launch {
-            val action = chatGptBot.calculateAction()
+        coroutineScope.launch {
+            val action = BET
             when (action) {
                 FOLD -> fold()
                 CHECK -> check()
                 CALL -> call()
                 BET -> {
-                    bet(chatGptBot.betValue)
+                    bet(40)
                 }
                 ALLIN -> {
                     allIn()

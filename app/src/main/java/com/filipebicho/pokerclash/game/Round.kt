@@ -79,6 +79,7 @@ class Round(var coroutineScope: CoroutineScope) {
 
         uiStateFlow.update { currentState -> currentState.copy(
             displayBotCards = true,
+            isPlayerTurn = false,
             showdown = true,
             mainPot = mainPot,
             roundPot = roundPot
