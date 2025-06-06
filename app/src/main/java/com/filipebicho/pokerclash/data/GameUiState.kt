@@ -42,13 +42,14 @@ data class GameUiState(
     val playerOdds: Int = -1,
     val botOdds: Int = -1,
 
-    // Display cards
+    // Round
     val displayFlop: Boolean = false,
     val displayTurn: Boolean = false,
     val displayRiver: Boolean = false,
     val displayBotCards: Boolean = true,
     val showdown: Boolean = false,
     val newGame: Boolean = false,
+    val displayGameResult: Boolean = false,
 
     // Display Bet Buttons
     val displayFoldButton: Boolean = false,

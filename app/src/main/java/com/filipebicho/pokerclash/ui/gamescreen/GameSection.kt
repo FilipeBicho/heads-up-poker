@@ -68,8 +68,23 @@ fun GameSection(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .weight(1f)
+                .padding(top = 40.dp),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                RoundPot(roundPot = gameUiState.roundPot)
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
                 .weight(1f),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.BottomCenter
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -77,21 +92,7 @@ fun GameSection(
             ) {
                 MainPot(value = gameUiState.mainPot)
                 TableCards(gameUiState = gameUiState)
-                RoundPot(roundPot = gameUiState.roundPot)
                 Hand(hand = gameUiState.playerHandResult)
-                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        modifier = Modifier
-                            .background(
-                                Color.DarkGray.copy(alpha = 0.5f),
-                                shape = RoundedCornerShape(5.dp)
-                            )
-                            .padding(5.dp),
-                        color = Color.White,
-                        fontSize = 10.sp,
-                        text = "Debug: ${gameUiState.playerMoney + gameUiState.botMoney + gameUiState.mainPot}"
-                    )
-                }
             }
         }
 
@@ -192,12 +193,13 @@ private fun MainPot(value: Int) {
         Text(
             modifier = Modifier
                 .background(
-                    Color.DarkGray.copy(alpha = 0.5f),
+                    Color.DarkGray.copy(alpha = 0.9f),
                     shape = RoundedCornerShape(5.dp)
                 )
-                .padding(5.dp),
+                .padding(horizontal = 5.dp),
             color = Color.White,
-            text = "Pot: $value"
+            text = "Pot: $value",
+            fontSize = 14.sp
         )
     }
 }
@@ -208,13 +210,13 @@ private fun RoundPot(roundPot: Int) {
         Text(
             modifier = Modifier
                 .background(
-                    Color.DarkGray.copy(alpha = 0.5f),
+                    Color.DarkGray.copy(alpha = 0.8f),
                     shape = RoundedCornerShape(5.dp)
                 )
-                .padding(5.dp),
+                .padding(horizontal = 5.dp),
             color = Color.White,
             fontSize = 10.sp,
-            text = "Round Pot: $roundPot"
+            text = "$roundPot"
         )
     }
 }
@@ -246,7 +248,7 @@ private fun TableCards(gameUiState: GameUiState) {
     }
 
     Row(
-        modifier = Modifier.padding(30.dp),
+        modifier = Modifier.padding(top = 0.dp, bottom = 10.dp, start = 30.dp, end = 30.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
