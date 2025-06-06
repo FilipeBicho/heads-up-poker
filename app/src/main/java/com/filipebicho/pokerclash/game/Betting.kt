@@ -494,7 +494,7 @@ class Betting(var coroutineScope: CoroutineScope) {
 
     private fun botAction() {
         coroutineScope.launch {
-            val action = CALL
+            val action = chatGptBot.calculateAction()
             when (action) {
                 FOLD -> fold()
                 CHECK -> check()

@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
@@ -59,8 +60,8 @@ fun GameSection(
                 else
                     Color.Yellow.copy(alpha = 0.5f)
                 Odds(odds = "${gameUiState.botOdds} %", color = oddsColor)
-            } else if(gameUiState.botBet > 0) {
-                Bet(bet = "Bet ${gameUiState.botBet}")
+            } else {
+                Bet(bet = "Bet ${gameUiState.botBet}", gameUiState.botBet > 0)
             }
         }
 
@@ -111,8 +112,8 @@ fun GameSection(
                 else
                     Color.Yellow.copy(alpha = 0.5f)
                 Odds(odds = "${gameUiState.playerOdds} %", color = oddsColor)
-            } else if(gameUiState.playerBet > 0) {
-                Bet(bet = "Bet ${gameUiState.playerBet}")
+            } else {
+                Bet(bet = "Bet ${gameUiState.playerBet}", gameUiState.playerBet > 0)
             }
         }
     }
@@ -143,7 +144,7 @@ private fun SummaryToggleButton(gameUiState: GameUiState, gameViewModel: GameVie
 }
 
 @Composable
-private fun Bet(bet: String) {
+private fun Bet(bet: String, display: Boolean) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Top,
@@ -152,10 +153,11 @@ private fun Bet(bet: String) {
         Text(
             modifier = Modifier
                 .background(
-                    Color.DarkGray.copy(alpha = 0.5f),
+                    Color.DarkGray.copy(alpha = if (display) 0.5f else 0f),
                     shape = RoundedCornerShape(5.dp)
                 )
-                .padding(5.dp),
+                .padding(5.dp)
+                .alpha(if (display) 1f else 0f),
             fontSize = 12.sp,
             color = Color.White,
             text = bet
