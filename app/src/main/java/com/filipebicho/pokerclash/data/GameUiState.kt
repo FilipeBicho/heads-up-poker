@@ -1,6 +1,7 @@
 package com.filipebicho.pokerclash
 
 import com.filipebicho.pokerclash.cards.Card
+import com.filipebicho.pokerclash.hand.Hand
 
 data class GameUiState(
 
@@ -37,6 +38,7 @@ data class GameUiState(
     val playerCards: List<Card> = ArrayList(),
     val botCards: List<Card> = ArrayList(),
     val tableCards: List<Card> = ArrayList(),
+    val winningHand: Hand? = null,
 
     // Odds
     val playerOdds: Int = -1,
@@ -50,6 +52,8 @@ data class GameUiState(
     val showdown: Boolean = false,
     val newGame: Boolean = false,
     val displayGameResult: Boolean = false,
+    val winner: Int = -1,
+    val displayFold: Boolean = false,
 
     // Display Bet Buttons
     val displayFoldButton: Boolean = false,

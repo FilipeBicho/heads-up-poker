@@ -168,12 +168,15 @@ class Round(var coroutineScope: CoroutineScope) {
             playerMoney = pokerChips[PLAYER],
             botMoney = pokerChips[BOT],
             actions = actionText,
-            gameSummary = gameSummaryMap
+            gameSummary = gameSummaryMap,
+            displayGameResult = true,
+            winner = winner,
+            winningHand = if (winner == PLAYER) playerHand else botHand
         )}
 
         if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
             coroutineScope.launch {
-                delay(2000)
+                delay(4000)
                 init.newGame()
             }
         } else {

@@ -186,7 +186,9 @@ class Betting(var coroutineScope: CoroutineScope) {
                 botMoney = pokerChips[BOT],
                 gameSummary = gameSummaryMap,
                 actions = actionText,
-                isPlayerTurn = false
+                isPlayerTurn = false,
+                displayFold = true,
+                winner = opponent
             )
         }
         coroutineScope.launch {

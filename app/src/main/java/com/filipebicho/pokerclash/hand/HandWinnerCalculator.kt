@@ -167,9 +167,6 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
         }
     }
 
-    /**
-     * compare kickers
-     */
     private fun compareHigherKicker (startIndex: Int): Int {
         // check for kicker Ace
         if (player1Cards[startIndex].rank == ACE && player2Cards[startIndex].rank != ACE) {
@@ -189,9 +186,6 @@ class HandWinnerCalculator(player1Hand: Hand, player2Hand: Hand) {
         }
     }
 
-    /**
-     * Get winner
-     */
     fun getWinner() = winner
 
 }

@@ -34,8 +34,12 @@ import androidx.compose.ui.unit.sp
 import com.filipebicho.pokerclash.GameUiState
 import com.filipebicho.pokerclash.GameViewModel
 import com.filipebicho.pokerclash.R
+import com.filipebicho.pokerclash.cards.BOT
 import com.filipebicho.pokerclash.cards.Card
+import com.filipebicho.pokerclash.cards.PLAYER
+import com.filipebicho.pokerclash.hand.Hand
 import kotlinx.coroutines.delay
+import kotlin.collections.joinToString
 
 @Composable
 fun GameSection(
@@ -77,6 +81,32 @@ fun GameSection(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 RoundPot(roundPot = gameUiState.roundPot)
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if (gameUiState.displayGameResult) {
+                    GameResult(
+                        name = gameUiState.name,
+                        winner = gameUiState.winner,
+                        hand = gameUiState.winningHand,
+                        pot = gameUiState.mainPot
+                    )
+                } else if (gameUiState.displayFold) {
+                    Fold(
+                        name = gameUiState.name,
+                        winner = gameUiState.winner,
+                        pot = gameUiState.mainPot
+                    )
+                }
             }
         }
 
@@ -248,7 +278,7 @@ private fun TableCards(gameUiState: GameUiState) {
     }
 
     Row(
-        modifier = Modifier.padding(top = 0.dp, bottom = 10.dp, start = 30.dp, end = 30.dp),
+        modifier = Modifier.padding(top = 0.dp, bottom = 0.dp, start = 30.dp, end = 30.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
@@ -310,6 +340,60 @@ private fun Hand(hand: String) {
             text = hand,
             fontSize = 12.sp,
             color = Color.White,
+        )
+    }
+}
+
+@Composable
+private fun GameResult(name: List<String>, winner: Int, hand: Hand?, pot: Int) {
+    var handString = hand?.getHand()?.joinToString(" ") { it.cardString() }
+    Column(modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+        if (winner == PLAYER || winner == BOT) {
+            Text(
+                color = Color.White,
+                fontSize = 14.sp,
+                text = "${name[winner]} wins pot $pot"
+            )
+            Text(
+                color = Color.White,
+                fontSize = 10.sp,
+                text = "${hand?.resultText}"
+            )
+            Text(
+                color = Color.White,
+                fontSize = 16.sp,
+                text = "$handString"
+            )
+        } else {
+            Text(
+                color = Color.White,
+                fontSize = 14.sp,
+                text = "Split pot $pot"
+            )
+            Text(
+                color = Color.White,
+                fontSize = 16.sp,
+                text = "$handString"
+            )
+        }
+    }
+}
+
+@Composable
+private fun Fold(name: List<String>, winner: Int, pot: Int) {
+    val opponent = if (winner == PLAYER) BOT else PLAYER
+    Column(modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            color = Color.White,
+            fontSize = 14.sp,
+            text = "${name[opponent]} folds"
+        )
+        Text(
+            color = Color.White,
+            fontSize = 14.sp,
+            text = "${name[winner]} wins pot $pot"
         )
     }
 }

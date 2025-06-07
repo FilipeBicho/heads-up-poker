@@ -113,7 +113,10 @@ class Init(coroutineScope: CoroutineScope) {
             isPlayerTurn = player == PLAYER,
             newGame = false,
             dealer = dealer,
-            displayGameResult = false
+            displayGameResult = false,
+            winner = -1,
+            winningHand = null,
+            displayFold = false
         )}
     }
 
