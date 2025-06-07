@@ -502,7 +502,7 @@ class Betting(var coroutineScope: CoroutineScope) {
                 CHECK -> check()
                 CALL -> call()
                 BET -> {
-                    bet(40)
+                    bet(chatGptBot.betValue)
                 }
                 ALLIN -> {
                     allIn()

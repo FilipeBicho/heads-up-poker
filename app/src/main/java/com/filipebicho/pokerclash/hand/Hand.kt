@@ -52,7 +52,7 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
 
         if (isFullHouse()) {
             resultValue = FULL_HOUSE
-            resultText = "Full House of {${hand[0].cardRank()}s with ${hand[3].cardRank()}s}"
+            resultText = "Full House of ${hand[0].cardRank()}s with ${hand[3].cardRank()}s"
             return
         }
 
@@ -70,7 +70,7 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
 
         if (isThreeOfAKind()) {
             resultValue = THREE_OF_A_KIND
-            resultText = "Three of a Kind of {${hand[0].cardRank()}s"
+            resultText = "Three of a Kind of ${hand[0].cardRank()}s"
             return
         }
 

@@ -36,6 +36,9 @@ class Round(var coroutineScope: CoroutineScope) {
     fun flop(showdownCards: Boolean = false) {
         round = FLOP
 
+        mainPot += roundPot
+        roundPot = 0
+
         var flopCards = tableCards.subList(0,3)
         if (showdownCards) {
             odds.calculateShowdownFlopOdds(
@@ -57,6 +60,9 @@ class Round(var coroutineScope: CoroutineScope) {
     fun turn(showdownCards: Boolean = false) {
         round = TURN
 
+        mainPot += roundPot
+        roundPot = 0
+
         var turnCards = tableCards.subList(0,4)
         if (showdownCards) {
             odds.calculateShowdownTurnOdds(
@@ -77,16 +83,20 @@ class Round(var coroutineScope: CoroutineScope) {
 
     fun river(showdownCards: Boolean = false) {
         round = RIVER
+
+        mainPot += roundPot
+        roundPot = 0
+
         if (showdownCards) {
             odds.calculateShowdownTurnOdds(
                 playerCards = playerCards,
                 opponentCards = botCards,
-                tableCards = tableCards
+                tableCards = tableCards,
             )
 
             uiStateFlow.update { currentState -> currentState.copy(
                 playerOdds = odds.getShowdownPlayerOdds(),
-                botOdds = odds.getShowdownBotOdds()
+                botOdds = odds.getShowdownBotOdds(),
             )}
 
             showdownCards()
@@ -96,15 +106,10 @@ class Round(var coroutineScope: CoroutineScope) {
     }
 
     fun showdownCards() {
-        mainPot += roundPot
-        roundPot = 0
-
         uiStateFlow.update { currentState -> currentState.copy(
             displayBotCards = true,
             isPlayerTurn = false,
             showdown = true,
-            mainPot = mainPot,
-            roundPot = roundPot
         )}
 
         coroutineScope.launch {
@@ -119,6 +124,10 @@ class Round(var coroutineScope: CoroutineScope) {
     }
 
     fun calculateWinner() {
+
+        mainPot += roundPot
+        roundPot = 0
+
         uiStateFlow.update { currentState -> currentState.copy(
             isPlayerTurn = false,
             displayFoldButton = false,
@@ -126,7 +135,11 @@ class Round(var coroutineScope: CoroutineScope) {
             displayCallButton = false,
             displayBetButton = false,
             displayBotCards = true,
-            showdown = true
+            showdown = true,
+            roundPot = roundPot,
+            mainPot = mainPot,
+            playerBet = 0,
+            botBet = 0,
         )}
 
         val playerHand = Hand(playerCards = playerCards, tableCards = tableCards)
@@ -204,7 +217,9 @@ class Round(var coroutineScope: CoroutineScope) {
             displayTurn = round >= TURN,
             displayRiver = round == RIVER,
             gameSummary = gameSummaryMap,
-            playerHandResult = playerHand.resultText
+            playerHandResult = playerHand.resultText,
+            mainPot = mainPot,
+            roundPot = roundPot
         )}
     }
 }
