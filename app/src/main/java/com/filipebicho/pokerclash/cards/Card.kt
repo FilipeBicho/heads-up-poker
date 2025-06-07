@@ -18,7 +18,7 @@ const val TWO = 1
 
 const val HEARTS = 0
 const val SPADES = 1
-const val CLUBS = 2
+const val  CLUBS = 2
 const val DIAMONDS = 3
 
 class Card(var rank: Int, var suit: Int) {
@@ -30,11 +30,6 @@ class Card(var rank: Int, var suit: Int) {
     private val suitArraySymbols = arrayOf("\u2665", "\u2660", "\u2663", "\u2666")
 
     /**
-     * Get Card image path
-     */
-    fun getCardImagePath() = "${this.suitArray[this.suit]}_${this.rankArray[this.rank]}"
-
-    /**
      * output card rank_suit
      */
     override fun toString(): String {
@@ -43,6 +38,14 @@ class Card(var rank: Int, var suit: Int) {
 
     fun cardString(): String {
         return "${this.rankArraySymbols[this.rank]}${this.suitArraySymbols[this.suit]}"
+    }
+
+    fun cardRank(): String {
+        return this.rankArraySymbols[this.rank]
+    }
+
+    fun cardSuit(): String {
+        return this.suitArraySymbols[this.suit]
     }
 
     fun getCardDrawableResource(): Int {

@@ -40,55 +40,55 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
 
         if (isStraightFlush()) {
             resultValue = STRAIGHT_FLUSH
-            resultText = "Straight Flush"
+            resultText = "Straight Flush from ${hand[4].cardRank()} to ${hand[0].cardRank()}"
             return
         }
 
         if (isFourOfAKind()) {
             resultValue = FOUR_OF_A_KIND
-            resultText = "Four of a Kind"
+            resultText = "Four of a Kind of {${hand[0].cardRank()}s"
             return
         }
 
         if (isFullHouse()) {
             resultValue = FULL_HOUSE
-            resultText = "Full House"
+            resultText = "Full House of {${hand[0].cardRank()}s with ${hand[3].cardRank()}s}"
             return
         }
 
         if (isFlush()) {
             resultValue = FLUSH
-            resultText = "Flush"
+            resultText = "Flush of ${hand[0].cardSuit()}"
             return
         }
 
         if (isStraight()) {
             resultValue = STRAIGHT
-            resultText = "Straight"
+            resultText = "Straight from ${hand[4].cardRank()} to ${hand[0].cardRank()}"
             return
         }
 
         if (isThreeOfAKind()) {
             resultValue = THREE_OF_A_KIND
-            resultText = "Three of a Kind"
+            resultText = "Three of a Kind of {${hand[0].cardRank()}s"
             return
         }
 
         if (isTwoPair()) {
             resultValue = TWO_PAIR
-            resultText = "Two Pair"
+            resultText = "Two Pair of ${hand[0].cardRank()}s and ${hand[2].cardRank()}s"
             return
         }
 
         if (isPair()) {
             resultValue = PAIR
-            resultText = "Pair"
+            resultText = "Pair of ${hand[0].cardRank()}s"
             return
         }
 
         highCards()
         resultValue = HIGH_CARD
-        resultText = "High Card"
+        resultText = "High Card ${hand[0].cardRank()}"
     }
 
     private fun isRoyalStraightFlush(): Boolean {
@@ -310,9 +310,9 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
 
         for (index: Int in hand.size..4) {
             if (otherCards.any { it.rank == ACE }) {
-                hand.add(otherCards.removeFirst())
+                hand.add(otherCards.removeAt(0))
             } else {
-                hand.add(otherCards.removeLast())
+                hand.add(otherCards.removeAt(otherCards.lastIndex))
             }
         }
     }

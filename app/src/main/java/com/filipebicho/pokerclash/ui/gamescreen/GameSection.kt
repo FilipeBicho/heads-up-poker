@@ -154,10 +154,10 @@ private fun Bet(bet: String, display: Boolean) {
         Text(
             modifier = Modifier
                 .background(
-                    Color.DarkGray.copy(alpha = if (display) 0.5f else 0f),
+                    Color.DarkGray.copy(alpha = if (display) 0.7f else 0f),
                     shape = RoundedCornerShape(5.dp)
                 )
-                .padding(5.dp)
+                .padding(horizontal = 5.dp)
                 .alpha(if (display) 1f else 0f),
             fontSize = 12.sp,
             color = Color.White,
@@ -179,7 +179,7 @@ private fun Odds(odds: String, color: Color) {
                     color,
                     shape = RoundedCornerShape(5.dp)
                 )
-                .padding(5.dp),
+                .padding(horizontal = 5.dp),
             fontSize = 12.sp,
             color = Color.White,
             text = odds

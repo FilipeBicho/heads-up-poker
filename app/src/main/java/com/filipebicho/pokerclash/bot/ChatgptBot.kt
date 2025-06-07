@@ -31,7 +31,6 @@ const val FOLD = 0
 const val CHECK = 1
 const val CALL = 2
 const val BET = 3
-const val RAISE = 4
 const val ALLIN = 5
 
 class ChatgptBot {
