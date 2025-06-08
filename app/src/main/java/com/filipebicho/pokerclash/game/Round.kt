@@ -184,7 +184,8 @@ class Round(var coroutineScope: CoroutineScope) {
             gameSummary = gameSummaryMap,
             displayGameResult = true,
             winner = winner,
-            winningHand = if (winner == PLAYER) playerHand else botHand
+            winningHand = if (winner == PLAYER) playerHand else botHand,
+            displayPot = false
         )}
 
         if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {

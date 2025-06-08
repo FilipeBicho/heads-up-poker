@@ -38,7 +38,6 @@ import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.data.Data.validActions
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -188,7 +187,10 @@ class Betting(var coroutineScope: CoroutineScope) {
                 actions = actionText,
                 isPlayerTurn = false,
                 displayFold = true,
-                winner = opponent
+                winner = opponent,
+                botBet = 0,
+                playerBet = 0,
+                displayPot = false
             )
         }
         coroutineScope.launch {
@@ -234,7 +236,6 @@ class Betting(var coroutineScope: CoroutineScope) {
 
             bettingLog("--- BEFORE CALL (all in) $playerName ---")
             Log.d("MONEY DEBUG", "Amount to call: $amountToCall")
-
 
             // Player is all-in by calling
             val allInAmount = pokerChips[player]
@@ -381,8 +382,9 @@ class Betting(var coroutineScope: CoroutineScope) {
 
     private fun nextRound() {
 
-        if (player == dealer)
+        if (player == dealer) {
             switchPlayerTurn()
+        }
 
         action = NO_ACTION
 
@@ -436,12 +438,14 @@ class Betting(var coroutineScope: CoroutineScope) {
         val playerBet = bet[PLAYER]
 
         // Pre-flop: if both bets are zero (new hand)
-        if (botBet == 0 && playerBet == 0)
+        if (botBet == 0 && playerBet == 0) {
             return BIG_BLIND
+        }
 
         // No previous raise (bot just called BB)
-        if (botBet == BIG_BLIND)
+        if (botBet == BIG_BLIND) {
             return BIG_BLIND * 2
+        }
 
         // There was a previous raise — use lastRaiseAmount
         return botBet + botLastRaise
@@ -450,11 +454,13 @@ class Betting(var coroutineScope: CoroutineScope) {
     private fun isBetAvailable(): Boolean {
         val playerTotalStake = pokerChips[PLAYER] + bet[PLAYER]
 
-        if (playerTotalStake < bet[opponent])
+        if (playerTotalStake < bet[opponent]) {
             return false
+        }
 
-        if (bet[opponent] == 0 && pokerChips[PLAYER] > 0)
+        if (bet[opponent] == 0 && pokerChips[PLAYER] > 0) {
             return true
+        }
 
         return playerTotalStake >= bet[opponent]
     }

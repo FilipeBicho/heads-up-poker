@@ -84,8 +84,9 @@ class Init(coroutineScope: CoroutineScope) {
         checkAvailable = true
         gameSummaryList.clear()
 
-        if (gameSummaryMap.isNotEmpty())
+        if (gameSummaryMap.isNotEmpty()) {
             gameNumber += 1
+        }
 
         gameSummaryList.add("Game ${gameNumber+1}")
         gameSummaryMap.add(gameNumber, gameSummaryList.toList())
@@ -116,7 +117,8 @@ class Init(coroutineScope: CoroutineScope) {
             displayGameResult = false,
             winner = -1,
             winningHand = null,
-            displayFold = false
+            displayFold = false,
+            displayPot = true
         )}
     }
 

@@ -80,7 +80,7 @@ fun GameSection(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                RoundPot(roundPot = gameUiState.roundPot)
+                RoundPot(roundPot = gameUiState.roundPot, display = gameUiState.displayPot)
             }
         }
 
@@ -120,7 +120,7 @@ fun GameSection(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                MainPot(value = gameUiState.mainPot)
+                MainPot(pot = gameUiState.mainPot, display = gameUiState.displayPot)
                 TableCards(gameUiState = gameUiState)
                 Hand(hand = gameUiState.playerHandResult)
             }
@@ -218,32 +218,34 @@ private fun Odds(odds: String, color: Color) {
 }
 
 @Composable
-private fun MainPot(value: Int) {
+private fun MainPot(pot: Int, display: Boolean) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             modifier = Modifier
                 .background(
-                    Color.DarkGray.copy(alpha = 0.9f),
+                    Color.DarkGray.copy(alpha = if (display) 0.9f else 0f),
                     shape = RoundedCornerShape(5.dp)
                 )
-                .padding(horizontal = 5.dp),
+                .padding(horizontal = 5.dp)
+                .alpha(if (display) 1f else 0f),
             color = Color.White,
-            text = "Pot: $value",
+            text = "Pot: $pot",
             fontSize = 14.sp
         )
     }
 }
 
 @Composable
-private fun RoundPot(roundPot: Int) {
+private fun RoundPot(roundPot: Int, display: Boolean) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             modifier = Modifier
                 .background(
-                    Color.DarkGray.copy(alpha = 0.8f),
+                    Color.DarkGray.copy(alpha = if (display) 0.9f else 0f),
                     shape = RoundedCornerShape(5.dp)
                 )
-                .padding(horizontal = 5.dp),
+                .padding(horizontal = 5.dp)
+                .alpha(if (display) 1f else 0f),
             color = Color.White,
             fontSize = 10.sp,
             text = "$roundPot"

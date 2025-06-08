@@ -33,6 +33,7 @@ data class GameUiState(
     val botBet: Int = 0,
     val mainPot: Int = 0,
     val roundPot: Int = 0,
+    val displayPot: Boolean = true,
 
     // Cards
     val playerCards: List<Card> = ArrayList(),
