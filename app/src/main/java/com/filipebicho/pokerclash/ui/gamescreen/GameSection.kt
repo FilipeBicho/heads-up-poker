@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -60,104 +62,122 @@ fun GameSection(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
     ) {
-        Box(
-            modifier = Modifier.padding(0.dp, 5.dp, 0.dp, 0.dp),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            if (gameUiState.showdown && gameUiState.playerOdds != -1 && gameUiState.botOdds != -1) {
-                val oddsColor = if (gameUiState.botOdds > gameUiState.playerOdds)
-                    Color.Green.copy(alpha = 0.5f)
-                else if (gameUiState.botOdds < gameUiState.playerOdds)
-                    Color.Red.copy(alpha = 0.5f)
-                else
-                    Color.Yellow.copy(alpha = 0.5f)
-                Odds(odds = "${gameUiState.botOdds} %", color = oddsColor)
-            } else {
-                Bet(bet = "Bet ${gameUiState.botBet}", display = gameUiState.botBet > 0)
-            }
-        }
+        TopSection(gameUiState = gameUiState)
+        Spacer(modifier.height(40.dp))
+        MiddleSection(
+            gameUiState = gameUiState,
+            gameViewModel = gameViewModel,
+            modifier = Modifier.weight(1f)
+        )
+        BottomSection(gameUiState = gameUiState, modifier = Modifier.weight(1f))
+        SummaryAndPlayerOddsSection(gameUiState = gameUiState, gameViewModel = gameViewModel)
+    }
+}
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .padding(top = 40.dp),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                RoundPot(roundPot = gameUiState.roundPot, display = gameUiState.displayPot)
-            }
-        }
+@Composable
+private fun TopSection(gameUiState: GameUiState) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        BetOrOddsSection(
+            showdown = gameUiState.showdown,
+            bet = gameUiState.botBet,
+            playerOdds = gameUiState.botOdds,
+            opponentOdds = gameUiState.playerOdds
+        )
+        Spacer(modifier = Modifier.height(40.dp))
+        RoundPot(roundPot = gameUiState.roundPot, display = gameUiState.displayPot)
+    }
+}
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            contentAlignment = Alignment.Center
+@Composable
+private fun MiddleSection(
+    gameUiState: GameUiState,
+    gameViewModel: GameViewModel,
+    modifier: Modifier) {
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                if (gameUiState.displayGameResult) {
+            when {
+                gameUiState.displayGameResult -> {
                     GameResult(
                         name = gameUiState.name,
                         winner = gameUiState.winner,
                         hand = gameUiState.winningHand,
                         pot = gameUiState.mainPot
                     )
-                } else if (gameUiState.displayFold) {
+                }
+
+                gameUiState.displayFold -> {
                     Fold(
                         name = gameUiState.name,
                         winner = gameUiState.winner,
                         pot = gameUiState.mainPot
                     )
-                } else if (gameUiState.newGame) {
+                }
+
+                gameUiState.newGame -> {
                     NewGame(gameViewModel = gameViewModel)
                 }
             }
         }
+    }
+}
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            contentAlignment = Alignment.BottomCenter
+@Composable
+private fun BottomSection(gameUiState: GameUiState, modifier: Modifier) {
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                if (!gameUiState.newGame) {
-                    MainPot(pot = gameUiState.mainPot, display = gameUiState.displayPot)
-                    TableCards(gameUiState = gameUiState)
-                    HandResult(hand = gameUiState.playerHandResult)
-                }
+            if (!gameUiState.newGame) {
+                MainPot(pot = gameUiState.mainPot, display = gameUiState.displayPot)
+                TableCards(gameUiState = gameUiState)
+                HandResult(hand = gameUiState.playerHandResult)
             }
         }
+    }
+}
 
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            SummaryToggleButton(gameUiState = gameUiState, gameViewModel = gameViewModel)
-        }
+@Composable
+private fun SummaryAndPlayerOddsSection(gameUiState: GameUiState, gameViewModel: GameViewModel) {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        SummaryToggleButton(gameUiState = gameUiState, gameViewModel = gameViewModel)
+    }
 
-        Box(contentAlignment = Alignment.CenterEnd) {
-            if (gameUiState.showdown && gameUiState.playerOdds != -1 && gameUiState.botOdds != -1) {
-                val oddsColor = if (gameUiState.playerOdds > gameUiState.botOdds)
-                    Color.Green.copy(alpha = 0.5f)
-                else if (gameUiState.playerOdds < gameUiState.botOdds)
-                    Color.Red.copy(alpha = 0.5f)
-                else
-                    Color.Yellow.copy(alpha = 0.5f)
-                Odds(odds = "${gameUiState.playerOdds} %", color = oddsColor)
-            } else {
-                Bet(bet = "Bet ${gameUiState.playerBet}", gameUiState.playerBet > 0)
-            }
-        }
+    Box(contentAlignment = Alignment.CenterEnd) {
+       BetOrOddsSection(
+           showdown = gameUiState.showdown,
+           bet = gameUiState.playerBet,
+           playerOdds = gameUiState.playerOdds,
+           opponentOdds = gameUiState.botOdds
+       )
+    }
+}
+
+@Composable
+private fun BetOrOddsSection(
+    showdown: Boolean,
+    bet: Int,
+    playerOdds: Int,
+    opponentOdds: Int
+) {
+    if (showdown && playerOdds != -1 && opponentOdds != -1) {
+        OddsDisplay(playerOdds = playerOdds, opponentOdds = opponentOdds)
+    } else {
+        Bet(bet = "Bet $bet", display = bet > 0)
     }
 }
 
@@ -294,19 +314,29 @@ private fun TableCards(gameUiState: GameUiState) {
         modifier = Modifier.padding(top = 0.dp, bottom = 0.dp, start = 30.dp, end = 30.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.2f)) {
             TableCardImage(card = gameUiState.tableCards[0], display = showFlopCard1)
         }
-        Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.2f)) {
             TableCardImage(card = gameUiState.tableCards[1], display = showFlopCard2)
         }
-        Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.2f)) {
             TableCardImage(card = gameUiState.tableCards[2], display = showFlopCard3)
         }
-        Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.2f)) {
             TableCardImage(card = gameUiState.tableCards[3], display = gameUiState.displayTurn)
         }
-        Box(modifier = Modifier.fillMaxWidth().weight(0.2f)) {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.2f)) {
             TableCardImage(card = gameUiState.tableCards[4], display = gameUiState.displayRiver)
         }
     }
@@ -434,4 +464,14 @@ private fun NewGame(gameViewModel: GameViewModel) {
             modifier = Modifier.padding(horizontal = 2.dp)
         )
     }
+}
+
+@Composable
+private fun OddsDisplay(playerOdds: Int, opponentOdds: Int) {
+    val oddsColor = when {
+        playerOdds > opponentOdds -> Color.Green.copy(alpha = 0.5f)
+        playerOdds < opponentOdds -> Color.Red.copy(alpha = 0.5f)
+        else -> Color.Yellow.copy(alpha = 0.5f)
+    }
+    Odds(odds = "$playerOdds %", color = oddsColor)
 }
