@@ -57,6 +57,7 @@ class Init(coroutineScope: CoroutineScope) {
 
         uiStateFlow.update { currentState -> currentState.copy(
             displayBotCards = false,
+            displayPlayerCards = true,
             displayFlop = false,
             displayTurn = false,
             displayRiver = false,
@@ -118,7 +119,7 @@ class Init(coroutineScope: CoroutineScope) {
             winner = -1,
             winningHand = null,
             displayFold = false,
-            displayPot = true
+            displayPot = true,
         )}
     }
 

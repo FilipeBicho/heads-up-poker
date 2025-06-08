@@ -96,7 +96,11 @@ private fun PlayerCards(gameUiState: GameUiState, modifier: Modifier = Modifier)
             .padding(0.dp, 0.dp, 4.dp, 4.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
-        Cards(cards = gameUiState.playerCards, display = true, modifier = modifier)
+        Cards(
+            cards = gameUiState.playerCards,
+            display = gameUiState.displayPlayerCards,
+            modifier = modifier
+        )
         NameAndMoneySection(
             name = gameUiState.playerName,
             action = gameUiState.actions[PLAYER],

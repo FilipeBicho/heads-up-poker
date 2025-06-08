@@ -8,14 +8,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,7 +32,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.filipebicho.pokerclash.GameUiState
@@ -106,6 +114,8 @@ fun GameSection(
                         winner = gameUiState.winner,
                         pot = gameUiState.mainPot
                     )
+                } else if (gameUiState.newGame) {
+                    NewGame(gameViewModel = gameViewModel)
                 }
             }
         }
@@ -120,9 +130,11 @@ fun GameSection(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                MainPot(pot = gameUiState.mainPot, display = gameUiState.displayPot)
-                TableCards(gameUiState = gameUiState)
-                Hand(hand = gameUiState.playerHandResult)
+                if (!gameUiState.newGame) {
+                    MainPot(pot = gameUiState.mainPot, display = gameUiState.displayPot)
+                    TableCards(gameUiState = gameUiState)
+                    HandResult(hand = gameUiState.playerHandResult)
+                }
             }
         }
 
@@ -332,7 +344,7 @@ private fun TableCardImage(card: Card?, display: Boolean) {
 }
 
 @Composable
-private fun Hand(hand: String) {
+private fun HandResult(hand: String) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -395,6 +407,31 @@ private fun Fold(name: List<String>, winner: Int, pot: Int) {
             color = Color.White,
             fontSize = 14.sp,
             text = "${name[winner]} wins pot $pot"
+        )
+    }
+}
+
+@Composable
+private fun NewGame(gameViewModel: GameViewModel) {
+    OutlinedButton(
+        onClick = { gameViewModel.startGame()},
+        modifier = Modifier
+            .width(200.dp),
+        shape = RoundedCornerShape(10.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = colorResource(id = R.color.button_red),
+            contentColor = Color.White
+        ),
+        contentPadding = PaddingValues(12.dp),
+    ) {
+        Text(
+            text = "New Game",
+            style = TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center
+            ),
+            modifier = Modifier.padding(horizontal = 2.dp)
         )
     }
 }

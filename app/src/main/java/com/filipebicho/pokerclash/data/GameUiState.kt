@@ -50,6 +50,7 @@ data class GameUiState(
     val displayTurn: Boolean = false,
     val displayRiver: Boolean = false,
     val displayBotCards: Boolean = true,
+    val displayPlayerCards: Boolean = true,
     val showdown: Boolean = false,
     val newGame: Boolean = false,
     val displayGameResult: Boolean = false,

@@ -196,12 +196,20 @@ class Round(var coroutineScope: CoroutineScope) {
         } else {
             winnerCount[winner]++
             coroutineScope.launch {
+                delay(4000)
                 uiStateFlow.update { currentState -> currentState.copy(
                     newGame = true,
                     playerWins = winnerCount[PLAYER],
-                    botWins = winnerCount[BOT]
+                    botWins = winnerCount[BOT],
+                    showdown = false,
+                    displayFlop = false,
+                    displayTurn = false,
+                    displayRiver = false,
+                    displayBotCards = false,
+                    displayPlayerCards = false,
+                    displayPot = false,
+                    displayGameResult = false
                 )}
-                delay(4000)
             }
         }
     }
