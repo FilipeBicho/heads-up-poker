@@ -71,8 +71,15 @@ class ChatgptBot {
         if (content.isNotEmpty()) {
             val jsonContent = JSONObject(content)
             Log.d("ChatgptBot", "Response: $jsonContent")
-            val actionString = jsonContent.get("action").toString()
-            betValue = jsonContent.get("bet").toString().toInt()
+
+            var actionString = ""
+            if (jsonContent.has("action")) {
+                actionString = jsonContent.get("action").toString()
+            }
+
+            if (jsonContent.has("bet")) {
+                betValue = jsonContent.get("bet").toString().toInt()
+            }
 
             return when (actionString) {
                 "fold" -> FOLD
