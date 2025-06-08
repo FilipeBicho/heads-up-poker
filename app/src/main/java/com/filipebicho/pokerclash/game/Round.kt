@@ -88,7 +88,7 @@ class Round(var coroutineScope: CoroutineScope) {
         roundPot = 0
 
         if (showdownCards) {
-            odds.calculateShowdownTurnOdds(
+            odds.calculateShowdownRiverOdds(
                 playerCards = playerCards,
                 opponentCards = botCards,
                 tableCards = tableCards,

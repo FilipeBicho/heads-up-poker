@@ -65,7 +65,7 @@ fun GameSection(
                     Color.Yellow.copy(alpha = 0.5f)
                 Odds(odds = "${gameUiState.botOdds} %", color = oddsColor)
             } else {
-                Bet(bet = "Bet ${gameUiState.botBet}", gameUiState.botBet > 0)
+                Bet(bet = "Bet ${gameUiState.botBet}", display = gameUiState.botBet > 0)
             }
         }
 
@@ -134,7 +134,6 @@ fun GameSection(
         }
 
         Box(contentAlignment = Alignment.CenterEnd) {
-
             if (gameUiState.showdown && gameUiState.playerOdds != -1 && gameUiState.botOdds != -1) {
                 val oddsColor = if (gameUiState.playerOdds > gameUiState.botOdds)
                     Color.Green.copy(alpha = 0.5f)

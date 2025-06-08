@@ -1,8 +1,10 @@
 package com.filipebicho.pokerclash.odds
 
 import android.util.Log
+import com.filipebicho.pokerclash.cards.BOT
 import com.filipebicho.pokerclash.cards.Card
 import com.filipebicho.pokerclash.cards.Deck
+import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.hand.Hand
 import com.filipebicho.pokerclash.hand.HandWinnerCalculator
 import com.filipebicho.pokerclash.hand.RESULT
@@ -112,6 +114,24 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
 
         showdownPlayerOdds = ((player1.toDouble()/count) * 100).roundToInt()
         showdownOpponentOdds = ((player2.toDouble()/count) * 100).roundToInt()
+    }
+
+    fun calculateShowdownRiverOdds(playerCards: MutableList<Card>, opponentCards: MutableList<Card>, tableCards: MutableList<Card>)
+    {
+        val playerHand = Hand(playerCards, tableCards)
+        val botHand = Hand(opponentCards, tableCards)
+        val winner = HandWinnerCalculator(player1Hand = playerHand, player2Hand = botHand).getWinner()
+
+        if (winner == PLAYER) {
+            showdownPlayerOdds = 100
+            showdownOpponentOdds = 0
+        } else if (winner == BOT) {
+            showdownPlayerOdds = 0
+            showdownOpponentOdds = 100
+        } else {
+            showdownPlayerOdds = 50
+            showdownOpponentOdds = 50
+        }
     }
 
     fun getShowdownPlayerOdds() = showdownPlayerOdds
