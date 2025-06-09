@@ -4,13 +4,10 @@ import android.util.Log
 import com.filipebicho.pokerclash.BIG_BLIND
 import com.filipebicho.pokerclash.SMALL_BLIND
 import com.filipebicho.pokerclash.cards.BOT
-import com.filipebicho.pokerclash.cards.Card
 import com.filipebicho.pokerclash.cards.FLOP
 import com.filipebicho.pokerclash.cards.PLAYER
-import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.cards.RIVER
 import com.filipebicho.pokerclash.cards.TURN
-import com.filipebicho.pokerclash.data.Data.action
 import com.filipebicho.pokerclash.data.Data.actionHistory
 import com.filipebicho.pokerclash.data.Data.bet
 import com.filipebicho.pokerclash.data.Data.botCards
@@ -21,6 +18,7 @@ import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
 import com.filipebicho.pokerclash.data.Data.roundText
+import com.filipebicho.pokerclash.data.Data.stats
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.validActions
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -109,6 +107,17 @@ class ChatgptBot {
             else -> "[none]"
         }
 
+        val opponentStatsPayload = mapOf(
+            "handsPlayed" to stats.handsPlayed,
+            "voluntarilyPutMoneyInPot" to stats.safePercentage(stats.voluntarilyPutMoneyInPot, stats.handsPlayed),
+            "preFlopRaises" to stats.safePercentage(stats.preFlopRaises, stats.handsPlayed),
+            "continuationBet" to stats.safePercentage(stats.continuationBet, stats.preFlopRaises),
+            "continuationBetFaced" to stats.continuationBetFaced,
+            "foldsToContinuationBet" to stats.safePercentage(stats.foldsToContinuationBet, stats.continuationBetFaced),
+            "riverBets" to stats.riverBets,
+            "riverBluffsDetected" to stats.riverBluffsDetected
+        )
+
         val prompt = PokerRequest(
             yourHand = botCards.joinToString(", ") { it.cardString() },
             tableCards = currentTableCards,
@@ -124,6 +133,7 @@ class ChatgptBot {
             currentPot = mainPot + roundPot,
             actionHistory = actionHistory,
             validActions = validActions,
+            opponentStats = opponentStatsPayload
         )
 
         Log.d("ChatgptBot", "Request: $prompt")

@@ -37,6 +37,7 @@ import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
 import com.filipebicho.pokerclash.data.Data.roundText
+import com.filipebicho.pokerclash.data.Data.stats
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.data.Data.validActions
 import kotlinx.coroutines.flow.update
@@ -51,7 +52,6 @@ class Betting(var coroutineScope: CoroutineScope) {
     }
 
     fun preFlop() {
-
         val blindName = uiStateFlow.value.name[player]
         val dealerName = uiStateFlow.value.name[opponent]
 
@@ -213,6 +213,7 @@ class Betting(var coroutineScope: CoroutineScope) {
         }
         coroutineScope.launch {
             delay(3000)
+            stats.updateStatsAfterHand()
             init.newGame()
         }
     }

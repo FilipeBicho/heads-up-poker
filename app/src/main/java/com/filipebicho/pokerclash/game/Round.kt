@@ -7,7 +7,11 @@ import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.cards.RIVER
 import com.filipebicho.pokerclash.cards.TURN
+import com.filipebicho.pokerclash.data.Data.actionHistory
+import com.filipebicho.pokerclash.data.Data.actionPlayer
 import com.filipebicho.pokerclash.data.Data.actionText
+import com.filipebicho.pokerclash.data.Data.bet
+import com.filipebicho.pokerclash.data.Data.blind
 import com.filipebicho.pokerclash.data.Data.botCards
 import com.filipebicho.pokerclash.data.Data.gameNumber
 import com.filipebicho.pokerclash.data.Data.gameSummaryList
@@ -21,6 +25,8 @@ import com.filipebicho.pokerclash.data.Data.playerCards
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
+import com.filipebicho.pokerclash.data.Data.roundText
+import com.filipebicho.pokerclash.data.Data.stats
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.data.Data.winnerCount
@@ -175,6 +181,12 @@ class Round(var coroutineScope: CoroutineScope) {
             }
         }
 
+        actionHistory += if (winner == PLAYER)
+            "Showdown: ${actionPlayer[BOT]} lost"
+        else
+            "Showdown: ${actionPlayer[BOT]} won"
+
+
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
         uiStateFlow.update { currentState -> currentState.copy(
@@ -191,6 +203,7 @@ class Round(var coroutineScope: CoroutineScope) {
         if (pokerChips[player] > 0 && pokerChips[opponent] > 0) {
             coroutineScope.launch {
                 delay(4000)
+                stats.updateStatsAfterHand()
                 init.newGame()
             }
         } else {

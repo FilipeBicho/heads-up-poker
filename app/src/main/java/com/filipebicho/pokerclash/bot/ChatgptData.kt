@@ -47,7 +47,8 @@ data class PokerRequest(
     val potBeforeRound: Int,
     val currentPot: Int,
     val actionHistory: List<String> = emptyList(),
-    val validActions: List<String>
+    val validActions: List<String>,
+    val opponentStats: Map<String, Int> = emptyMap(),
 ) {
     fun toPrompt(): String {
         return buildString {
@@ -65,10 +66,10 @@ data class PokerRequest(
             appendLine("Pot before this round: $potBeforeRound")
             appendLine("Current pot: $currentPot")
             appendLine("Valid actions: ${validActions.joinToString(", ", prefix = "[", postfix = "]")}")
+            appendLine("Opponent Stats: ${opponentStats.entries.joinToString(", ", prefix = "{", postfix = "}") { "${it.key}: ${it.value}" }}")
             appendLine("Output: JSON with keys \"action\" and \"bet\"")
             appendLine("Question: What should be my action and bet?")
         }
     }
 }
-
 

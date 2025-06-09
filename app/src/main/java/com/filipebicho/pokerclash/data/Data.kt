@@ -10,6 +10,7 @@ import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.game.Betting
 import com.filipebicho.pokerclash.game.Init
 import com.filipebicho.pokerclash.game.Round
+import com.filipebicho.pokerclash.game.Stats
 import com.filipebicho.pokerclash.odds.Odds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,6 +28,7 @@ object Data {
     lateinit var betting: Betting
     lateinit var cardDealer: Dealer
     lateinit var gameRound: Round
+    var stats: Stats = Stats()
     val chatGptBot = ChatgptBot()
 
     // Bot
