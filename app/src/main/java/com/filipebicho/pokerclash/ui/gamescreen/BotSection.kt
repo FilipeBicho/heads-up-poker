@@ -9,11 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,8 +16,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.filipebicho.pokerclash.GameUiState
 import com.filipebicho.pokerclash.cards.BOT
-import com.filipebicho.pokerclash.cards.PLAYER
-import kotlinx.coroutines.delay
 
 @Composable
 fun BotSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
@@ -41,7 +34,7 @@ private fun InfoSection(gameUiState: GameUiState, modifier: Modifier = Modifier)
             .padding(0.dp, 5.dp, 0.dp, 0.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = "Model: ${gameUiState.botModel}", fontSize = 10.sp, color = Color.White)
+        Text(text = "Model: ${gameUiState.chatgptModel}", fontSize = 10.sp, color = Color.White)
 
         if (gameUiState.dealer == BOT) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
@@ -60,8 +53,8 @@ fun WinCountSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top
     ) {
-        Text(text = "Player wins: ${gameUiState.playerWins}", fontSize = 10.sp, color = Color.White)
-        Text(text = "Bot wins: ${gameUiState.botWins}", fontSize = 10.sp, color = Color.White)
+        Text(text = "${gameUiState.playerName} wins: ${gameUiState.playerWins}", fontSize = 10.sp, color = Color.White)
+        Text(text = "${gameUiState.simulatedPlayerName} wins: ${gameUiState.botWins}", fontSize = 10.sp, color = Color.White)
     }
 }
 
@@ -80,7 +73,7 @@ private fun BotCards(gameUiState: GameUiState, modifier: Modifier = Modifier) {
             modifier = modifier
         )
         NameAndMoneySection(
-            name = gameUiState.botName,
+            name = gameUiState.simulatedPlayerName,
             action = gameUiState.actions[BOT],
             money = gameUiState.botMoney
         )

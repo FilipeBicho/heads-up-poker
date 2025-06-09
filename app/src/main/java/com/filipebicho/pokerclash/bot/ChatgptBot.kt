@@ -1,8 +1,6 @@
 package com.filipebicho.pokerclash.bot
 
 import android.util.Log
-import com.filipebicho.pokerclash.BIG_BLIND
-import com.filipebicho.pokerclash.SMALL_BLIND
 import com.filipebicho.pokerclash.cards.BOT
 import com.filipebicho.pokerclash.cards.Card
 import com.filipebicho.pokerclash.cards.FLOP
@@ -12,13 +10,14 @@ import com.filipebicho.pokerclash.cards.TURN
 import com.filipebicho.pokerclash.data.Data.actionHistory
 import com.filipebicho.pokerclash.data.Data.bet
 import com.filipebicho.pokerclash.data.Data.botCards
-import com.filipebicho.pokerclash.data.Data.botModel
+import com.filipebicho.pokerclash.data.Data.chatgptModel
 import com.filipebicho.pokerclash.data.Data.dealer
 import com.filipebicho.pokerclash.data.Data.mainPot
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
 import com.filipebicho.pokerclash.data.Data.roundText
+import com.filipebicho.pokerclash.data.Data.simulatedPlayer
 import com.filipebicho.pokerclash.data.Data.stats
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.validActions
@@ -43,7 +42,7 @@ class ChatgptBot {
     var betValue: Int = 0
 
     suspend fun getAction(): Int = suspendCancellableCoroutine { continuation ->
-        val request = ChatRequest(model = botModel, messages = getRequestMessage(), response_format = ResponseFormat(type = "json_object"))
+        val request = ChatRequest(model = "gpt-4o", messages = getRequestMessage(), response_format = ResponseFormat(type = "json_object"))
         retrofit.getChatCompletion(request).enqueue(object : Callback<ChatResponse> {
             override fun onResponse(call: Call<ChatResponse>, response: Response<ChatResponse>) {
                 if (response.isSuccessful) {
@@ -157,7 +156,7 @@ class ChatgptBot {
         appendLine("Action History:")
         actionHistory.forEach { appendLine("- $it") }
         appendLine()
-        appendLine("Play style: Play as Daniel Negreanu")
+        appendLine("Play style: Play as $simulatedPlayer")
         appendLine("Output: JSON with keys \"action\" and \"bet\"")
         appendLine("Question: What should be my action and bet?")
     }

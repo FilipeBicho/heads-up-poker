@@ -9,8 +9,8 @@ data class GameUiState(
 
     // Names
     val playerName: String = "",
-    val botName: String = "",
-    val botModel: String = "",
+    val simulatedPlayerName: String = "",
+    val chatgptModel: String = "GPT-4o",
 
     // Actions
     val actions: List<String> = mutableListOf(),

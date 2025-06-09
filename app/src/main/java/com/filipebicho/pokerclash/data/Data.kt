@@ -33,12 +33,18 @@ object Data {
 
     // Bot
     val botOptions = listOf(
-        Pair("GPT 4o latest", "chatgpt-4o-latest"),
-        Pair("GPT 4o", "gpt-4o"),
-        Pair("GPT 4o mini", "gpt-4o-mini"),
-        Pair("GPT 3 turbo", "gpt-3.5-turbo")
+        Pair("Tom Dwan", "Tom Dwan"),
+        Pair("Dan Bilzerian","Dan Bilzerian"),
+        Pair("Stephen Chidwick","Stephen Chidwick"),
+        Pair("Phil Ivey","Phil Ivey"),
+        Pair("Daniel Negreanu","Daniel Negreanu"),
+        Pair("Doyle Brunson","Doyle Brunson"),
+        Pair("Phil Hellmuth","Phil Hellmuth"),
+        Pair("Doug Polk","Doug Polk"),
+        Pair("Linus Loeliger", "Linus Loeliger"),
     )
-    var botModel = ""
+    var simulatedPlayer = ""
+    val chatgptModel = "gpt‑4o"
     var actionHistory: MutableList<String> = mutableListOf()
     val actionPlayer:  List<String> = listOf("Opponent", "You")
     val roundText: List<String> = listOf("Pre-flop", "Flop", "Turn", "River")

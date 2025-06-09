@@ -40,7 +40,7 @@ fun BotSelectionScreen(
     ) {
         Column {
             Text(
-                text = "Select Bot AI Model",
+                text = "Select Opponent",
                 color = Color.White,
                 fontSize = 20.sp,
                 fontFamily = FontFamily.Serif,

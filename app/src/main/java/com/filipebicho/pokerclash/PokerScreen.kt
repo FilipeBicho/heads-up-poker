@@ -33,22 +33,10 @@ fun PokerApp(
     navController: NavHostController = rememberNavController()
 ) {
     val gameUiState by uiState.collectAsState()
-    // Define a development flag (you'd likely get this from build config)
-    val isDevelopmentMode = true // Set to false for production
-
-    // Use a LaunchedEffect to run initialization only once when the key changes
-    LaunchedEffect(Unit) {
-        if (isDevelopmentMode) {
-            // Temporarily initialize for direct game access in development
-            viewModel.setPlayerName("Filipe")
-            viewModel.setBot(Pair("GPT 4o mini", "gpt-4o"))
-            viewModel.startGame()
-        }
-    }
 
     NavHost(
         navController = navController,
-        startDestination = PokerScreen.Game.name,
+        startDestination = PokerScreen.Start.name,
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
