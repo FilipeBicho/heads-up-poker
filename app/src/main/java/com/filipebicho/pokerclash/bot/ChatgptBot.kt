@@ -4,6 +4,7 @@ import android.util.Log
 import com.filipebicho.pokerclash.BIG_BLIND
 import com.filipebicho.pokerclash.SMALL_BLIND
 import com.filipebicho.pokerclash.cards.BOT
+import com.filipebicho.pokerclash.cards.Card
 import com.filipebicho.pokerclash.cards.FLOP
 import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.cards.RIVER
@@ -98,13 +99,13 @@ class ChatgptBot {
     }
 
     fun getRequestMessage(): List<Message> {
-        var currentTableCards = ""
+        var currentTableCards = emptyList<Card>()
 
         currentTableCards = when (round) {
-            FLOP -> tableCards.subList(0,3).joinToString(", ") { it.cardString() }
-            TURN -> tableCards.subList(0,4).joinToString(", ") { it.cardString() }
-            RIVER -> tableCards.joinToString(", ") { it.cardString() }
-            else -> "[none]"
+            FLOP -> tableCards.subList(0,3)
+            TURN -> tableCards.subList(0,4)
+            RIVER -> tableCards
+            else -> emptyList()
         }
 
         val opponentStatsPayload = mapOf(
@@ -118,29 +119,47 @@ class ChatgptBot {
             "riverBluffsDetected" to stats.riverBluffsDetected
         )
 
-        val prompt = PokerRequest(
-            yourHand = botCards.joinToString(", ") { it.cardString() },
-            tableCards = currentTableCards,
-            round = roundText[round],
-            dealer = if (dealer == BOT) "You" else "Opponent",
-            smallBlind = SMALL_BLIND,
-            bigBlind = BIG_BLIND,
-            yourStack = pokerChips[BOT],
-            opponentStack = pokerChips[PLAYER],
-            yourBetThisRound = bet[BOT],
-            opponentBetThisRound = bet[PLAYER],
-            potBeforeRound = mainPot,
-            currentPot = mainPot + roundPot,
-            actionHistory = actionHistory,
-            validActions = validActions,
-            opponentStats = opponentStatsPayload
-        )
+        val prompt = buildChatPrompt(opponentStatsPayload, currentTableCards)
 
         Log.d("ChatgptBot", "Request: $prompt")
 
         return listOf(Message(
             role = "user",
-            content = prompt.toPrompt()
+            content = prompt
         ))
     }
+
+    fun buildChatPrompt(
+        opponentStatsPayload: Map<String, Int>,
+        tableCards: List<Card>,
+    ): String = buildString {
+        appendLine("You are playing Heads-up Texas Hold'em Poker.")
+        appendLine()
+        appendLine("Opponent Stats after ${opponentStatsPayload["handsPlayed"]} hands:")
+        appendLine("- VPIP (Voluntarily Put Money In Pot): ${opponentStatsPayload["voluntarilyPutMoneyInPot"]}%")
+        appendLine("- PFR (Pre-Flop Raise): ${opponentStatsPayload["preFlopRaises"]}%")
+        appendLine("- Continuation Bet Frequency: ${opponentStatsPayload["continuationBet"]}%")
+        appendLine("- Fold to C-Bet: ${opponentStatsPayload["foldsToContinuationBet"]}%")
+        appendLine("- River Bets: ${opponentStatsPayload["riverBets"]}")
+        appendLine("- River Bluffs Detected: ${opponentStatsPayload["riverBluffsDetected"]}")
+        appendLine()
+        appendLine("Current Hand State:")
+        appendLine("- Round: ${roundText[round]}")
+        appendLine("- Your Hand: ${botCards.joinToString(", ") { it.cardString() }}")
+        appendLine("- Board: ${if (tableCards.isEmpty()) "No board yet" else tableCards.joinToString(", ") { it.cardString() }}")
+        appendLine("- Dealer: ${if (dealer == BOT) "You" else "Opponent"}")
+        appendLine("- Pot: ${roundPot + mainPot}, Pot Before Round: ${mainPot}")
+        appendLine("- Your Stack: ${pokerChips[BOT]}, Opponent Stack: ${pokerChips[PLAYER]}")
+        appendLine("- Your Bet This Round: ${bet[BOT]}, Opponent Bet This Round: ${bet[PLAYER]}")
+        appendLine()
+        appendLine("Valid Actions: ${validActions.joinToString(", ")}")
+        appendLine()
+        appendLine("Action History:")
+        actionHistory.forEach { appendLine("- $it") }
+        appendLine()
+        appendLine("Play style: Play as Daniel Negreanu")
+        appendLine("Output: JSON with keys \"action\" and \"bet\"")
+        appendLine("Question: What should be my action and bet?")
+    }
+
 }
