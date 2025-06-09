@@ -6,6 +6,7 @@ import com.filipebicho.pokerclash.cards.Dealer
 import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.data.Data.action
+import com.filipebicho.pokerclash.data.Data.actionHistory
 import com.filipebicho.pokerclash.data.Data.bet
 import com.filipebicho.pokerclash.data.Data.betting
 import com.filipebicho.pokerclash.data.Data.blind
@@ -91,6 +92,8 @@ class Init(coroutineScope: CoroutineScope) {
 
         gameSummaryList.add("Game ${gameNumber+1}")
         gameSummaryMap.add(gameNumber, gameSummaryList.toList())
+
+        actionHistory.clear()
 
         // init or change dealer
         dealer = if (dealer == -1) {

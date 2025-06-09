@@ -16,6 +16,8 @@ import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.cards.RIVER
 import com.filipebicho.pokerclash.cards.TURN
 import com.filipebicho.pokerclash.data.Data.action
+import com.filipebicho.pokerclash.data.Data.actionHistory
+import com.filipebicho.pokerclash.data.Data.actionPlayer
 import com.filipebicho.pokerclash.data.Data.actionText
 import com.filipebicho.pokerclash.data.Data.bet
 import com.filipebicho.pokerclash.data.Data.blind
@@ -34,6 +36,7 @@ import com.filipebicho.pokerclash.data.Data.player
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
+import com.filipebicho.pokerclash.data.Data.roundText
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.data.Data.validActions
 import kotlinx.coroutines.flow.update
@@ -74,6 +77,9 @@ class Betting(var coroutineScope: CoroutineScope) {
                  actionText[blind] = "All in ${bet[blind]}"
                  actionText[dealer] = "Call ${bet[dealer]}"
 
+                 actionHistory += "${roundText[round]}: ${actionPlayer[blind]} make all-in with ${bet[blind]}"
+                 actionHistory += "${roundText[round]}: ${actionPlayer[dealer]} call all-in with ${bet[blind]}"
+
                  bettingLog("--- AFTER BLIND (small blind) All in ---")
 
                  updateStateFlowBets()
@@ -98,6 +104,9 @@ class Betting(var coroutineScope: CoroutineScope) {
 
                  actionText[blind] = "All in ${bet[blind]}"
                  actionText[dealer] = "Call ${bet[dealer]}"
+
+                 actionHistory += "${roundText[round]}: ${actionPlayer[blind]} make all-in with ${bet[blind]}"
+                 actionHistory += "${roundText[round]}: ${actionPlayer[dealer]} call all-in with ${bet[blind]}"
 
                  bettingLog("--- AFTER BLIND (big blind) All in ---")
 
@@ -126,6 +135,9 @@ class Betting(var coroutineScope: CoroutineScope) {
              actionText[dealer] = "All in ${bet[dealer]}"
              actionText[blind] = "Call ${bet[blind]}"
 
+             actionHistory += "${roundText[round]}: ${actionPlayer[dealer]} make all-in with ${bet[dealer]}"
+             actionHistory += "${roundText[round]}: ${actionPlayer[blind]} call all-in with ${bet[blind]}"
+
              bettingLog("--- AFTER DEALER (small blind) All in ---")
 
              updateStateFlowBets()
@@ -147,6 +159,9 @@ class Betting(var coroutineScope: CoroutineScope) {
 
              gameSummaryList += "$dealerName pays small blind ${bet[dealer]}"
              gameSummaryList += "$blindName pays big blind ${bet[blind]}"
+
+             actionHistory += "${roundText[round]}: ${actionPlayer[dealer]} pay small blind ${bet[dealer]}"
+             actionHistory += "${roundText[round]}: ${actionPlayer[blind]} pay big blind ${bet[blind]}"
 
              actionText[dealer] = "SB"
              actionText[blind] = "BB"
@@ -174,6 +189,9 @@ class Betting(var coroutineScope: CoroutineScope) {
 
         actionText[player] = "Fold"
         actionText[opponent] = "Win $totalPotWonByOpponent"
+
+        actionHistory += "${roundText[round]}: ${actionPlayer[player]} make fold"
+        actionHistory += "${roundText[round]}: ${actionPlayer[opponent]} win $totalPotWonByOpponent"
 
         bettingLog("--- AFTER FOLD $playerName ---")
 
@@ -206,6 +224,8 @@ class Betting(var coroutineScope: CoroutineScope) {
 
         gameSummaryList += "$playerName checks"
         actionText[player] = "Check"
+
+        actionHistory += "${roundText[round]}: ${actionPlayer[player]} make check"
 
         bettingLog("--- AFTER CHECK $playerName ---")
 
@@ -255,6 +275,8 @@ class Betting(var coroutineScope: CoroutineScope) {
             roundPot = bet[player] + bet[opponent]
             actionText[player] = "All in $allInAmount"
 
+            actionHistory += "${roundText[round]}: ${actionPlayer[player]} make call all-in with $allInAmount"
+
             bettingLog("--- AFTER CALL (all in) $playerName ---")
 
             updateStateFlowBets()
@@ -270,6 +292,8 @@ class Betting(var coroutineScope: CoroutineScope) {
 
             roundPot = bet[player] + bet[opponent]
             actionText[player] = "Call $amountToCall"
+
+            actionHistory += "${roundText[round]}: ${actionPlayer[player]} call $amountToCall"
 
             bettingLog("--- AFTER CALL $playerName ---")
 
@@ -326,6 +350,11 @@ class Betting(var coroutineScope: CoroutineScope) {
             gameSummaryList += "$playerName bets ${bet[player]}"
             actionText[player] = "Bet ${bet[player]}"
 
+            actionHistory += if (previousBetAmount == 0)
+                "${roundText[round]}: ${actionPlayer[player]} bet ${bet[player]}"
+            else
+                "${roundText[round]}: ${actionPlayer[player]} raise to $newBetAmount}"
+
             bettingLog("--- AFTER BET $playerName ---")
 
             updateStateFlowBets()
@@ -367,6 +396,8 @@ class Betting(var coroutineScope: CoroutineScope) {
 
         gameSummaryList += "$playerName makes all in with ${bet[player]}"
         actionText[player] = "All in ${bet[player]}"
+
+        actionHistory += "${roundText[round]}: ${actionPlayer[player]} make all-in with ${bet[player]}"
 
         bettingLog("--- AFTER ALL IN $playerName ---")
 
@@ -551,7 +582,7 @@ class Betting(var coroutineScope: CoroutineScope) {
                 displayAllInSmallButton = false
             )}
         } else {
-            validActions = listOf("Fold, Call")
+            validActions = listOf("Fold", "Call")
             botAction()
         }
     }
@@ -573,7 +604,7 @@ class Betting(var coroutineScope: CoroutineScope) {
                 displayAllInSmallButton = isAllInAvailable()
             )}
         } else {
-            validActions = listOf("Fold, Call and Bet")
+            validActions = listOf("Fold", "Call", "Bet")
             botAction()
         }
     }
@@ -595,7 +626,7 @@ class Betting(var coroutineScope: CoroutineScope) {
                 )
             }
         } else {
-            validActions = listOf("Check and Bet")
+            validActions = listOf("Check", "Bet")
             botAction()
         }
     }

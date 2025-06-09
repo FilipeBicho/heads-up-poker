@@ -1,13 +1,17 @@
 package com.filipebicho.pokerclash.bot
 
 import android.util.Log
+import com.filipebicho.pokerclash.BIG_BLIND
+import com.filipebicho.pokerclash.SMALL_BLIND
 import com.filipebicho.pokerclash.cards.BOT
+import com.filipebicho.pokerclash.cards.Card
 import com.filipebicho.pokerclash.cards.FLOP
 import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.cards.RIVER
 import com.filipebicho.pokerclash.cards.TURN
 import com.filipebicho.pokerclash.data.Data.action
+import com.filipebicho.pokerclash.data.Data.actionHistory
 import com.filipebicho.pokerclash.data.Data.bet
 import com.filipebicho.pokerclash.data.Data.botCards
 import com.filipebicho.pokerclash.data.Data.botModel
@@ -16,6 +20,7 @@ import com.filipebicho.pokerclash.data.Data.mainPot
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
+import com.filipebicho.pokerclash.data.Data.roundText
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.validActions
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -95,80 +100,37 @@ class ChatgptBot {
     }
 
     fun getRequestMessage(): List<Message> {
-        val botCard1 = botCards.first().toString()
-        val botCard2 = botCards.last().toString()
+        var currentTableCards = ""
 
-        var tableCardsString = ""
-        when (round) {
-            FLOP -> tableCards.subList(0,3).forEach { tableCardsString += "$it, " }
-            TURN -> tableCards.subList(0,4).forEach { tableCardsString += "$it, " }
-            RIVER -> tableCards.forEach { tableCardsString += "$it, " }
-            else -> ""
+        currentTableCards = when (round) {
+            FLOP -> tableCards.subList(0,3).joinToString(", ") { it.cardString() }
+            TURN -> tableCards.subList(0,4).joinToString(", ") { it.cardString() }
+            RIVER -> tableCards.joinToString(", ") { it.cardString() }
+            else -> "[none]"
         }
 
-        var playerAction = when (action) {
-            NO_ACTION -> "No action"
-            FOLD -> "Fold"
-            CHECK -> "Check"
-            CALL -> "Call"
-            BET -> "Bet ${bet[PLAYER]}"
-            ALLIN -> "All in"
-            else -> ""
-        }
+        val prompt = PokerRequest(
+            yourHand = botCards.joinToString(", ") { it.cardString() },
+            tableCards = currentTableCards,
+            round = roundText[round],
+            dealer = if (dealer == BOT) "You" else "Opponent",
+            smallBlind = SMALL_BLIND,
+            bigBlind = BIG_BLIND,
+            yourStack = pokerChips[BOT],
+            opponentStack = pokerChips[PLAYER],
+            yourBetThisRound = bet[BOT],
+            opponentBetThisRound = bet[PLAYER],
+            potBeforeRound = mainPot,
+            currentPot = mainPot + roundPot,
+            actionHistory = actionHistory,
+            validActions = validActions,
+        )
 
-        var roundString = when (round) {
-            PRE_FLOP -> "Pre flop"
-            FLOP -> "Flop"
-            TURN -> "Turn"
-            RIVER -> "River"
-            else -> ""
-        }
-
-        val dealer = if (dealer == BOT) "You" else "Opponent"
-
-        Log.d("ChatgptBot", "Request: \"Game type: Heads-up Texas hold'em\\n\" +\n" +
-                "                    \"Your hand: $botCard1, $botCard2\\n\" +\n" +
-                "                    \"Table cards: $tableCardsString\\n\" +\n" +
-                "                    \"Round: $roundString\\n\" +\n" +
-                "                    \"Dealer: $dealer\\n\" +\n" +
-                "                    \"Initial money: 1500\\n\" +\n" +
-                "                    \"Your money: ${pokerChips[BOT]}\\n\" +\n" +
-                "                    \"Your money + current bet: ${pokerChips[BOT] + bet[BOT]}\\n\" +\n" +
-                "                    \"Opponent money: ${pokerChips[PLAYER]}\\n\" +\n" +
-                "                    \"Opponent money + opponent current bet: ${pokerChips[PLAYER] + bet[PLAYER]}\\n\" +\n" +
-                "                    \"Your previous bet: ${bet[BOT]}\\n\"+\n" +
-                "                    \"Opponent bet: ${bet[PLAYER]}\\n\"+\n" +
-                "                    \"Current pot round: $roundPot\\n\" +\n" +
-                "                    \"Total pot: $mainPot\\n\" +\n" +
-                "                    \"Opponent action: $playerAction \\n\" +\n" +
-                "                    \"Valid actions: $validActions \\n\" +\n" +
-                "                    \"Output: JSON containing only the action and bet\\n\" +\n" +
-                "                    \"Action types: Fold, Check, Call, Bet, All in\\n\" +\n" +
-                "                    \"Bet: value of the bet\\n\" +\n" +
-                "                    \"Question: What should be my action and Bet?\\n\"")
+        Log.d("ChatgptBot", "Request: $prompt")
 
         return listOf(Message(
             role = "user",
-            content = "Game type: Heads-up Texas hold'em\n" +
-                    "Your hand: $botCard1, $botCard2\n" +
-                    "Table cards: $tableCardsString\n" +
-                    "Round: $roundString\n" +
-                    "Dealer: $dealer\n" +
-                    "Initial money: 1500\n" +
-                    "Your money: ${pokerChips[BOT]}\n" +
-                    "Your money + your current bet: ${pokerChips[BOT] + bet[BOT]}\n" +
-                    "Opponent money: ${pokerChips[PLAYER]}\n" +
-                    "Opponent money + Opponent current bet: ${pokerChips[PLAYER] + bet[PLAYER]}\n" +
-                    "Your previous bet: ${bet[BOT]}\n"+
-                    "Opponent bet: ${bet[PLAYER]}\n"+
-                    "Current pot round: $roundPot\n" +
-                    "Total pot: $mainPot\n" +
-                    "Opponent action: $playerAction \n" +
-                    "Valid actions: $validActions \n" +
-                    "Output: JSON containing only the action and bet\n" +
-                    "Action types: Fold, Check, Call, Bet, All in\n" +
-                    "Bet: value of the bet\n" +
-                    "Question: What should be my action and Bet?\n"
+            content = prompt.toPrompt()
         ))
     }
 }

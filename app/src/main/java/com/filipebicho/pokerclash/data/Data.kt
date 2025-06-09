@@ -29,7 +29,7 @@ object Data {
     lateinit var gameRound: Round
     val chatGptBot = ChatgptBot()
 
-    // Bot models
+    // Bot
     val botOptions = listOf(
         Pair("GPT 4o latest", "chatgpt-4o-latest"),
         Pair("GPT 4o", "gpt-4o"),
@@ -37,13 +37,16 @@ object Data {
         Pair("GPT 3 turbo", "gpt-3.5-turbo")
     )
     var botModel = ""
+    var actionHistory: MutableList<String> = mutableListOf()
+    val actionPlayer:  List<String> = listOf("Opponent", "You")
+    val roundText: List<String> = listOf("Pre-flop", "Flop", "Turn", "River")
 
     // Actions
     var actionText : MutableList<String> = mutableListOf("", "")
 
     // Money
-    var playerMoney = 100
-    var botMoney = 100
+    var playerMoney = 1500
+    var botMoney = 1500
     var pokerChips: MutableList<Int> = mutableListOf(0,0)
     var bet: MutableList<Int> = mutableListOf(0,0)
     var botLastRaise: Int = 0

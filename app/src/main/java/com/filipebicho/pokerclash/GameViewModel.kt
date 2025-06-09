@@ -8,6 +8,7 @@ import com.filipebicho.pokerclash.bot.CHECK
 import com.filipebicho.pokerclash.bot.FOLD
 import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.data.Data.action
+import com.filipebicho.pokerclash.data.Data.actionPlayer
 import com.filipebicho.pokerclash.data.Data.betting
 import com.filipebicho.pokerclash.data.Data.botModel
 import com.filipebicho.pokerclash.data.Data.init
