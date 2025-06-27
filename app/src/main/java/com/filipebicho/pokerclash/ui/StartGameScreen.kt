@@ -44,7 +44,7 @@ fun StartGameScreen(onStartButtonClicked: (String) -> Unit) {
     var playerName by remember { mutableStateOf("") }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(0.dp, 50.dp)
+        modifier = Modifier.padding(0.dp, 100.dp)
     ) {
         GameTitle()
     }
@@ -70,7 +70,7 @@ fun GameTitle() {
         fontSize = 40.sp,
         fontFamily = FontFamily.Serif,
         style = TextStyle(
-            shadow = Shadow(color = Color.Red, offset = Offset(5.0f, 10.0f) , blurRadius = 3f)
+            shadow = Shadow(color = colorResource(id = R.color.button_red), offset = Offset(5.0f, 10.0f) , blurRadius = 3f)
         ),
     )
 }
