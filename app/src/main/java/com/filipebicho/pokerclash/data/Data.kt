@@ -33,15 +33,15 @@ object Data {
 
     // Bot
     val botOptions = listOf(
-        Pair("Tom Dwan", "Tom Dwan"),
-        Pair("Dan Bilzerian","Dan Bilzerian"),
-        Pair("Stephen Chidwick","Stephen Chidwick"),
-        Pair("Phil Ivey","Phil Ivey"),
-        Pair("Daniel Negreanu","Daniel Negreanu"),
-        Pair("Doyle Brunson","Doyle Brunson"),
-        Pair("Phil Hellmuth","Phil Hellmuth"),
-        Pair("Doug Polk","Doug Polk"),
-        Pair("Linus Loeliger", "Linus Loeliger"),
+        Pair("Tom Dwan", "An unpredictable, ultra-aggressive heads-up beast. Bluff-heavy, always pressuring you with wild plays."),
+        Pair("Dan Bilzerian","Loose and flashy with wild swings. He’ll gamble big and chase spots — expect chaos, not consistency."),
+        Pair("Stephen Chidwick","A tight-aggressive heads-up technician. Plays disciplined and balanced, exploiting every small edge."),
+        Pair("Phil Ivey","Smooth and unreadable. Mixes aggression and control masterfully — a complete heads-up threat."),
+        Pair("Daniel Negreanu","Talkative and intuitive. Reads hands like a book and adjusts fast — don’t expect the same play twice."),
+        Pair("Doyle Brunson","Old-school pressure player. Fast, fearless, and aggressive in heads-up — plays big and bold."),
+        Pair("Phil Hellmuth","Starts tight, then strikes hard. May tilt when down, but don’t underestimate his tournament instincts."),
+        Pair("Doug Polk","A heads-up GTO master. Balanced, aggressive, and nearly impossible to exploit — built for this format."),
+        Pair("Linus Loeliger", "GTO perfectionist. Rarely makes mistakes, plays tight but punishes errors — a pure online crusher."),
     )
     var simulatedPlayer = ""
     val chatgptModel = "gpt‑4o"

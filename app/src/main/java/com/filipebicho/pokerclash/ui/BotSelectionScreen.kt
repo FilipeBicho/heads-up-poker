@@ -1,90 +1,147 @@
 package com.filipebicho.pokerclash.ui
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.filipebicho.pokerclash.R
-import com.filipebicho.pokerclash.StartGameBackground
 import com.filipebicho.pokerclash.data.Data.botOptions
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BotSelectionScreen(
-    onBotButtonClicked: (Pair<String, String>) -> Unit
+    onBotSelected: (Pair<String, String>) -> Unit,
 ) {
-    StartGameBackground()
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Column {
-            Text(
-                text = "Select Opponent",
-                color = Color.White,
-                fontSize = 20.sp,
-                fontFamily = FontFamily.Serif,
+    // Scaffold provides structure for typical Material Design screens
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Select Opponent") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = colorResource(id = R.color.button_red),
+                    titleContentColor = Color.White
+                )
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            botOptions.forEach { bot ->
-                BotButton(bot = bot, onBotButtonClicked)
-                Spacer(modifier = Modifier.height(10.dp))
+        }
+    ) { paddingValues ->
+        StartGameBackground(modifier = Modifier.padding(paddingValues)) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp)
+            ) {
+                items(botOptions) { bot ->
+                    BotOptionCard(
+                        botName = bot.first,
+                        botDescription = bot.second,
+                        onBotSelected = { onBotSelected(bot) }
+                    )
+                }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BotButton(bot: Pair<String, String>, onBotButtonClicked: (Pair<String, String>) -> Unit) {
-    Button(
-        onClick = { onBotButtonClicked(bot) },
+fun BotOptionCard(
+    botName: String,
+    botDescription: String,
+    onBotSelected: () -> Unit
+) {
+    Card(
+        onClick = onBotSelected,
         modifier = Modifier
-            .clip(shape = RoundedCornerShape(10.dp))
-            .border(
-                2.dp,
-                colorResource(id = R.color.border_gray),
-                shape = RoundedCornerShape(10.dp)
-            )
-            .height(40.dp)
-            .width(180.dp)
-            .background(colorResource(id = R.color.button_red)),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            contentColor = Color.White
-        ),
-        contentPadding = PaddingValues(0.dp)
-    ) {
-        Text(
-            text = bot.first,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = colorResource(id = R.color.bg_bot_card)
         )
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Person,
+                    contentDescription = "$botName icon",
+                    modifier = Modifier.size(48.dp),
+                    tint = colorResource(id = R.color.button_red)
+                )
+
+                Column {
+                    Text(
+                        text = botName,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    if (botDescription.isNotBlank()) {
+                        Text(
+                            text = botDescription,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.LightGray
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
-@Preview
+
+@Preview(showBackground = true)
 @Composable
 fun BotSelectionScreenPreview() {
-    BotSelectionScreen (onBotButtonClicked = {})
+    // Make sure to wrap your preview in your app's theme for accurate results
+    // MyPokerAppTheme {
+    BotSelectionScreen(onBotSelected = {})
+    // }
+}
+
+// Dummy StartGameBackground for preview purposes
+@Composable
+fun StartGameBackground(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        color = colorResource(id = R.color.bg_dark_gray)
+    ) {
+        content()
+    }
 }

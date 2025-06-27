@@ -38,7 +38,7 @@ class GameViewModel : ViewModel() {
     fun setBot(bot: Pair<String, String>) {
         uiStateFlow.update { currentState ->
             currentState.copy(
-                simulatedPlayerName = bot.second,
+                simulatedPlayerName = bot.first,
                 name = listOf(uiStateFlow.value.playerName, bot.first)
             )
         }

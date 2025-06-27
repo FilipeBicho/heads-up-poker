@@ -39,7 +39,6 @@ fun PokerApp(
         startDestination = PokerScreen.Start.name,
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
     ) {
         composable(route = PokerScreen.Start.name) {
             StartGameScreen(
@@ -51,7 +50,7 @@ fun PokerApp(
         }
         composable(route = PokerScreen.BotSelection.name) {
             BotSelectionScreen(
-                onBotButtonClicked = {
+                onBotSelected = {
                     viewModel.setBot(it)
                     viewModel.startGame()
                     navController.navigate(PokerScreen.Game.name)
