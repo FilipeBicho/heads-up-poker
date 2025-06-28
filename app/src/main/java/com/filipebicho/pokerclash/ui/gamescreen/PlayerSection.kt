@@ -193,7 +193,7 @@ private fun SmallBetButton(
         modifier = modifier.height(30.dp),
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = colorResource(id = R.color.button_red),
+            containerColor = colorResource(id = R.color.poker_red),
             contentColor = Color.White
         ),
         enabled = enabled
@@ -258,7 +258,7 @@ private fun BetSlider(
             onValueChangeFinished = { gameViewModel.updatePlayerBet(sliderPosition.toInt())},
             colors = SliderDefaults.colors(
                 thumbColor = Color.LightGray,
-                activeTrackColor = colorResource(id = R.color.button_red),
+                activeTrackColor = colorResource(id = R.color.poker_red),
                 inactiveTrackColor = Color.Black
             ),
             valueRange = minValue..maxValue,
@@ -340,7 +340,7 @@ private fun Button(
             .alpha(if (enabled) 1f else 0f),
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = colorResource(id = R.color.button_red),
+            containerColor = colorResource(id = R.color.poker_red),
             contentColor = Color.White
         ),
         contentPadding = PaddingValues(12.dp),

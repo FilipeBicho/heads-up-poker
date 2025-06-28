@@ -23,12 +23,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.filipebicho.pokerclash.R
-import com.filipebicho.pokerclash.StartGameBackground
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -39,26 +40,27 @@ import androidx.compose.ui.text.style.TextAlign
 
 @Composable
 fun StartGameScreen(onStartButtonClicked: (String) -> Unit) {
-    StartGameBackground()
-
     var playerName by remember { mutableStateOf("") }
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(0.dp, 100.dp)
-    ) {
-        GameTitle()
-    }
+    StartGameBackground() {
+        Column(horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(0.dp, 100.dp)
+        ) {
+            GameTitle()
+        }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom) {
 
-        PlayerNameTextField(playerName = playerName, onPlayerNameChanged = { playerName = it })
+            PlayerNameTextField(playerName = playerName, onPlayerNameChanged = { playerName = it })
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        if (playerName.isNotEmpty())
-            StartButton(playerName = playerName, onStartButtonClicked = onStartButtonClicked)
+            if (playerName.isNotEmpty())
+                StartButton(playerName = playerName, onStartButtonClicked = onStartButtonClicked)
+        }
     }
 }
 
@@ -70,7 +72,7 @@ fun GameTitle() {
         fontSize = 40.sp,
         fontFamily = FontFamily.Serif,
         style = TextStyle(
-            shadow = Shadow(color = colorResource(id = R.color.button_red), offset = Offset(5.0f, 10.0f) , blurRadius = 3f)
+            shadow = Shadow(color = colorResource(id = R.color.poker_red), offset = Offset(5.0f, 10.0f) , blurRadius = 3f)
         ),
     )
 }
@@ -110,7 +112,7 @@ fun StartButton(playerName: String, onStartButtonClicked: (String) -> Unit) {
             )
             .height(48.dp)
             .width(200.dp)
-            .background(colorResource(id = R.color.button_red)),
+            .background(colorResource(id = R.color.poker_red)),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
             contentColor = Color.White
@@ -130,4 +132,14 @@ fun StartButton(playerName: String, onStartButtonClicked: (String) -> Unit) {
 @Composable
 fun StartGameScreenPreview() {
     StartGameScreen(onStartButtonClicked = {})
+}
+
+@Composable
+fun StartGameBackground(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        color = colorResource(id = R.color.bg_start_game)
+    ) {
+        content()
+    }
 }

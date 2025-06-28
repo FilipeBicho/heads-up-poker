@@ -45,13 +45,13 @@ fun BotSelectionScreen(
             TopAppBar(
                 title = { Text("Select Opponent") },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colorResource(id = R.color.button_red),
+                    containerColor = colorResource(id = R.color.poker_red),
                     titleContentColor = Color.White
                 )
             )
         }
     ) { paddingValues ->
-        StartGameBackground(modifier = Modifier.padding(paddingValues)) {
+        BotSelectionBackground(modifier = Modifier.padding(paddingValues)) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -102,7 +102,7 @@ fun BotOptionCard(
                     imageVector = Icons.Filled.Person,
                     contentDescription = "$botName icon",
                     modifier = Modifier.size(48.dp),
-                    tint = colorResource(id = R.color.button_red)
+                    tint = colorResource(id = R.color.poker_red)
                 )
 
                 Column {
@@ -135,12 +135,11 @@ fun BotSelectionScreenPreview() {
     // }
 }
 
-// Dummy StartGameBackground for preview purposes
 @Composable
-fun StartGameBackground(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+fun BotSelectionBackground(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Surface(
         modifier = modifier.fillMaxSize(),
-        color = colorResource(id = R.color.bg_dark_gray)
+        color = colorResource(id = R.color.bg_bot_selection)
     ) {
         content()
     }

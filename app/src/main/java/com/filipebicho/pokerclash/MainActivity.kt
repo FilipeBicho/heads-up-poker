@@ -36,17 +36,6 @@ fun Background() {
     }
 }
 
-@Composable
-fun StartGameBackground() {
-    PokerTheme {
-        Image(
-            painter = painterResource(id = R.drawable.background_into),
-            contentScale = ContentScale.FillBounds,
-            contentDescription = "Background",
-        )
-    }
-}
-
 private fun hideStatusBar(window: Window) {
 
     val windowInsetsController =

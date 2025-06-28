@@ -449,7 +449,7 @@ private fun NewGame(gameViewModel: GameViewModel) {
             .width(200.dp),
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = colorResource(id = R.color.button_red),
+            containerColor = colorResource(id = R.color.poker_red),
             contentColor = Color.White
         ),
         contentPadding = PaddingValues(12.dp),
