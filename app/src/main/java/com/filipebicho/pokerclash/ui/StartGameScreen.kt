@@ -1,8 +1,15 @@
 package com.filipebicho.pokerclash.ui
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateTo
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
@@ -15,7 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
@@ -25,55 +31,108 @@ import androidx.compose.ui.unit.sp
 import com.filipebicho.pokerclash.R
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.offset
+import kotlin.math.roundToInt
 
 @Composable
 fun StartGameScreen(onStartButtonClicked: (String) -> Unit) {
     var playerName by remember { mutableStateOf("") }
 
-    StartGameBackground() {
-        Column(horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(0.dp, 100.dp)
+    StartGameBackground {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding()
         ) {
-            GameTitle()
-        }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 60.dp, start = 16.dp, end = 16.dp)
+            ) {
+                AnimatedPokerTitle()
+                Spacer(modifier = Modifier.height(24.dp))
+            }
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Bottom) {
-
-            PlayerNameTextField(playerName = playerName, onPlayerNameChanged = { playerName = it })
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (playerName.isNotEmpty())
-                StartButton(playerName = playerName, onStartButtonClicked = onStartButtonClicked)
+            // Bottom section: Input and Button
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Bottom,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 100.dp, start = 32.dp, end = 32.dp)
+            ) {
+                PlayerNameTextField(playerName = playerName, onPlayerNameChanged = { playerName = it })
+                Spacer(modifier = Modifier.height(24.dp))
+                if (playerName.isNotEmpty()) {
+                    StartButton(playerName = playerName, onStartButtonClicked = onStartButtonClicked)
+                } else {
+                    Spacer(modifier = Modifier.height(52.dp))
+                }
+            }
         }
     }
 }
 
 @Composable
-fun GameTitle() {
+fun AnimatedPokerTitle(modifier: Modifier = Modifier) { // Added modifier for flexibility, though not used in current StartGameScreen directly
+    val alpha = remember { Animatable(0f) }
+    val scale = remember { Animatable(0.5f) }
+
+    LaunchedEffect(Unit) {
+        alpha.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 800, delayMillis = 0)
+        )
+        scale.animateTo(
+            targetValue = 1f,
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioHighBouncy,
+                stiffness = Spring.StiffnessMediumLow,
+            )
+        )
+    }
+
     Text(
         text = "AI Poker Clash",
-        color = Color.White,
-        fontSize = 40.sp,
-        fontFamily = FontFamily.Serif,
         style = TextStyle(
-            shadow = Shadow(color = colorResource(id = R.color.poker_red), offset = Offset(5.0f, 10.0f) , blurRadius = 3f)
+            color =colorResource(id = R.color.poker_red),
+            fontSize = 44.sp,
+            fontFamily = FontFamily.SansSerif,
+            fontWeight = FontWeight.ExtraBold,
+            shadow = Shadow(
+                color = Color.White.copy(alpha = 0.5f),
+                offset = Offset(3.0f, 3.0f),
+                blurRadius = 5f
+            ),
+            textAlign = TextAlign.Center
         ),
+        modifier = modifier
+            .scale(scale.value)
+            .alpha(alpha.value)
     )
 }
 
@@ -88,14 +147,16 @@ fun PlayerNameTextField(playerName: String, onPlayerNameChanged: (String) -> Uni
             unfocusedLabelColor = colorResource(id = R.color.border_gray),
             focusedLabelColor = colorResource(id = R.color.teal_700),
             focusedBorderColor = colorResource(id = R.color.teal_700),
-            unfocusedBorderColor = colorResource(id = R.color.border_gray)
+            unfocusedBorderColor = colorResource(id = R.color.border_gray),
+            unfocusedContainerColor = Color.LightGray,
+            focusedContainerColor = Color.DarkGray
         ),
         value = playerName,
         onValueChange = onPlayerNameChanged,
-        label = { Text("Player Name") },
+        label = { Text("Insert your name...") },
         singleLine = true,
         textStyle = TextStyle(fontSize = 16.sp),
-        placeholder = { Text("Enter your name") }
+        placeholder = { Text("Insert your name...") }
     )
 }
 
@@ -136,10 +197,22 @@ fun StartGameScreenPreview() {
 
 @Composable
 fun StartGameBackground(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = colorResource(id = R.color.bg_start_game)
-    ) {
+    Box(modifier = modifier.fillMaxSize()) { // Use a Box to layer the image and content
+        Image(
+            painter = painterResource(id = R.drawable.intro_background), // Replace with your image name
+            contentDescription = "Background Image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.8f)) // Adjust alpha for desired dimness
+            // 0.0f = fully transparent, 1.0f = fully opaque black
+            // 0.5f to 0.7f is often a good range
+        )
+        // The actual screen content is placed on top of the image
         content()
     }
 }

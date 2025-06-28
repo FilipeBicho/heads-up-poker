@@ -1,6 +1,9 @@
 package com.filipebicho.pokerclash.ui
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -27,7 +30,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -137,10 +142,22 @@ fun BotSelectionScreenPreview() {
 
 @Composable
 fun BotSelectionBackground(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = colorResource(id = R.color.bg_bot_selection)
-    ) {
+    Box(modifier = modifier.fillMaxSize()) { // Use a Box to layer the image and content
+        Image(
+            painter = painterResource(id = R.drawable.intro_background), // Replace with your image name
+            contentDescription = "Background Image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.8f)) // Adjust alpha for desired dimness
+            // 0.0f = fully transparent, 1.0f = fully opaque black
+            // 0.5f to 0.7f is often a good range
+        )
+        // The actual screen content is placed on top of the image
         content()
     }
 }

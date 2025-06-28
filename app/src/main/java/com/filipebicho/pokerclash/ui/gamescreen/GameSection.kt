@@ -389,7 +389,7 @@ private fun HandResult(hand: String) {
 
 @Composable
 private fun GameResult(name: List<String>, winner: Int, hand: Hand?, pot: Int) {
-    var handString = hand?.getHand()?.joinToString(" ") { it.cardString() }
+    val handString = hand?.getHand()?.joinToString(" ") { it.cardString() }
     Column(modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally) {
         if (winner == PLAYER || winner == BOT) {
