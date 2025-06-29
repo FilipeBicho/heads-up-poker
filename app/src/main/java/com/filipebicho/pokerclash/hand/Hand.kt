@@ -136,15 +136,15 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
 
         // add highest three of a kind
         if (threeOfAKindList.any { it.key == 0 }) {
-            hand.addAll(threeOfAKindList.removeLast().value)
+            hand.addAll(threeOfAKindList.removeAt(threeOfAKindList.size -1).value)
 
         } else {
-            hand.addAll(threeOfAKindList.removeFirst().value)
+            hand.addAll(threeOfAKindList.removeAt(0).value)
         }
 
         // if there is a pair of Ace
         if (pairList.isNotEmpty() && pairList.any { it.key == 0 }) {
-            hand.addAll(pairList.removeLast().value)
+            hand.addAll(pairList.removeAt(pairList.size - 1).value)
             return true
         } else {
             // if there is another three of a kind
@@ -274,8 +274,8 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
                 hand.addAll(pairList.last().value)
                 hand.addAll(pairList[0].value)
             } else {
-                hand.addAll(pairList.removeFirst().value)
-                hand.addAll(pairList.removeFirst().value)
+                hand.addAll(pairList.removeAt(0).value)
+                hand.addAll(pairList.removeAt(0).value)
             }
             highCards()
             return true
