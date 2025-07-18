@@ -16,7 +16,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,7 +26,9 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -48,6 +49,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -62,6 +64,7 @@ import com.filipebicho.pokerclash.R
 @Composable
 fun StartGameScreen(onStartButtonClicked: (String) -> Unit) {
     var playerName by remember { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
 
     StartGameBackground {
         Box(
@@ -71,23 +74,22 @@ fun StartGameScreen(onStartButtonClicked: (String) -> Unit) {
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 24.dp, vertical = 32.dp)
+                    .padding(horizontal = 24.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
-
+                Spacer(Modifier.weight(0.3f))
                 Title()
                 Spacer(modifier = Modifier.height(32.dp))
                 Logo()
-                Spacer(modifier = Modifier.height(48.dp))
+                Spacer(modifier = Modifier.height(40.dp))
                 PlayerNameTextField(
                     playerName = playerName,
                     onPlayerNameChanged = { playerName = it }
                 )
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                // AnimatedVisibility for the button
                 AnimatedVisibility(
                     visible = playerName.isNotBlank(),
                     enter = slideInVertically(initialOffsetY = { it / 2 }) + fadeIn(),
@@ -95,9 +97,18 @@ fun StartGameScreen(onStartButtonClicked: (String) -> Unit) {
                 ) {
                     StartButton(
                         playerName = playerName,
-                        onStartButtonClicked = onStartButtonClicked
+                        onStartButtonClicked = {
+                            focusManager.clearFocus()
+                            onStartButtonClicked(it)
+                        },
                     )
                 }
+
+                if (playerName.isBlank()) {
+                    Spacer(modifier = Modifier.height(56.dp + 24.dp))
+                }
+
+                Spacer(Modifier.weight(0.7f))
             }
         }
     }
@@ -125,7 +136,7 @@ fun Title(modifier: Modifier = Modifier) {
             text = "AI",
             style = TextStyle(
                 color = colorResource(id = R.color.poker_red),
-                fontSize = 120.sp,
+                fontSize = 100.sp,
                 fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.Bold,
                 shadow = Shadow(
@@ -139,7 +150,7 @@ fun Title(modifier: Modifier = Modifier) {
             text = "Poker Clash",
             style = TextStyle(
                 color = colorResource(id = R.color.off_white),
-                fontSize = 55.sp,
+                fontSize = 50.sp,
                 fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.Normal,
                 shadow = Shadow(
@@ -169,7 +180,7 @@ fun Logo() {
         contentScale = ContentScale.Fit,
         contentDescription = "Poker Clash Logo",
         modifier = Modifier
-            .size(160.dp)
+            .size(120.dp)
             .scale(scale)
     )
 }
@@ -185,15 +196,15 @@ fun PlayerNameTextField(playerName: String, onPlayerNameChanged: (String) -> Uni
         placeholder = { Text("Enter Your Nickname", color = colorResource(id = R.color.off_white).copy(alpha = 0.7f)) },
         singleLine = true,
         textStyle = TextStyle(fontSize = 18.sp, color = colorResource(id = R.color.off_white), fontWeight = FontWeight.SemiBold),
-        shape = RoundedCornerShape(12.dp), // More rounded corners
+        shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = colorResource(id = R.color.poker_red),
-            unfocusedBorderColor = colorResource(id = R.color.subtle_gray),
+            unfocusedBorderColor = colorResource(id = R.color.off_white),
             focusedLabelColor = colorResource(id = R.color.poker_red),
             unfocusedLabelColor = colorResource(id = R.color.off_white).copy(alpha = 0.4f),
             cursorColor = colorResource(id = R.color.poker_red),
-            focusedContainerColor = colorResource(id = R.color.dark_background).copy(alpha = 0.5f),
-            unfocusedContainerColor = colorResource(id = R.color.dark_background).copy(alpha = 0.3f)
+            focusedContainerColor = colorResource(id = R.color.dark_background).copy(alpha = 0.8f),
+            unfocusedContainerColor = colorResource(id = R.color.dark_background).copy(alpha = 0.5f)
         )
     )
 }
@@ -205,11 +216,6 @@ fun StartButton(playerName: String, onStartButtonClicked: (String) -> Unit) {
     Button(
         onClick = {
             onStartButtonClicked(playerName)
-            // Optional: Add a little click animation
-            // CoroutineScope(Dispatchers.Main).launch {
-            //     scale.animateTo(0.95f, animationSpec = tween(50))
-            //     scale.animateTo(1f, animationSpec = tween(50))
-            // }
         },
         modifier = Modifier
             .width(250.dp)
@@ -250,6 +256,13 @@ fun StartGameScreenPreview() {
 @Composable
 fun StartGameBackground(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Box(modifier = modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(id = R.drawable.intro_background),
+            contentDescription = "Background Image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            alpha = 0.3f
+        )
         Box(
             modifier = Modifier
                 .fillMaxSize()

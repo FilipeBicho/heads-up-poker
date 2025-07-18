@@ -90,7 +90,7 @@ fun BotOptionCard(
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = colorResource(id = R.color.bg_bot_card)
+            containerColor = colorResource(id = R.color.dark_background)
         )
     ) {
         Row(
@@ -115,7 +115,7 @@ fun BotOptionCard(
                         text = botName,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = colorResource(id = R.color.off_white)
                     )
                     if (botDescription.isNotBlank()) {
                         Text(
@@ -142,22 +142,19 @@ fun BotSelectionScreenPreview() {
 
 @Composable
 fun BotSelectionBackground(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Box(modifier = modifier.fillMaxSize()) { // Use a Box to layer the image and content
+    Box(modifier = modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(id = R.drawable.intro_background), // Replace with your image name
+            painter = painterResource(id = R.drawable.intro_background),
             contentDescription = "Background Image",
             modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
+            alpha = 0.3f
         )
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.8f)) // Adjust alpha for desired dimness
-            // 0.0f = fully transparent, 1.0f = fully opaque black
-            // 0.5f to 0.7f is often a good range
+                .background(Color.DarkGray.copy(alpha = 0.85f))
         )
-        // The actual screen content is placed on top of the image
         content()
     }
 }

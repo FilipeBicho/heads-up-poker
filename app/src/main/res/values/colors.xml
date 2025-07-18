@@ -11,9 +11,6 @@
     <color name="border_gray">#878787</color>
     <color name="bg_start_game">#595656</color>
     <color name="bg_bot_selection">#F2F2F2</color>
-    <color name="bg_bot_card">#2C2C2E</color>
-    <color name="bg_bot_card_hover">#3E3E47</color>
-    <color name="bot_selection_description">#4D4D4D</color>
     <color name="bg_poker_deep_blue">#FF1A237E</color>
     <color name="off_white">#F5F5F5</color>
     <color name="dark_background">#121212</color>

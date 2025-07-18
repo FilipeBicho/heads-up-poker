@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -114,7 +115,7 @@ fun NameAndMoneySection(name: String, action: String, money: Int) {
             textAlign = TextAlign.Center,
             color = Color.White,
             lineHeight = 1.5.em,
-            modifier = Modifier.background(Color.DarkGray,RoundedCornerShape(5.dp)).fillMaxWidth()
+            modifier = Modifier.background(colorResource(id = R.color.subtle_gray),RoundedCornerShape(5.dp)).fillMaxWidth()
         )
 
         HorizontalDivider(
@@ -128,7 +129,7 @@ fun NameAndMoneySection(name: String, action: String, money: Int) {
             textAlign = TextAlign.Center,
             color = Color.White,
             lineHeight = 1.5.em,
-            modifier = Modifier.background(Color.Black,RoundedCornerShape(5.dp)).fillMaxWidth()
+            modifier = Modifier.background(colorResource(id = R.color.dark_background),RoundedCornerShape(5.dp)).fillMaxWidth()
         )
     }
 }
