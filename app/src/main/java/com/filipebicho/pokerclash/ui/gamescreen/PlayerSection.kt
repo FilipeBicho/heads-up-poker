@@ -214,7 +214,6 @@ private fun BetSlider(
     gameViewModel: GameViewModel,
     modifier: Modifier = Modifier
 ) {
-
     // Add gameUiState.minPlayerBet as a key to remember.
     // This will cause sliderPosition to be re-initialized when minPlayerBet changes.
     var sliderPosition by remember(gameUiState.playerCurrentRaise) {

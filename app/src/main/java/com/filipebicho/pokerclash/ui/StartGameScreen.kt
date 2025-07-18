@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -43,11 +42,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
@@ -60,15 +57,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.filipebicho.pokerclash.R // Assuming your R file is here
-
-// Define some modern poker-themed colors (adjust as needed)
-val PokerRed = Color(0xFFB71C1C)
-val PokerGreen = Color(0xFF2E7D32)
-val DarkBackground = Color(0xFF121212)
-val SubtleGray = Color(0xFF424242)
-val OffWhite = Color(0xFFF5F5F5)
-
+import com.filipebicho.pokerclash.R
 
 @Composable
 fun StartGameScreen(onStartButtonClicked: (String) -> Unit) {
@@ -78,7 +67,7 @@ fun StartGameScreen(onStartButtonClicked: (String) -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .imePadding() // Handles keyboard overlap
+                .imePadding()
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -88,9 +77,9 @@ fun StartGameScreen(onStartButtonClicked: (String) -> Unit) {
                     .padding(horizontal = 24.dp, vertical = 32.dp)
             ) {
 
-                AnimatedPokerTitle()
+                Title()
                 Spacer(modifier = Modifier.height(32.dp))
-                PulsingLogo() // Added pulsing animation
+                Logo()
                 Spacer(modifier = Modifier.height(48.dp))
                 PlayerNameTextField(
                     playerName = playerName,
@@ -109,42 +98,14 @@ fun StartGameScreen(onStartButtonClicked: (String) -> Unit) {
                         onStartButtonClicked = onStartButtonClicked
                     )
                 }
-                // Maintain consistent spacing when button is not visible
-                if (playerName.isBlank()) {
-                    Spacer(modifier = Modifier.height(56.dp)) // Approximate button height + padding
-                }
             }
         }
     }
 }
 
 @Composable
-fun PulsingLogo() {
-    val infiniteTransition = rememberInfiniteTransition(label = "PulsingLogoTransition")
-    val scale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.05f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1000),
-            repeatMode = RepeatMode.Reverse
-        ), label = "PulsingLogoScale"
-    )
-
-    Image(
-        painter = painterResource(R.drawable.logo), // Ensure you have a logo in drawable
-        contentScale = ContentScale.Fit,
-        contentDescription = "Poker Clash Logo",
-        modifier = Modifier
-            .size(160.dp) // Slightly larger
-            .scale(scale) // Apply pulsing scale
-            .clip(CircleShape) // Give it a circular frame
-            .border(2.dp, PokerRed, CircleShape) // Gold border
-    )
-}
-
-@Composable
-fun AnimatedPokerTitle(modifier: Modifier = Modifier) {
-    val scale = remember { Animatable(0.5f) } // Initial scale for animation
+fun Title(modifier: Modifier = Modifier) {
+    val scale = remember { Animatable(0.5f) }
 
     LaunchedEffect(Unit) {
         scale.animateTo(
@@ -158,16 +119,16 @@ fun AnimatedPokerTitle(modifier: Modifier = Modifier) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.scale(scale.value) // Apply scale animation
+        modifier = modifier.scale(scale.value)
     ) {
         Text(
             text = "AI",
             style = TextStyle(
-                color = PokerRed, // Use gold for accent
-                fontSize = 120.sp, // Slightly larger
-                fontFamily = FontFamily.Serif, // A more classic poker font
+                color = colorResource(id = R.color.poker_red),
+                fontSize = 120.sp,
+                fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.Bold,
-                shadow = Shadow( // Add a subtle shadow
+                shadow = Shadow(
                     color = Color.Black.copy(alpha = 0.5f),
                     offset = Offset(4f, 4f),
                     blurRadius = 8f
@@ -177,10 +138,10 @@ fun AnimatedPokerTitle(modifier: Modifier = Modifier) {
         Text(
             text = "Poker Clash",
             style = TextStyle(
-                color = OffWhite,
+                color = colorResource(id = R.color.off_white),
                 fontSize = 55.sp,
                 fontFamily = FontFamily.Serif,
-                fontWeight = FontWeight.Normal, // Less bold for contrast
+                fontWeight = FontWeight.Normal,
                 shadow = Shadow(
                     color = Color.Black.copy(alpha = 0.3f),
                     offset = Offset(2f, 2f),
@@ -192,26 +153,47 @@ fun AnimatedPokerTitle(modifier: Modifier = Modifier) {
 }
 
 @Composable
+fun Logo() {
+    val infiniteTransition = rememberInfiniteTransition(label = "PulsingLogoTransition")
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.20f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1000),
+            repeatMode = RepeatMode.Reverse
+        ), label = "PulsingLogoScale"
+    )
+
+    Image(
+        painter = painterResource(R.drawable.logo),
+        contentScale = ContentScale.Fit,
+        contentDescription = "Poker Clash Logo",
+        modifier = Modifier
+            .size(160.dp)
+            .scale(scale)
+    )
+}
+
+@Composable
 fun PlayerNameTextField(playerName: String, onPlayerNameChanged: (String) -> Unit) {
     OutlinedTextField(
         modifier = Modifier
-            .width(280.dp) // Wider text field
+            .width(250.dp)
             .height(65.dp),
         value = playerName,
         onValueChange = onPlayerNameChanged,
-        label = { Text("Enter Your Nickname", color = OffWhite.copy(alpha = 0.7f)) },
-        placeholder = { Text("e.g., AceHigh", color = SubtleGray) },
+        placeholder = { Text("Enter Your Nickname", color = colorResource(id = R.color.off_white).copy(alpha = 0.7f)) },
         singleLine = true,
-        textStyle = TextStyle(fontSize = 18.sp, color = OffWhite, fontWeight = FontWeight.SemiBold),
+        textStyle = TextStyle(fontSize = 18.sp, color = colorResource(id = R.color.off_white), fontWeight = FontWeight.SemiBold),
         shape = RoundedCornerShape(12.dp), // More rounded corners
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = PokerRed,
-            unfocusedBorderColor = SubtleGray,
-            focusedLabelColor = PokerRed,
-            unfocusedLabelColor = OffWhite.copy(alpha = 0.7f),
-            cursorColor = PokerRed,
-            focusedContainerColor = DarkBackground.copy(alpha = 0.5f), // Darker, slightly transparent
-            unfocusedContainerColor = DarkBackground.copy(alpha = 0.3f)
+            focusedBorderColor = colorResource(id = R.color.poker_red),
+            unfocusedBorderColor = colorResource(id = R.color.subtle_gray),
+            focusedLabelColor = colorResource(id = R.color.poker_red),
+            unfocusedLabelColor = colorResource(id = R.color.off_white).copy(alpha = 0.4f),
+            cursorColor = colorResource(id = R.color.poker_red),
+            focusedContainerColor = colorResource(id = R.color.dark_background).copy(alpha = 0.5f),
+            unfocusedContainerColor = colorResource(id = R.color.dark_background).copy(alpha = 0.3f)
         )
     )
 }
@@ -230,37 +212,29 @@ fun StartButton(playerName: String, onStartButtonClicked: (String) -> Unit) {
             // }
         },
         modifier = Modifier
-            .width(280.dp)
+            .width(250.dp)
             .height(56.dp)
             .scale(scale.value)
-            .clip(RoundedCornerShape(12.dp)) // Consistent rounded corners
-            .background(
-                Brush.horizontalGradient( // Add a subtle gradient
-                    colors = listOf(PokerRed, PokerRed.copy(alpha = 0.7f))
-                )
-            )
+            .clip(RoundedCornerShape(12.dp))
+            .background(colorResource(id = R.color.poker_red))
             .border(
-                1.dp,
-                PokerRed.copy(alpha = 0.5f), // Subtle gold border
-                RoundedCornerShape(12.dp)
+                2.dp,
+                colorResource(id = R.color.border_gray),
+                shape = RoundedCornerShape(10.dp)
             ),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent, // Background is handled by the modifier
-            contentColor = OffWhite
+            containerColor = Color.Transparent,
+            contentColor = Color.White
         ),
-        elevation = ButtonDefaults.buttonElevation( // Add some elevation
-            defaultElevation = 4.dp,
-            pressedElevation = 8.dp
-        ),
-        contentPadding = PaddingValues(vertical = 12.dp)
+        contentPadding = PaddingValues(0.dp)
     ) {
         Text(
-            text = "DEAL ME IN", // More thematic text
+            text = "Start Game",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.SansSerif, // A clean sans-serif for the button
+            fontFamily = FontFamily.SansSerif,
             textAlign = TextAlign.Center,
-            letterSpacing = 1.1.sp // Add some letter spacing
+            letterSpacing = 1.1.sp
         )
     }
 }
@@ -268,7 +242,7 @@ fun StartButton(playerName: String, onStartButtonClicked: (String) -> Unit) {
 @Preview(showBackground = true, backgroundColor = 0xFF121212)
 @Composable
 fun StartGameScreenPreview() {
-    MaterialTheme { // Wrap in MaterialTheme for consistent theming if not already done
+    MaterialTheme {
         StartGameScreen(onStartButtonClicked = {})
     }
 }
@@ -276,18 +250,10 @@ fun StartGameScreenPreview() {
 @Composable
 fun StartGameBackground(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Box(modifier = modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(id = R.drawable.intro_background),
-            contentDescription = "Background Image",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-            alpha = 0.5f // Make the background image more subtle
-        )
-        // Darker overlay for better text contrast
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(DarkBackground.copy(alpha = 0.85f)) // Darker overlay
+                .background(Color.DarkGray.copy(alpha = 0.85f))
         )
         content()
     }
