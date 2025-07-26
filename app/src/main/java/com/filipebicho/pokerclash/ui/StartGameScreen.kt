@@ -1,7 +1,7 @@
 package com.filipebicho.pokerclash.ui
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -259,37 +259,35 @@ fun StartGameScreenPreview() {
 
 @Composable
 fun StartGameBackground(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    val lightShade = Color.Black.copy(alpha = 0.75f)
-    val darkShade = Color.Black.copy(alpha = 0.9f)
+    val blackShade = Color.Black
+    val darkGrayShade = Color.DarkGray
 
-    var useFirstGradient by remember { mutableStateOf(true) }
+    // 1. Use InfiniteTransition for continuous animation
+    val infiniteTransition = rememberInfiniteTransition(label = "BackgroundColorTransition")
 
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(2000)
-            useFirstGradient = !useFirstGradient
-        }
-    }
 
-    val gradientStartColor by animateColorAsState(
-        targetValue = if (useFirstGradient) darkShade else lightShade,
-        animationSpec = tween(durationMillis = 2000, easing = LinearEasing),
-        label = "GradientStartColor"
+    // 2. Animate colors using the infiniteTransition
+    val gradientStartColor by infiniteTransition.animateColor(
+        initialValue = blackShade,
+        targetValue = darkGrayShade,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 2000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse // This makes it go back and forth
+        ),
+        label = "GradientStartColorInfinite"
     )
-    val gradientEndColor by animateColorAsState(
-        targetValue = if (useFirstGradient) lightShade else darkShade,
-        animationSpec = tween(durationMillis = 2000, easing = LinearEasing),
-        label = "GradientEndColor"
+
+    val gradientEndColor by infiniteTransition.animateColor(
+        initialValue = darkGrayShade,
+        targetValue = blackShade,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 2000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse // This makes it go back and forth
+        ),
+        label = "GradientEndColorInfinite"
     )
 
     Box(modifier = modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(id = R.drawable.intro_background),
-            contentDescription = "Background Image",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-            alpha = 0.2f
-        )
         Box(
             modifier = Modifier
                 .fillMaxSize()
