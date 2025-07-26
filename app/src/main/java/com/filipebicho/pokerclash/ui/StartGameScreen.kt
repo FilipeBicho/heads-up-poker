@@ -63,7 +63,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.filipebicho.pokerclash.R
-import kotlinx.coroutines.delay
 
 @Composable
 fun StartGameScreen(onStartButtonClicked: (String) -> Unit) {
@@ -174,7 +173,7 @@ fun Logo() {
         initialValue = 1f,
         targetValue = 1.20f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 2000),
+            animation = tween(durationMillis = 2000, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ), label = "PulsingLogoScale"
     )

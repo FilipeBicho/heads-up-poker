@@ -38,10 +38,9 @@ fun Background() {
 
 private fun hideStatusBar(window: Window) {
 
-    val windowInsetsController =
-        WindowCompat.getInsetsController(window, window.decorView)
+    val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+
     // Configure the behavior of the hidden system bars.
-    windowInsetsController.systemBarsBehavior =
-        WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+    windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
     windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
 }

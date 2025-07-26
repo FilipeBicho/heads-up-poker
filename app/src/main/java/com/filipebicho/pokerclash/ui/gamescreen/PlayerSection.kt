@@ -38,7 +38,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.filipebicho.pokerclash.BIG_BLIND
@@ -46,7 +45,6 @@ import com.filipebicho.pokerclash.GameUiState
 import com.filipebicho.pokerclash.GameViewModel
 import com.filipebicho.pokerclash.R
 import com.filipebicho.pokerclash.cards.PLAYER
-import com.filipebicho.pokerclash.ui.GameBoardScreen
 import kotlin.math.roundToInt
 
 @Composable
@@ -391,10 +389,4 @@ private fun SummarySection(gameUiState: GameUiState, modifier: Modifier = Modifi
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun GameBoardScreenPreview() {
-    GameBoardScreen(gameUiState = GameUiState(), gameViewModel = GameViewModel())
 }

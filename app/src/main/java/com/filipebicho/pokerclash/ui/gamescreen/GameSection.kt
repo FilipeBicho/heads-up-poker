@@ -41,8 +41,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.filipebicho.pokerclash.GameUiState
 import com.filipebicho.pokerclash.GameViewModel
+import com.filipebicho.pokerclash.PokerScreen
 import com.filipebicho.pokerclash.R
 import com.filipebicho.pokerclash.cards.BOT
 import com.filipebicho.pokerclash.cards.Card
@@ -55,7 +57,8 @@ import kotlin.collections.joinToString
 fun GameSection(
     gameUiState: GameUiState,
     gameViewModel: GameViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavHostController
 ) {
     Column(
         modifier = modifier,
@@ -67,6 +70,7 @@ fun GameSection(
         MiddleSection(
             gameUiState = gameUiState,
             gameViewModel = gameViewModel,
+            navController = navController,
             modifier = Modifier.weight(1f)
         )
         BottomSection(gameUiState = gameUiState, modifier = Modifier.weight(1f))
@@ -95,6 +99,7 @@ private fun TopSection(gameUiState: GameUiState) {
 private fun MiddleSection(
     gameUiState: GameUiState,
     gameViewModel: GameViewModel,
+    navController: NavHostController,
     modifier: Modifier) {
     Box(
         modifier = modifier.fillMaxWidth(),
@@ -122,7 +127,8 @@ private fun MiddleSection(
                 }
 
                 gameUiState.newGame -> {
-                    NewGame(gameViewModel = gameViewModel)
+                    Button (text = "New Game", onClick = { gameViewModel.startGame() })
+                    Button (text = "New Opponent", onClick = { navController.navigate(PokerScreen.BotSelection.name) })
                 }
             }
         }
@@ -442,9 +448,9 @@ private fun Fold(name: List<String>, winner: Int, pot: Int) {
 }
 
 @Composable
-private fun NewGame(gameViewModel: GameViewModel) {
+private fun Button(text: String, onClick: () -> Unit) {
     OutlinedButton(
-        onClick = { gameViewModel.startGame()},
+        onClick = onClick,
         modifier = Modifier
             .width(200.dp),
         shape = RoundedCornerShape(10.dp),
@@ -455,7 +461,7 @@ private fun NewGame(gameViewModel: GameViewModel) {
         contentPadding = PaddingValues(12.dp),
     ) {
         Text(
-            text = "New Game",
+            text = text,
             style = TextStyle(
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,

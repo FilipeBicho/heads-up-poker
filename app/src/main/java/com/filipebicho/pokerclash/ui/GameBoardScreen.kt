@@ -1,13 +1,12 @@
 package com.filipebicho.pokerclash.ui
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.filipebicho.pokerclash.Background
 import com.filipebicho.pokerclash.GameUiState
 import com.filipebicho.pokerclash.GameViewModel
@@ -16,7 +15,11 @@ import com.filipebicho.pokerclash.ui.gamescreen.GameSection
 import com.filipebicho.pokerclash.ui.gamescreen.PlayerSection
 
 @Composable
-fun GameBoardScreen(gameUiState: GameUiState, gameViewModel: GameViewModel) {
+fun GameBoardScreen(
+    gameUiState: GameUiState,
+    gameViewModel: GameViewModel,
+    navController: NavHostController
+) {
     Background()
 
     Column(
@@ -28,6 +31,7 @@ fun GameBoardScreen(gameUiState: GameUiState, gameViewModel: GameViewModel) {
         MiddleRow(
             gameUiState = gameUiState,
             gameViewModel = gameViewModel,
+            navController = navController,
             modifier = Modifier.weight(0.58f)
         )
         BottomRow(
@@ -47,11 +51,13 @@ fun TopRow(gameUiState: GameUiState, modifier: Modifier = Modifier) {
 fun MiddleRow(
     gameUiState: GameUiState,
     gameViewModel: GameViewModel,
-    modifier: Modifier = Modifier
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
 ) {
     GameSection(
         gameUiState = gameUiState,
         gameViewModel = gameViewModel,
+        navController = navController,
         modifier = modifier
     )
 }
@@ -67,12 +73,4 @@ fun BottomRow(
         gameViewModel = gameViewModel,
         modifier = modifier
     )
-}
-
-
-@SuppressLint("ViewModelConstructorInComposable")
-@Preview
-@Composable
-fun GameBoardScreenPreview() {
-    GameBoardScreen(gameUiState = GameUiState(), gameViewModel = GameViewModel())
 }
