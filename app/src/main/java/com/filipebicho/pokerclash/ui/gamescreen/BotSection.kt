@@ -24,14 +24,19 @@ import com.filipebicho.pokerclash.cards.BOT
 @Composable
 fun BotSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
     Row(modifier = modifier.fillMaxHeight()) {
-        WinCount(gameUiState.playerName, gameUiState.playerWins, modifier = Modifier.weight(0.33f))
+        WinCount(gameUiState.playerName, gameUiState.playerWins, modifier = Modifier.weight(0.33f), displayDealer = gameUiState.dealer == BOT)
         BotCards(gameUiState = gameUiState, modifier = Modifier.weight(0.33f))
-        WinCount(gameUiState.simulatedPlayerName, gameUiState.botWins, modifier = Modifier.weight(0.33f))
+        WinCount(gameUiState.simulatedPlayerName, gameUiState.botWins, modifier = Modifier.weight(0.33f), false)
     }
 }
 
 @Composable
-fun WinCount(name: String, wins: Int, modifier: Modifier = Modifier) {
+fun WinCount(
+    name: String,
+    wins: Int, modifier:
+    Modifier = Modifier,
+    displayDealer: Boolean
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -56,7 +61,15 @@ fun WinCount(name: String, wins: Int, modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.labelSmall,
             color = Color.White
         )
+
+        if (displayDealer) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                DealerChipImage()
+            }
+        }
     }
+
+
 }
 
 @Composable
