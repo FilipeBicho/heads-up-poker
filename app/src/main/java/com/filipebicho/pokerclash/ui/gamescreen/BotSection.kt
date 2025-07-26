@@ -4,14 +4,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.filipebicho.pokerclash.GameUiState
@@ -20,41 +24,38 @@ import com.filipebicho.pokerclash.cards.BOT
 @Composable
 fun BotSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
     Row(modifier = modifier.fillMaxHeight()) {
-        InfoSection(gameUiState = gameUiState, modifier = Modifier.weight(0.33f))
+        WinCount(gameUiState.playerName, gameUiState.playerWins, modifier = Modifier.weight(0.33f))
         BotCards(gameUiState = gameUiState, modifier = Modifier.weight(0.33f))
-        WinCountSection(gameUiState = gameUiState, modifier = Modifier.weight(0.33f))
+        WinCount(gameUiState.simulatedPlayerName, gameUiState.botWins, modifier = Modifier.weight(0.33f))
     }
 }
 
 @Composable
-private fun InfoSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
+fun WinCount(name: String, wins: Int, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
-            .fillMaxHeight()
-            .padding(0.dp, 5.dp, 0.dp, 0.dp),
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(text = "Model: ${gameUiState.chatgptModel}", fontSize = 10.sp, color = Color.White)
-
-        if (gameUiState.dealer == BOT) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                DealerChipImage()
-            }
-        }
-    }
-}
-
-@Composable
-fun WinCountSection(gameUiState: GameUiState, modifier: Modifier = Modifier) {
-    Column(
-        modifier
             .fillMaxWidth()
-            .padding(5.dp),
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Top
+            .padding(vertical = 2.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "${gameUiState.playerName} wins: ${gameUiState.playerWins}", fontSize = 10.sp, color = Color.White)
-        Text(text = "${gameUiState.simulatedPlayerName} wins: ${gameUiState.botWins}", fontSize = 10.sp, color = Color.White)
+        Text(
+            text = name,
+            style = MaterialTheme.typography.titleSmall,
+            color = Color.White
+        )
+        Text(
+            text = "$wins",
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.Bold,
+            ),
+            color = Color.LightGray
+        )
+        Text(
+            text = "Wins",
+            style = MaterialTheme.typography.labelSmall,
+            color = Color.White
+        )
     }
 }
 
