@@ -1,7 +1,9 @@
 package com.filipebicho.pokerclash.ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
@@ -46,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
@@ -60,6 +63,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.filipebicho.pokerclash.R
+import kotlinx.coroutines.delay
 
 @Composable
 fun StartGameScreen(onStartButtonClicked: (String) -> Unit) {
@@ -170,7 +174,7 @@ fun Logo() {
         initialValue = 1f,
         targetValue = 1.20f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1000),
+            animation = tween(durationMillis = 2000),
             repeatMode = RepeatMode.Reverse
         ), label = "PulsingLogoScale"
     )
@@ -235,7 +239,7 @@ fun StartButton(playerName: String, onStartButtonClicked: (String) -> Unit) {
         contentPadding = PaddingValues(0.dp)
     ) {
         Text(
-            text = "Start Game",
+            text = "START GAME",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.SansSerif,
@@ -255,18 +259,45 @@ fun StartGameScreenPreview() {
 
 @Composable
 fun StartGameBackground(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    val lightShade = Color.Black.copy(alpha = 0.75f)
+    val darkShade = Color.Black.copy(alpha = 0.9f)
+
+    var useFirstGradient by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(2000)
+            useFirstGradient = !useFirstGradient
+        }
+    }
+
+    val gradientStartColor by animateColorAsState(
+        targetValue = if (useFirstGradient) darkShade else lightShade,
+        animationSpec = tween(durationMillis = 2000, easing = LinearEasing),
+        label = "GradientStartColor"
+    )
+    val gradientEndColor by animateColorAsState(
+        targetValue = if (useFirstGradient) lightShade else darkShade,
+        animationSpec = tween(durationMillis = 2000, easing = LinearEasing),
+        label = "GradientEndColor"
+    )
+
     Box(modifier = modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.intro_background),
             contentDescription = "Background Image",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
-            alpha = 0.3f
+            alpha = 0.2f
         )
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.DarkGray.copy(alpha = 0.85f))
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(gradientStartColor, gradientEndColor)
+                    )
+                )
         )
         content()
     }

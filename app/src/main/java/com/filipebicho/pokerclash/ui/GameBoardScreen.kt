@@ -1,5 +1,6 @@
 package com.filipebicho.pokerclash.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,7 +21,7 @@ fun GameBoardScreen(gameUiState: GameUiState, gameViewModel: GameViewModel) {
 
     Column(
         modifier = Modifier
-            .padding(16.dp, 4.dp, 16.dp, 2.dp)
+            .padding(16.dp, 20.dp, 16.dp, 5.dp)
             .fillMaxSize(),
     ) {
         TopRow(gameUiState = gameUiState, modifier = Modifier.weight(0.12f))
@@ -69,6 +70,7 @@ fun BottomRow(
 }
 
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview
 @Composable
 fun GameBoardScreenPreview() {
