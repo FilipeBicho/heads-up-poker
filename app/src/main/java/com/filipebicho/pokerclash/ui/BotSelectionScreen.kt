@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.filipebicho.pokerclash.R
 import com.filipebicho.pokerclash.data.Data.botOptions
 import com.filipebicho.pokerclash.data.Data.botWins
+import com.filipebicho.pokerclash.data.Data.playerWins
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,7 +69,7 @@ fun BotSelectionScreen(
                     BotOptionCard(
                         botName = bot.first,
                         botDescription = bot.second,
-                        wins = botWins[index],
+                        index = index,
                         onBotSelected = { onBotSelected(bot, index) }
                     )
                 }
@@ -82,7 +83,7 @@ fun BotSelectionScreen(
 fun BotOptionCard(
     botName: String,
     botDescription: String,
-    wins: Int,
+    index: Int,
     onBotSelected: () -> Unit
 ) {
     Card(
@@ -126,12 +127,19 @@ fun BotOptionCard(
                             color = Color.LightGray
                         )
                     }
-                    Text(
-                        text = "Wins: $wins",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.LightGray,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
+                    Column(modifier = Modifier.padding(top = 8.dp)) {
+                        Text(
+                            text = "Wins: ${playerWins[index]}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.LightGray,
+                        )
+
+                        Text(
+                            text = "Losses: ${botWins[index]}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.LightGray,
+                        )
+                    }
                 }
             }
         }

@@ -67,8 +67,8 @@ object Data {
     var validActions = listOf("")
 
     // Count variables
-    var playerWins = 0
     var currentBot = -1
+    var playerWins: MutableList<Int> = MutableList(botOptions.size) { 0 }
     var botWins: MutableList<Int> = MutableList(botOptions.size) { 0 }
     var gameNumber: Int = 0
 

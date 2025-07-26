@@ -126,7 +126,7 @@ class Init(coroutineScope: CoroutineScope) {
             winningHand = null,
             displayFold = false,
             displayPot = true,
-            playerWins = playerWins,
+            playerWins = playerWins[currentBot],
             botWins = botWins[currentBot],
         )}
     }

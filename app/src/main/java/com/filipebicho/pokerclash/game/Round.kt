@@ -208,7 +208,7 @@ class Round(var coroutineScope: CoroutineScope) {
         } else {
 
             if (winner == PLAYER) {
-                playerWins++
+                playerWins[currentBot]++
             } else {
                 botWins[currentBot]++
             }
@@ -217,7 +217,7 @@ class Round(var coroutineScope: CoroutineScope) {
                 delay(4000)
                 uiStateFlow.update { currentState -> currentState.copy(
                     newGame = true,
-                    playerWins = playerWins,
+                    playerWins = playerWins[currentBot],
                     botWins = botWins[currentBot],
                     showdown = false,
                     displayFlop = false,
