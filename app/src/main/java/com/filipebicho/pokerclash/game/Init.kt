@@ -14,6 +14,8 @@ import com.filipebicho.pokerclash.data.Data.botMoney
 import com.filipebicho.pokerclash.data.Data.cardDealer
 import com.filipebicho.pokerclash.data.Data.checkAvailable
 import com.filipebicho.pokerclash.data.Data.botCards
+import com.filipebicho.pokerclash.data.Data.botWins
+import com.filipebicho.pokerclash.data.Data.currentBot
 import com.filipebicho.pokerclash.data.Data.dealer
 import com.filipebicho.pokerclash.data.Data.gameNumber
 import com.filipebicho.pokerclash.data.Data.gameSummaryList
@@ -24,6 +26,7 @@ import com.filipebicho.pokerclash.data.Data.opponent
 import com.filipebicho.pokerclash.data.Data.player
 import com.filipebicho.pokerclash.data.Data.playerCards
 import com.filipebicho.pokerclash.data.Data.playerMoney
+import com.filipebicho.pokerclash.data.Data.playerWins
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
@@ -123,6 +126,8 @@ class Init(coroutineScope: CoroutineScope) {
             winningHand = null,
             displayFold = false,
             displayPot = true,
+            playerWins = playerWins,
+            botWins = botWins[currentBot],
         )}
     }
 

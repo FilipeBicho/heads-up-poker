@@ -44,7 +44,6 @@ object Data {
         Pair("Linus Loeliger", "GTO perfectionist. Rarely makes mistakes, plays tight but punishes errors — a pure online crusher."),
     )
     var simulatedPlayer = ""
-    val chatgptModel = "gpt‑4o"
     var actionHistory: MutableList<String> = mutableListOf()
     val actionPlayer:  List<String> = listOf("Opponent", "You")
     val roundText: List<String> = listOf("Pre-flop", "Flop", "Turn", "River")
@@ -68,7 +67,9 @@ object Data {
     var validActions = listOf("")
 
     // Count variables
-    var winnerCount: MutableList<Int> = mutableListOf(0,0)
+    var playerWins = 0
+    var currentBot = -1
+    var botWins: MutableList<Int> = MutableList(botOptions.size) { 0 }
     var gameNumber: Int = 0
 
     // Player positions

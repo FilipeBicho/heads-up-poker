@@ -10,9 +10,9 @@ import com.filipebicho.pokerclash.cards.TURN
 import com.filipebicho.pokerclash.data.Data.actionHistory
 import com.filipebicho.pokerclash.data.Data.actionPlayer
 import com.filipebicho.pokerclash.data.Data.actionText
-import com.filipebicho.pokerclash.data.Data.bet
-import com.filipebicho.pokerclash.data.Data.blind
 import com.filipebicho.pokerclash.data.Data.botCards
+import com.filipebicho.pokerclash.data.Data.botWins
+import com.filipebicho.pokerclash.data.Data.currentBot
 import com.filipebicho.pokerclash.data.Data.gameNumber
 import com.filipebicho.pokerclash.data.Data.gameSummaryList
 import com.filipebicho.pokerclash.data.Data.gameSummaryMap
@@ -22,14 +22,13 @@ import com.filipebicho.pokerclash.data.Data.odds
 import com.filipebicho.pokerclash.data.Data.opponent
 import com.filipebicho.pokerclash.data.Data.player
 import com.filipebicho.pokerclash.data.Data.playerCards
+import com.filipebicho.pokerclash.data.Data.playerWins
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
-import com.filipebicho.pokerclash.data.Data.roundText
 import com.filipebicho.pokerclash.data.Data.stats
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
-import com.filipebicho.pokerclash.data.Data.winnerCount
 import com.filipebicho.pokerclash.hand.Hand
 import com.filipebicho.pokerclash.hand.HandWinnerCalculator
 import kotlinx.coroutines.CoroutineScope
@@ -207,13 +206,19 @@ class Round(var coroutineScope: CoroutineScope) {
                 init.newGame()
             }
         } else {
-            winnerCount[winner]++
+
+            if (winner == PLAYER) {
+                playerWins++
+            } else {
+                botWins[currentBot]++
+            }
+
             coroutineScope.launch {
                 delay(4000)
                 uiStateFlow.update { currentState -> currentState.copy(
                     newGame = true,
-                    playerWins = winnerCount[PLAYER],
-                    botWins = winnerCount[BOT],
+                    playerWins = playerWins,
+                    botWins = botWins[currentBot],
                     showdown = false,
                     displayFlop = false,
                     displayTurn = false,
@@ -229,7 +234,7 @@ class Round(var coroutineScope: CoroutineScope) {
 
     private fun updateStateFlowRound(tableCards: List<Card>, round: Int)
     {
-        var cardsString = tableCards.joinToString(" ") { it.cardString() }
+        val cardsString = tableCards.joinToString(" ") { it.cardString() }
         gameSummaryList.add("---- $cardsString ----")
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 

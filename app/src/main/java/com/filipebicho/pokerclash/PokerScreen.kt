@@ -47,8 +47,8 @@ fun PokerApp(
         }
         composable(route = PokerScreen.BotSelection.name) {
             BotSelectionScreen(
-                onBotSelected = {
-                    viewModel.setBot(it)
+                onBotSelected = { bot, index ->
+                    viewModel.setBot(bot = bot, index = index)
                     viewModel.startGame()
                     navController.navigate(PokerScreen.Game.name)
                 }

@@ -10,7 +10,6 @@ import com.filipebicho.pokerclash.cards.TURN
 import com.filipebicho.pokerclash.data.Data.actionHistory
 import com.filipebicho.pokerclash.data.Data.bet
 import com.filipebicho.pokerclash.data.Data.botCards
-import com.filipebicho.pokerclash.data.Data.chatgptModel
 import com.filipebicho.pokerclash.data.Data.dealer
 import com.filipebicho.pokerclash.data.Data.mainPot
 import com.filipebicho.pokerclash.data.Data.pokerChips

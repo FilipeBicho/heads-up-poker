@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -22,7 +22,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -38,11 +37,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.filipebicho.pokerclash.R
 import com.filipebicho.pokerclash.data.Data.botOptions
+import com.filipebicho.pokerclash.data.Data.botWins
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BotSelectionScreen(
-    onBotSelected: (Pair<String, String>) -> Unit,
+    onBotSelected: (Pair<String, String>, index: Int) -> Unit,
 ) {
     // Scaffold provides structure for typical Material Design screens
     Scaffold(
@@ -64,11 +64,12 @@ fun BotSelectionScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp)
             ) {
-                items(botOptions) { bot ->
+                itemsIndexed(botOptions) { index, bot ->
                     BotOptionCard(
                         botName = bot.first,
                         botDescription = bot.second,
-                        onBotSelected = { onBotSelected(bot) }
+                        wins = botWins[index],
+                        onBotSelected = { onBotSelected(bot, index) }
                     )
                 }
             }
@@ -81,6 +82,7 @@ fun BotSelectionScreen(
 fun BotOptionCard(
     botName: String,
     botDescription: String,
+    wins: Int,
     onBotSelected: () -> Unit
 ) {
     Card(
@@ -124,6 +126,12 @@ fun BotOptionCard(
                             color = Color.LightGray
                         )
                     }
+                    Text(
+                        text = "Wins: $wins",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.LightGray,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
                 }
             }
         }
@@ -134,10 +142,10 @@ fun BotOptionCard(
 @Preview(showBackground = true)
 @Composable
 fun BotSelectionScreenPreview() {
-    // Make sure to wrap your preview in your app's theme for accurate results
-    // MyPokerAppTheme {
-    BotSelectionScreen(onBotSelected = {})
-    // }
+    BotSelectionScreen(onBotSelected = { bot, index ->
+        // Handle the bot and index in your preview if needed
+        println("Preview: Selected ${bot.first} at index $index")
+    })
 }
 
 @Composable

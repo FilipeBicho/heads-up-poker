@@ -9,6 +9,7 @@ import com.filipebicho.pokerclash.bot.FOLD
 import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.data.Data.action
 import com.filipebicho.pokerclash.data.Data.betting
+import com.filipebicho.pokerclash.data.Data.currentBot
 import com.filipebicho.pokerclash.data.Data.init
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.simulatedPlayer
@@ -35,7 +36,7 @@ class GameViewModel : ViewModel() {
         }
     }
 
-    fun setBot(bot: Pair<String, String>) {
+    fun setBot(bot: Pair<String, String>, index: Int) {
         uiStateFlow.update { currentState ->
             currentState.copy(
                 simulatedPlayerName = bot.first,
@@ -44,6 +45,7 @@ class GameViewModel : ViewModel() {
         }
 
         simulatedPlayer = bot.second
+        currentBot = index
     }
 
     fun startGame() {
