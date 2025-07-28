@@ -11,11 +11,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.filipebicho.pokerclash.data.Data.statsRepository
+import com.filipebicho.pokerclash.data.PokerStatsRepository
 import com.filipebicho.pokerclash.ui.theme.PokerTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        statsRepository = PokerStatsRepository(applicationContext)
         setContent {
             PokerTheme {
                 hideStatusBar(window)

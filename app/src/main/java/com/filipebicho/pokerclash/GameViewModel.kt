@@ -1,5 +1,6 @@
 package com.filipebicho.pokerclash
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.filipebicho.pokerclash.bot.BET
@@ -11,11 +12,16 @@ import com.filipebicho.pokerclash.data.Data.action
 import com.filipebicho.pokerclash.data.Data.betting
 import com.filipebicho.pokerclash.data.Data.currentBot
 import com.filipebicho.pokerclash.data.Data.init
+import com.filipebicho.pokerclash.data.Data.playerWins
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.simulatedPlayer
+import com.filipebicho.pokerclash.data.Data.stats
+import com.filipebicho.pokerclash.data.Data.statsRepository
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
+import com.filipebicho.pokerclash.data.PokerStatsRepository
 import com.filipebicho.pokerclash.game.Init
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 
 const val SMALL_BLIND = 20
@@ -24,6 +30,7 @@ const val BIG_BLIND = 40
 class GameViewModel : ViewModel() {
 
     init {
+        loadStats()
         init = Init(viewModelScope)
     }
 
@@ -92,6 +99,23 @@ class GameViewModel : ViewModel() {
             currentState.copy(
                 displaySummary = !currentState.displaySummary,
             )
+        }
+    }
+
+    private fun loadStats() {
+        viewModelScope.launch {
+            val loadedData = statsRepository.getAllStats()
+
+            stats.handsPlayed = loadedData.handsPlayed
+            stats.voluntarilyPutMoneyInPot = loadedData.voluntarilyPutMoneyInPot
+            stats.preFlopRaises = loadedData.preFlopRaises
+            stats.continuationBet = loadedData.continuationBet
+            stats.continuationBetFaced = loadedData.continuationBetFaced
+            stats.foldsToContinuationBet = loadedData.foldsToContinuationBet
+            stats.riverBets = loadedData.riverBets
+            stats.riverBluffsDetected = loadedData.riverBluffsDetected
+            playerWins.addAll(loadedData.playerWins)
+            playerWins.addAll(loadedData.botWins)
         }
     }
 }

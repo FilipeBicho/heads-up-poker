@@ -30,6 +30,7 @@ object Data {
     lateinit var gameRound: Round
     var stats: Stats = Stats()
     val chatGptBot = ChatgptBot()
+    lateinit var statsRepository: PokerStatsRepository
 
     // Bot
     val botOptions = listOf(
@@ -86,4 +87,6 @@ object Data {
     // Summary
     var gameSummaryMap: MutableList<List<String>> = ArrayList()
     var gameSummaryList: MutableList<String> = mutableListOf()
+
+
 }
