@@ -3,7 +3,6 @@ package com.filipebicho.pokerclash.data
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -12,7 +11,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 
-val Context.pokerStatsDataStore: DataStore<Preferences> by preferencesDataStore(name = "poker_game_stats")
+val Context.pokerDataStore: DataStore<Preferences> by preferencesDataStore(name = "data_store_poker")
 
 object PokerStatsKeys {
     val HANDS_PLAYED = intPreferencesKey("hands_played")
@@ -27,43 +26,43 @@ object PokerStatsKeys {
     val BOT_WINS = stringPreferencesKey("bot_wins")
 }
 
-class PokerStatsRepository(private val context: Context) {
+class DataStore(private val context: Context) {
 
     private val json = Json { ignoreUnknownKeys = true }
 
     // Read Data
-    val handsPlayed: Flow<Int> = context.pokerStatsDataStore.data
+    val handsPlayed: Flow<Int> = context.pokerDataStore.data
         .map { preferences -> preferences[PokerStatsKeys.HANDS_PLAYED] ?: 0}
 
-    val voluntaryPutInPot: Flow<Int> = context.pokerStatsDataStore.data
+    val voluntaryPutInPot: Flow<Int> = context.pokerDataStore.data
         .map { preferences -> preferences[PokerStatsKeys.VOLUNTARY_PUT_IN_POT] ?: 0}
 
-    val preFlopRaises: Flow<Int> = context.pokerStatsDataStore.data
+    val preFlopRaises: Flow<Int> = context.pokerDataStore.data
         .map { preferences -> preferences[PokerStatsKeys.PRE_FLOP_RAISES] ?: 0}
 
-    val continuationBet: Flow<Int> = context.pokerStatsDataStore.data
+    val continuationBet: Flow<Int> = context.pokerDataStore.data
         .map { preferences -> preferences[PokerStatsKeys.CONTINUATION_BET] ?: 0}
 
-    val continuationBetFaced: Flow<Int> = context.pokerStatsDataStore.data
+    val continuationBetFaced: Flow<Int> = context.pokerDataStore.data
         .map { preferences -> preferences[PokerStatsKeys.CONTINUATION_BET_FACED] ?: 0}
 
-    val foldsToContinuationBet: Flow<Int> = context.pokerStatsDataStore.data
+    val foldsToContinuationBet: Flow<Int> = context.pokerDataStore.data
         .map { preferences -> preferences[PokerStatsKeys.FOLDS_TO_CONTINUATION_BET] ?: 0}
 
-    val riverBets: Flow<Int> = context.pokerStatsDataStore.data
+    val riverBets: Flow<Int> = context.pokerDataStore.data
         .map { preferences -> preferences[PokerStatsKeys.RIVER_BETS] ?: 0}
 
-    val riverBluffsDetected: Flow<Int> = context.pokerStatsDataStore.data
+    val riverBluffsDetected: Flow<Int> = context.pokerDataStore.data
         .map { preferences -> preferences[PokerStatsKeys.RIVER_BLUFFS_DETECTED] ?: 0}
 
-    private val playerWinsJson: Flow<String?> = context.pokerStatsDataStore.data
+    private val playerWinsJson: Flow<String?> = context.pokerDataStore.data
         .map { preferences -> preferences[PokerStatsKeys.PLAYER_WINS] }
 
-    private val botWinsJson: Flow<String?> = context.pokerStatsDataStore.data
+    private val botWinsJson: Flow<String?> = context.pokerDataStore.data
         .map { preferences -> preferences[PokerStatsKeys.BOT_WINS] }
 
     suspend fun getAllStats(): StoredPokerStats {
-        val preferences = context.pokerStatsDataStore.data.first()
+        val preferences = context.pokerDataStore.data.first()
 
         val handsPlayed = preferences[PokerStatsKeys.HANDS_PLAYED] ?: 0
         val voluntaryPutInPot = preferences[PokerStatsKeys.VOLUNTARY_PUT_IN_POT] ?: 0
@@ -89,21 +88,6 @@ class PokerStatsRepository(private val context: Context) {
             playerWins,
             botWins
         )
-    }
-
-    suspend fun saveAllStats(stats: StoredPokerStats) {
-        context.pokerStatsDataStore.edit { settings ->
-            settings[PokerStatsKeys.HANDS_PLAYED] = stats.handsPlayed
-            settings[PokerStatsKeys.VOLUNTARY_PUT_IN_POT] = stats.voluntarilyPutMoneyInPot
-            settings[PokerStatsKeys.PRE_FLOP_RAISES] = stats.preFlopRaises
-            settings[PokerStatsKeys.CONTINUATION_BET] = stats.continuationBet
-            settings[PokerStatsKeys.CONTINUATION_BET_FACED] = stats.continuationBetFaced
-            settings[PokerStatsKeys.FOLDS_TO_CONTINUATION_BET] = stats.foldsToContinuationBet
-            settings[PokerStatsKeys.RIVER_BETS] = stats.riverBets
-            settings[PokerStatsKeys.RIVER_BLUFFS_DETECTED] = stats.riverBluffsDetected
-            settings[PokerStatsKeys.PLAYER_WINS] = json.encodeToString(stats.playerWins)
-            settings[PokerStatsKeys.BOT_WINS] = json.encodeToString(stats.botWins)
-        }
     }
 }
 

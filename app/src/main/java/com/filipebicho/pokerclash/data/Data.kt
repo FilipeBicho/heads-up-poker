@@ -28,9 +28,8 @@ object Data {
     lateinit var betting: Betting
     lateinit var cardDealer: Dealer
     lateinit var gameRound: Round
-    var stats: Stats = Stats()
+    lateinit var stats: Stats
     val chatGptBot = ChatgptBot()
-    lateinit var statsRepository: PokerStatsRepository
 
     // Bot
     val botOptions = listOf(
