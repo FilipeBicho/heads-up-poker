@@ -10,14 +10,15 @@ import com.filipebicho.pokerclash.bot.FOLD
 import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.data.Data.action
 import com.filipebicho.pokerclash.data.Data.betting
+import com.filipebicho.pokerclash.data.Data.botWins
 import com.filipebicho.pokerclash.data.Data.currentBot
 import com.filipebicho.pokerclash.data.Data.init
 import com.filipebicho.pokerclash.data.Data.playerWins
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.simulatedPlayer
-import com.filipebicho.pokerclash.data.Data.stats
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
-import com.filipebicho.pokerclash.data.DataStore
+import com.filipebicho.pokerclash.data.PokerDataStore
+import com.filipebicho.pokerclash.data.pokerDataStore
 import com.filipebicho.pokerclash.game.Init
 import com.filipebicho.pokerclash.game.Stats
 import kotlinx.coroutines.flow.update
@@ -29,12 +30,12 @@ const val BIG_BLIND = 40
 class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     private val appContext = application.applicationContext
-    val pokerDataStore = DataStore(appContext)
+    val pokerDataStore = PokerDataStore(appContext)
+    val stats = Stats(appContext.pokerDataStore, viewModelScope)
 
     init {
-        stats = Stats(appContext, viewModelScope)
         loadStats()
-        init = Init(viewModelScope)
+        init = Init(viewModelScope, stats)
     }
 
     fun setPlayerName(playerName: String) {
@@ -116,8 +117,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             stats.foldsToContinuationBet = loadedData.foldsToContinuationBet
             stats.riverBets = loadedData.riverBets
             stats.riverBluffsDetected = loadedData.riverBluffsDetected
-            playerWins.addAll(loadedData.playerWins)
-            playerWins.addAll(loadedData.botWins)
+            playerWins = loadedData.playerWins
+            botWins = loadedData.botWins
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.filipebicho.pokerclash
+package com.filipebicho.pokerclash.data
 
 import com.filipebicho.pokerclash.cards.Card
 import com.filipebicho.pokerclash.hand.Hand

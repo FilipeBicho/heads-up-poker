@@ -1,18 +1,18 @@
 package com.filipebicho.pokerclash.game
 
-import android.content.Context
+import android.util.Log
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.filipebicho.pokerclash.data.Data.actionHistory
 import com.filipebicho.pokerclash.data.Data.botWins
 import com.filipebicho.pokerclash.data.Data.playerWins
-import com.filipebicho.pokerclash.data.Data.stats
 import com.filipebicho.pokerclash.data.PokerStatsKeys
-import com.filipebicho.pokerclash.data.pokerDataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
-class Stats(var context: Context, var coroutineScope: CoroutineScope) {
+class Stats(var pokerDataStore: DataStore<Preferences>, var coroutineScope: CoroutineScope) {
 
     var handsPlayed: Int = 0
     var voluntarilyPutMoneyInPot: Int = 0
@@ -39,8 +39,9 @@ class Stats(var context: Context, var coroutineScope: CoroutineScope) {
             coroutineScope.launch {
                 saveStats()
             }
-
-        } catch (_: Exception) {}
+        } catch (e: Exception) {
+            Log.e("Stats", "Failed to update stats", e)
+        }
     }
 
     fun safePercentage(numerator: Int, denominator: Int): Int {
@@ -147,15 +148,15 @@ class Stats(var context: Context, var coroutineScope: CoroutineScope) {
     }
 
     suspend fun saveStats() {
-        context.pokerDataStore.edit { settings ->
-            settings[PokerStatsKeys.HANDS_PLAYED] = stats.handsPlayed
-            settings[PokerStatsKeys.VOLUNTARY_PUT_IN_POT] = stats.voluntarilyPutMoneyInPot
-            settings[PokerStatsKeys.PRE_FLOP_RAISES] = stats.preFlopRaises
-            settings[PokerStatsKeys.CONTINUATION_BET] = stats.continuationBet
-            settings[PokerStatsKeys.CONTINUATION_BET_FACED] = stats.continuationBetFaced
-            settings[PokerStatsKeys.FOLDS_TO_CONTINUATION_BET] = stats.foldsToContinuationBet
-            settings[PokerStatsKeys.RIVER_BETS] = stats.riverBets
-            settings[PokerStatsKeys.RIVER_BLUFFS_DETECTED] = stats.riverBluffsDetected
+        pokerDataStore.edit { settings ->
+            settings[PokerStatsKeys.HANDS_PLAYED] = handsPlayed
+            settings[PokerStatsKeys.VOLUNTARY_PUT_IN_POT] = voluntarilyPutMoneyInPot
+            settings[PokerStatsKeys.PRE_FLOP_RAISES] = preFlopRaises
+            settings[PokerStatsKeys.CONTINUATION_BET] = continuationBet
+            settings[PokerStatsKeys.CONTINUATION_BET_FACED] = continuationBetFaced
+            settings[PokerStatsKeys.FOLDS_TO_CONTINUATION_BET] = foldsToContinuationBet
+            settings[PokerStatsKeys.RIVER_BETS] = riverBets
+            settings[PokerStatsKeys.RIVER_BLUFFS_DETECTED] = riverBluffsDetected
             settings[PokerStatsKeys.PLAYER_WINS] = json.encodeToString(playerWins)
             settings[PokerStatsKeys.BOT_WINS] = json.encodeToString(botWins)
         }

@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.filipebicho.pokerclash.Background
-import com.filipebicho.pokerclash.GameUiState
+import com.filipebicho.pokerclash.data.GameUiState
 import com.filipebicho.pokerclash.GameViewModel
 import com.filipebicho.pokerclash.ui.gamescreen.BotSection
 import com.filipebicho.pokerclash.ui.gamescreen.GameSection

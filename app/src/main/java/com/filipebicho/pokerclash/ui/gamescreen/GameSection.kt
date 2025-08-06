@@ -42,7 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.filipebicho.pokerclash.GameUiState
+import com.filipebicho.pokerclash.data.GameUiState
 import com.filipebicho.pokerclash.GameViewModel
 import com.filipebicho.pokerclash.PokerScreen
 import com.filipebicho.pokerclash.R

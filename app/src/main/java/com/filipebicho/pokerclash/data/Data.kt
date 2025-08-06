@@ -2,7 +2,6 @@ package com.filipebicho.pokerclash.data
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.filipebicho.pokerclash.GameUiState
 import com.filipebicho.pokerclash.bot.ChatgptBot
 import com.filipebicho.pokerclash.cards.Card
 import com.filipebicho.pokerclash.cards.Dealer
@@ -28,8 +27,7 @@ object Data {
     lateinit var betting: Betting
     lateinit var cardDealer: Dealer
     lateinit var gameRound: Round
-    lateinit var stats: Stats
-    val chatGptBot = ChatgptBot()
+    lateinit var chatGptBot: ChatgptBot
 
     // Bot
     val botOptions = listOf(

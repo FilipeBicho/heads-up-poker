@@ -37,7 +37,6 @@ import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
 import com.filipebicho.pokerclash.data.Data.roundText
-import com.filipebicho.pokerclash.data.Data.stats
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.data.Data.validActions
 import kotlinx.coroutines.flow.update
@@ -45,10 +44,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class Betting(var coroutineScope: CoroutineScope) {
+class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
 
     init {
-        gameRound = Round(coroutineScope)
+        gameRound = Round(coroutineScope, stats)
     }
 
     fun preFlop() {

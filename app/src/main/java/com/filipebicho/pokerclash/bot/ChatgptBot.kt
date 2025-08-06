@@ -17,9 +17,9 @@ import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
 import com.filipebicho.pokerclash.data.Data.roundText
 import com.filipebicho.pokerclash.data.Data.simulatedPlayer
-import com.filipebicho.pokerclash.data.Data.stats
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.validActions
+import com.filipebicho.pokerclash.game.Stats
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONObject
 import retrofit2.Call
@@ -35,7 +35,7 @@ const val CALL = 2
 const val BET = 3
 const val ALLIN = 5
 
-class ChatgptBot {
+class ChatgptBot(private val stats: Stats) {
 
     val retrofit = RetrofitClient.getOpenAiClient()
     var betValue: Int = 0

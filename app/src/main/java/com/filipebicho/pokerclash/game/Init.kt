@@ -1,5 +1,6 @@
 package com.filipebicho.pokerclash.game
 
+import com.filipebicho.pokerclash.bot.ChatgptBot
 import com.filipebicho.pokerclash.bot.NO_ACTION
 import com.filipebicho.pokerclash.cards.BOT
 import com.filipebicho.pokerclash.cards.Dealer
@@ -15,6 +16,7 @@ import com.filipebicho.pokerclash.data.Data.cardDealer
 import com.filipebicho.pokerclash.data.Data.checkAvailable
 import com.filipebicho.pokerclash.data.Data.botCards
 import com.filipebicho.pokerclash.data.Data.botWins
+import com.filipebicho.pokerclash.data.Data.chatGptBot
 import com.filipebicho.pokerclash.data.Data.currentBot
 import com.filipebicho.pokerclash.data.Data.dealer
 import com.filipebicho.pokerclash.data.Data.gameNumber
@@ -37,10 +39,11 @@ import com.filipebicho.pokerclash.odds.Odds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.update
 
-class Init(coroutineScope: CoroutineScope) {
+class Init(coroutineScope: CoroutineScope, stats: Stats) {
 
     init {
-        betting = Betting(coroutineScope)
+        betting = Betting(coroutineScope, stats)
+        chatGptBot = ChatgptBot(stats)
     }
 
     private fun dealCards() {

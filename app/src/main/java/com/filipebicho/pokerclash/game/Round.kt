@@ -26,7 +26,6 @@ import com.filipebicho.pokerclash.data.Data.playerWins
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
-import com.filipebicho.pokerclash.data.Data.stats
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.hand.Hand
@@ -36,7 +35,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class Round(var coroutineScope: CoroutineScope) {
+class Round(var coroutineScope: CoroutineScope, private val stats: Stats) {
 
     fun flop(showdownCards: Boolean = false) {
         round = FLOP
@@ -214,6 +213,7 @@ class Round(var coroutineScope: CoroutineScope) {
             }
 
             coroutineScope.launch {
+                stats.updateStatsAfterHand()
                 delay(4000)
                 uiStateFlow.update { currentState -> currentState.copy(
                     newGame = true,
