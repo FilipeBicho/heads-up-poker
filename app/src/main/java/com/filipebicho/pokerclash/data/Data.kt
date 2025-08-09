@@ -2,15 +2,13 @@ package com.filipebicho.pokerclash.data
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.filipebicho.pokerclash.BIG_BLIND
-import com.filipebicho.pokerclash.GameUiState
 import com.filipebicho.pokerclash.bot.ChatgptBot
 import com.filipebicho.pokerclash.cards.Card
 import com.filipebicho.pokerclash.cards.Dealer
 import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.game.Betting
 import com.filipebicho.pokerclash.game.Init
-import com.filipebicho.pokerclash.game.Showdown
+import com.filipebicho.pokerclash.game.Round
 import com.filipebicho.pokerclash.odds.Odds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,44 +20,67 @@ object Data {
     val uiStateFlow = MutableStateFlow(GameUiState())
     val uiState: StateFlow<GameUiState> = uiStateFlow.asStateFlow()
 
-    val botOptions = listOf(
-        Pair("GPT 4o latest", "chatgpt-4o-latest"),
-        Pair("GPT 4o", "gpt-4o"),
-        Pair("GPT 4o mini", "gpt-4o-mini"),
-        Pair("GPT 3 turbo", "gpt-3.5-turbo")
-    )
+    // Classes
+    lateinit var odds: Odds
+    lateinit var init: Init
+    lateinit var betting: Betting
+    lateinit var cardDealer: Dealer
+    lateinit var gameRound: Round
+    lateinit var chatGptBot: ChatgptBot
 
+    // Bot
+    val botOptions = listOf(
+        Pair("Tom Dwan", "An unpredictable, ultra-aggressive heads-up beast. Bluff-heavy, always pressuring you with wild plays."),
+        Pair("Dan Bilzerian","Loose and flashy with wild swings. He’ll gamble big and chase spots — expect chaos, not consistency."),
+        Pair("Stephen Chidwick","A tight-aggressive heads-up technician. Plays disciplined and balanced, exploiting every small edge."),
+        Pair("Phil Ivey","Smooth and unreadable. Mixes aggression and control masterfully — a complete heads-up threat."),
+        Pair("Daniel Negreanu","Talkative and intuitive. Reads hands like a book and adjusts fast — don’t expect the same play twice."),
+        Pair("Doyle Brunson","Old-school pressure player. Fast, fearless, and aggressive in heads-up — plays big and bold."),
+        Pair("Phil Hellmuth","Starts tight, then strikes hard. May tilt when down, but don’t underestimate his tournament instincts."),
+        Pair("Doug Polk","A heads-up GTO master. Balanced, aggressive, and nearly impossible to exploit — built for this format."),
+        Pair("Linus Loeliger", "GTO perfectionist. Rarely makes mistakes, plays tight but punishes errors — a pure online crusher."),
+    )
+    var simulatedPlayer = ""
+    var actionHistory: MutableList<String> = mutableListOf()
+    val actionPlayer:  List<String> = listOf("Opponent", "You")
+    val roundText: List<String> = listOf("Pre-flop", "Flop", "Turn", "River")
+
+    // Actions
+    var actionText : MutableList<String> = mutableListOf("", "")
+
+    // Money
     var playerMoney = 1500
     var botMoney = 1500
-    var minPlayerBet = BIG_BLIND
+    var pokerChips: MutableList<Int> = mutableListOf(0,0)
+    var bet: MutableList<Int> = mutableListOf(0,0)
+    var botLastRaise: Int = 0
+    var roundPot: Int = 0
+    var mainPot: Int = 0
 
-    var pokerChips: MutableList<Int> = mutableListOf(0,0,0)
-    var bet: MutableList<Int> = mutableListOf(0,0,0)
-    var totalPotValue: Int = 0
+    // Bet and turn type
     var action: Int = -1
-    var winnerCount: MutableList<Int> = mutableListOf(0,0)
-
-    var gameNumber: Int = 0
     var checkAvailable: Boolean = true
     var round: Int = PRE_FLOP
+    var validActions = listOf("")
 
+    // Count variables
+    var currentBot = -1
+    var playerWins: MutableList<Int> = MutableList(botOptions.size) { 0 }
+    var botWins: MutableList<Int> = MutableList(botOptions.size) { 0 }
+    var gameNumber: Int = 0
+
+    // Player positions
     var player: Int = -1
     var opponent: Int = -1
     var dealer: Int = -1
     var blind: Int = -1
 
+    // Cards
     var playerCards: SnapshotStateList<Card> = mutableStateListOf()
     var botCards: SnapshotStateList<Card> = mutableStateListOf()
     var tableCards: SnapshotStateList<Card> = mutableStateListOf()
 
+    // Summary
     var gameSummaryMap: MutableList<List<String>> = ArrayList()
     var gameSummaryList: MutableList<String> = mutableListOf()
-
-    lateinit var odds: Odds
-    var init: Init = Init()
-    var betting: Betting = Betting()
-    lateinit var cardDealer: Dealer
-    var showdown: Showdown = Showdown()
-
-    val chatGptBot = ChatgptBot()
 }

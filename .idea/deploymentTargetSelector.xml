@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-04-06T13:28:12.138097424Z">
+        <DropdownSelection timestamp="2025-08-06T14:40:27.677331457Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=R5CR71SJCYZ" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/fb/.android/avd/Samsung_s21_API_34.avd" />
             </handle>
           </Target>
         </DropdownSelection>
@@ -18,7 +18,7 @@
       </SelectionState>
       <SelectionState runConfigName="Projects.Poker.app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-05-04T16:55:35.655509236Z">
+        <DropdownSelection timestamp="2025-05-04T17:09:49.545980810Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=/home/fb/.android/avd/Samsung_s21_API_34.avd" />

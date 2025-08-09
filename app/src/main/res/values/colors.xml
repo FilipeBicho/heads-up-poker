@@ -7,6 +7,12 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="button_red">#a82020</color>
+    <color name="poker_red">#AB1E1E</color>
     <color name="border_gray">#878787</color>
+    <color name="bg_start_game">#595656</color>
+    <color name="bg_bot_selection">#F2F2F2</color>
+    <color name="bg_poker_deep_blue">#FF1A237E</color>
+    <color name="off_white">#F5F5F5</color>
+    <color name="dark_background">#121212</color>
+    <color name="subtle_gray">#424242</color>
 </resources>

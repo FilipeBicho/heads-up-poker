@@ -1,5 +1,8 @@
 package com.filipebicho.pokerclash.bot
 
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.filipebicho.pokerclash.cards.Card
+
 data class ChatRequest(
     val model: String,
     val messages: List<Message>,
@@ -28,5 +31,4 @@ data class MessageContent(
 data class ResponseFormat(
     val type: String
 )
-
 

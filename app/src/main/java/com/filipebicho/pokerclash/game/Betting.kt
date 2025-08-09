@@ -1,7 +1,7 @@
 package com.filipebicho.pokerclash.game
 
+import android.util.Log
 import com.filipebicho.pokerclash.BIG_BLIND
-import com.filipebicho.pokerclash.POT
 import com.filipebicho.pokerclash.SMALL_BLIND
 import com.filipebicho.pokerclash.bot.ALLIN
 import com.filipebicho.pokerclash.bot.BET
@@ -9,7 +9,6 @@ import com.filipebicho.pokerclash.bot.CALL
 import com.filipebicho.pokerclash.bot.CHECK
 import com.filipebicho.pokerclash.bot.FOLD
 import com.filipebicho.pokerclash.bot.NO_ACTION
-import com.filipebicho.pokerclash.bot.RAISE
 import com.filipebicho.pokerclash.cards.BOT
 import com.filipebicho.pokerclash.cards.FLOP
 import com.filipebicho.pokerclash.cards.PLAYER
@@ -17,233 +16,48 @@ import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.cards.RIVER
 import com.filipebicho.pokerclash.cards.TURN
 import com.filipebicho.pokerclash.data.Data.action
+import com.filipebicho.pokerclash.data.Data.actionHistory
+import com.filipebicho.pokerclash.data.Data.actionPlayer
+import com.filipebicho.pokerclash.data.Data.actionText
 import com.filipebicho.pokerclash.data.Data.bet
 import com.filipebicho.pokerclash.data.Data.blind
+import com.filipebicho.pokerclash.data.Data.botLastRaise
 import com.filipebicho.pokerclash.data.Data.chatGptBot
 import com.filipebicho.pokerclash.data.Data.checkAvailable
 import com.filipebicho.pokerclash.data.Data.dealer
 import com.filipebicho.pokerclash.data.Data.gameNumber
+import com.filipebicho.pokerclash.data.Data.gameRound
 import com.filipebicho.pokerclash.data.Data.gameSummaryList
 import com.filipebicho.pokerclash.data.Data.gameSummaryMap
 import com.filipebicho.pokerclash.data.Data.init
-import com.filipebicho.pokerclash.data.Data.minPlayerBet
+import com.filipebicho.pokerclash.data.Data.mainPot
 import com.filipebicho.pokerclash.data.Data.opponent
 import com.filipebicho.pokerclash.data.Data.player
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
-import com.filipebicho.pokerclash.data.Data.showdown
-import com.filipebicho.pokerclash.data.Data.totalPotValue
+import com.filipebicho.pokerclash.data.Data.roundPot
+import com.filipebicho.pokerclash.data.Data.roundText
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
+import com.filipebicho.pokerclash.data.Data.validActions
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.Timer
-import kotlin.concurrent.timerTask
 
-class Betting {
+class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
 
-    /**
-     * bet is available if:
-     *  - there is no previous bet
-     *  - player chips value is bigger then big bling
-     */
-    private fun isBetAvailable(): Boolean {
-        return if (bet[opponent] == 0 && pokerChips[player] > BIG_BLIND) {
-            minPlayerBet = BIG_BLIND
-            uiStateFlow.update { currentState ->
-                currentState.copy(
-                    playerBetValue = BIG_BLIND
-                )
-            }
-            true
-        } else {
-            false
-        }
-    }
-
-    /**
-     * raise is available if:
-     *  - there is a previous bet
-     *  - player chips and player bet (if any) is bigger than 2 times opponent bet
-     */
-    private fun isRaiseAvailable(): Boolean {
-        return if (bet[opponent] > 0 && pokerChips[player] > bet[opponent] * 2) {
-            minPlayerBet = bet[opponent] * 2
-            uiStateFlow.update { currentState ->
-                currentState.copy(
-                    playerBetValue = bet[opponent] * 2
-                )
-            }
-            true
-        } else {
-            false
-        }
-    }
-
-    /**
-     * all in is available if:
-     *  - there is a previous bet:
-     *      - player chips and player bet is equal or small than 2 times opponent bet
-     *  - there is no previous bet:
-     *      - player chips are smaller or equal to big bling
-     */
-    private fun isAllInAvailable(): Boolean {
-        return if (bet[opponent] > 0 && pokerChips[player] <= bet[opponent] * 2) {
-            true
-        } else {
-            pokerChips[player] <= BIG_BLIND
-        }
-    }
-    
-    private fun switchPlayerTurn() {
-        player = if (player == PLAYER) BOT else PLAYER
-        opponent = if (player == BOT) PLAYER else BOT
-        uiStateFlow.update { currentState -> currentState.copy(
-            displayBetButtons = player == PLAYER
-        )}
-    }
-
-    private fun botAction() {
-        CoroutineScope(Dispatchers.Main).launch {
-            val action = chatGptBot.calculateAction()
-            when (action) {
-                FOLD -> fold()
-                CHECK -> check()
-                CALL -> call()
-                BET -> {
-                    bet(chatGptBot.betValue)
-                }
-                RAISE -> {
-                    raise(chatGptBot.betValue)
-                }
-                ALLIN -> {
-                    allIn()
-                }
-                else -> null
-            }
-        }
-    }
-
-    private fun updateStateFlowBets() {
-        uiStateFlow.update { currentState ->
-            currentState.copy(
-                playerMoney = pokerChips[PLAYER],
-                botMoney = pokerChips[BOT],
-                playerBetValue = bet[dealer],
-                currentPot = pokerChips[POT],
-                totalPot = totalPotValue + pokerChips[POT],
-                debugTotal = pokerChips[PLAYER] + pokerChips[BOT] + pokerChips[POT] + totalPotValue,
-                playerText = "${bet[PLAYER]} €",
-                botText = "${bet[BOT]} €",
-                gameSummary = gameSummaryMap
-            )
-        }
-    }
-
-    private fun foldCall() {
-        if (player == PLAYER) {
-            uiStateFlow.update { currentState -> currentState.copy(
-                displayBetButtons = true,
-                displayFoldButton = true,
-                displayCheckButton = false,
-                displayCallButton = true,
-                displayBetButton = false,
-                displayRaiseButton = false,
-                displayAllInButton = false
-            )}
-        } else {
-            botAction()
-        }
-    }
-
-    private fun foldCallBet() {
-        if (player == PLAYER) {
-            uiStateFlow.update { currentState -> currentState.copy(
-                displayBetButtons = true,
-                displayFoldButton = true,
-                displayCheckButton = false,
-                displayCallButton = true,
-                displayBetButton = isBetAvailable(),
-                displayRaiseButton = isRaiseAvailable(),
-                displayAllInButton = isAllInAvailable()
-            )}
-        } else {
-            botAction()
-        }
-    }
-
-    private fun checkBet() {
-        if (player == PLAYER) {
-            uiStateFlow.update { currentState ->
-                currentState.copy(
-                    displayBetButtons = true,
-                    displayFoldButton = false,
-                    displayCheckButton = true,
-                    displayCallButton = false,
-                    displayBetButton = isBetAvailable(),
-                    displayRaiseButton = isRaiseAvailable(),
-                    displayAllInButton = isAllInAvailable()
-                )
-            }
-        } else {
-            botAction()
-        }
-    }
-
-    private fun nextRound() {
-
-        if (player == dealer)
-            switchPlayerTurn()
-
-        action = NO_ACTION
-
-        totalPotValue += pokerChips[POT]
-        bet[PLAYER] = 0
-        bet[BOT] = 0
-        pokerChips[POT] = 0
-        checkAvailable = true
-        minPlayerBet = BIG_BLIND
-
-        uiStateFlow.update { currentState ->
-            currentState.copy(
-                playerBetValue = bet[PLAYER],
-                botBetValue = bet[BOT],
-                totalPot = totalPotValue,
-                playerText = "${bet[PLAYER]} €",
-                botText = "${bet[BOT]} €",
-                currentPot = 0
-            )
-        }
-
-        when (round) {
-            PRE_FLOP -> {
-                round = FLOP
-                showdown.flop()
-                checkBet()
-            }
-
-            FLOP -> {
-                round = TURN
-                showdown.turn()
-                checkBet()
-            }
-
-            TURN -> {
-                round = RIVER
-                showdown.river()
-                checkBet()
-            }
-
-            RIVER -> {
-                showdown.calculateWinner()
-            }
-        }
+    init {
+        gameRound = Round(coroutineScope, stats)
     }
 
     fun preFlop() {
+        val blindName = uiStateFlow.value.name[player]
+        val dealerName = uiStateFlow.value.name[opponent]
+
          if (pokerChips[blind] <= BIG_BLIND) {
              if (pokerChips[blind] <= SMALL_BLIND) {
+
+                 bettingLog("--- BEFORE BLIND (small blind) All in ---")
 
                  // blind makes all in
                  bet[blind] = pokerChips[blind]
@@ -254,15 +68,25 @@ class Betting {
                  pokerChips[dealer] -= bet[dealer]
 
                  // calculate pot
-                 pokerChips[POT] = bet[blind] + bet[dealer]
+                 roundPot = bet[blind] + bet[dealer]
 
-                 gameSummaryList += "${uiStateFlow.value.name[blind]} makes all in ${bet[blind]} €"
-                 gameSummaryList += "${uiStateFlow.value.name[dealer]} pays all in ${bet[dealer]} €"
-                 gameSummaryMap[gameNumber] = gameSummaryList.toList()
+                 gameSummaryList += "$blindName makes all in ${bet[blind]}"
+                 gameSummaryList += "$dealerName pays all in ${bet[dealer]}"
+
+                 actionText[blind] = "All in ${bet[blind]}"
+                 actionText[dealer] = "Call ${bet[dealer]}"
+
+                 actionHistory += "${roundText[round]}: ${actionPlayer[blind]} make all-in with ${bet[blind]}"
+                 actionHistory += "${roundText[round]}: ${actionPlayer[dealer]} call all-in with ${bet[blind]}"
+
+                 bettingLog("--- AFTER BLIND (small blind) All in ---")
 
                  updateStateFlowBets()
-                 showdown.showdownCards()
+                 gameRound.showdownCards()
              } else {
+
+                 bettingLog("--- BEFORE BLIND (big blind) All in ---")
+
                  // blind makes all in
                  bet[blind] = pokerChips[blind]
                  pokerChips[blind] = 0
@@ -272,18 +96,27 @@ class Betting {
                  pokerChips[dealer] -= bet[dealer]
 
                  // calculate pot
-                 pokerChips[POT] = bet[blind] + bet[dealer]
+                 roundPot = bet[blind] + bet[dealer]
 
-                 gameSummaryList += "${uiStateFlow.value.name[blind]} makes all in ${bet[blind]} €"
-                 gameSummaryList += "${uiStateFlow.value.name[dealer]} pays small blind ${bet[dealer]} €"
-                 gameSummaryMap[gameNumber] = gameSummaryList.toList()
+                 gameSummaryList += "$blindName makes all in ${bet[blind]}"
+                 gameSummaryList += "$dealerName pays all in ${bet[dealer]}"
+
+                 actionText[blind] = "All in ${bet[blind]}"
+                 actionText[dealer] = "Call ${bet[dealer]}"
+
+                 actionHistory += "${roundText[round]}: ${actionPlayer[blind]} make all-in with ${bet[blind]}"
+                 actionHistory += "${roundText[round]}: ${actionPlayer[dealer]} call all-in with ${bet[blind]}"
+
+                 bettingLog("--- AFTER BLIND (big blind) All in ---")
 
                  player = dealer
-
                  updateStateFlowBets()
                  foldCall()
              }
          } else if (pokerChips[dealer] <= SMALL_BLIND) {
+
+             bettingLog("--- BEFORE DEALER (small blind) All in ---")
+
              // dealer makes all in
              bet[dealer] = pokerChips[dealer]
              pokerChips[dealer] = 0
@@ -293,15 +126,25 @@ class Betting {
              pokerChips[blind] -= bet[blind]
 
              // calculate pot
-             pokerChips[POT] = bet[blind] + bet[dealer]
+             roundPot = bet[blind] + bet[dealer]
 
-             gameSummaryList += "${uiStateFlow.value.name[blind]} makes all in ${bet[blind]} €"
-             gameSummaryList += "${uiStateFlow.value.name[dealer]} pays all in ${bet[dealer]} €"
-             gameSummaryMap[gameNumber] = gameSummaryList.toList()
+             gameSummaryList += "$blindName makes all in ${bet[dealer]}"
+             gameSummaryList += "$dealerName pays all in ${bet[blind]}"
+
+             actionText[dealer] = "All in ${bet[dealer]}"
+             actionText[blind] = "Call ${bet[blind]}"
+
+             actionHistory += "${roundText[round]}: ${actionPlayer[dealer]} make all-in with ${bet[dealer]}"
+             actionHistory += "${roundText[round]}: ${actionPlayer[blind]} call all-in with ${bet[blind]}"
+
+             bettingLog("--- AFTER DEALER (small blind) All in ---")
 
              updateStateFlowBets()
-             showdown.showdownCards()
+             gameRound.showdownCards()
          } else {
+
+             bettingLog("--- BEFORE PRE FLOP ---")
+
              // dealer pay small blind
              bet[dealer] = SMALL_BLIND
              pokerChips[dealer] -= bet[dealer]
@@ -311,11 +154,18 @@ class Betting {
              pokerChips[blind] -= bet[blind]
 
              // calculate pot
-             pokerChips[POT] = bet[blind] + bet[dealer]
+             roundPot = bet[blind] + bet[dealer]
 
-             gameSummaryList += "${uiStateFlow.value.name[dealer]} pays small blind ${bet[dealer]} €"
-             gameSummaryList += "${uiStateFlow.value.name[blind]} pays big blind ${bet[blind]} €"
-             gameSummaryMap[gameNumber] = gameSummaryList.toList()
+             gameSummaryList += "$dealerName pays small blind ${bet[dealer]}"
+             gameSummaryList += "$blindName pays big blind ${bet[blind]}"
+
+             actionHistory += "${roundText[round]}: ${actionPlayer[dealer]} pay small blind ${bet[dealer]}"
+             actionHistory += "${roundText[round]}: ${actionPlayer[blind]} pay big blind ${bet[blind]}"
+
+             actionText[dealer] = "SB"
+             actionText[blind] = "BB"
+
+             bettingLog("--- AFTER PRE FLOP ---")
 
              updateStateFlowBets()
              player = dealer
@@ -324,40 +174,71 @@ class Betting {
     }
 
     fun fold() {
-        // opponent wins the pot
-        pokerChips[opponent] += pokerChips[POT] + totalPotValue
+        val playerName = uiStateFlow.value.name[player]
+        val opponentName = uiStateFlow.value.name[opponent]
 
-        gameSummaryList += "${uiStateFlow.value.name[player]} folds"
-        gameSummaryList += "${uiStateFlow.value.name[opponent]} wins ${pokerChips[POT]} €"
+        bettingLog("--- BEFORE FOLD $playerName ---")
+
+        // opponent wins the pot
+        val totalPotWonByOpponent = mainPot + roundPot
+        pokerChips[opponent] += totalPotWonByOpponent
+
+        gameSummaryList += "$playerName folds"
+        gameSummaryList += "$opponentName wins $totalPotWonByOpponent"
+
+        actionText[player] = "Fold"
+        actionText[opponent] = "Win $totalPotWonByOpponent"
+
+        actionHistory += "${roundText[round]}: ${actionPlayer[player]} make fold"
+        actionHistory += "${roundText[round]}: ${actionPlayer[opponent]} win $totalPotWonByOpponent"
+
+        bettingLog("--- AFTER FOLD $playerName ---")
+
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
         uiStateFlow.update { currentState ->
             currentState.copy(
                 playerMoney = pokerChips[PLAYER],
                 botMoney = pokerChips[BOT],
-                playerText = "${bet[PLAYER]} €",
-                botText = "${bet[BOT]} €",
-                actionText = "${uiStateFlow.value.name[player]} folds, ${uiStateFlow.value.name[opponent]} wins ${pokerChips[POT] + totalPotValue} €",
                 gameSummary = gameSummaryMap,
-                displayBetButtons = false
+                actions = actionText,
+                isPlayerTurn = false,
+                displayFold = true,
+                winner = opponent,
+                botBet = 0,
+                playerBet = 0,
+                displayPot = false
             )
         }
-        Timer().schedule(timerTask {
+        coroutineScope.launch {
+            delay(3000)
+            stats.updateStatsAfterHand()
             init.newGame()
-        }, 3000)
+        }
     }
 
     fun check() {
-        gameSummaryList += "${uiStateFlow.value.name[player]} checks"
-        gameSummaryMap[gameNumber] = gameSummaryList.toList()
+        val playerName = uiStateFlow.value.name[player]
 
+        bettingLog("--- BEFORE CHECK $playerName ---")
+
+        gameSummaryList += "$playerName checks"
+        actionText[player] = "Check"
+
+        actionHistory += "${roundText[round]}: ${actionPlayer[player]} make check"
+
+        bettingLog("--- AFTER CHECK $playerName ---")
+
+        gameSummaryMap[gameNumber] = gameSummaryList.toList()
         uiStateFlow.update { currentState ->
             currentState.copy(
+                actions = actionText,
                 gameSummary = gameSummaryMap
             )
         }
 
-        if (checkAvailable && round != PRE_FLOP) {
+        val canPerformCheckAction = checkAvailable && round != PRE_FLOP
+        if (canPerformCheckAction) {
             checkAvailable = false
             switchPlayerTurn()
             checkBet()
@@ -367,132 +248,158 @@ class Betting {
     }
 
     fun call() {
+        val playerName = uiStateFlow.value.name[player]
+        val amountToCall = bet[opponent] - bet[player]
+        gameSummaryList += "$playerName calls $amountToCall"
 
-        val callValue = bet[opponent] - bet[player]
+        if (pokerChips[player] <= amountToCall) {
 
-        if (pokerChips[player] <= callValue) {
-            // player makes all in
-            bet[player] += pokerChips[player]
+            bettingLog("--- BEFORE CALL (all in) $playerName ---")
+            Log.d("MONEY DEBUG", "Amount to call: $amountToCall")
+
+            // Player is all-in by calling
+            val allInAmount = pokerChips[player]
+//            Log.d("MONEY DEBUG", "All in amount: $allInAmount")
+
+            bet[player] += allInAmount
             pokerChips[player] = 0
 
-            if (pokerChips[opponent] > 0) {
-                // opponent equals player all in
-                pokerChips[opponent] = pokerChips[opponent] + bet[opponent] // reset opponent poker chips
-                bet[opponent] = bet[player]
-                pokerChips[opponent] -= bet[opponent]
+            // Opponent's bet might need to be adjusted if player's all-in is less than opponent's bet
+            if (bet[opponent] > bet[player]) {
+                val excessBet = bet[opponent] - bet[player]
+                Log.d("MONEY DEBUG", "Excess bet: $excessBet")
+                pokerChips[opponent] += excessBet // Return excess to opponent's chips
+                bet[opponent] = bet[player]     // Opponent's bet now matches player's all-in bet
             }
 
-            // calculate pot
-            pokerChips[POT] = bet[player] + bet[opponent]
+            roundPot = bet[player] + bet[opponent]
+            actionText[player] = "All in $allInAmount"
 
-            gameSummaryList += "${uiStateFlow.value.name[player]} calls $callValue €"
-            gameSummaryMap[gameNumber] = gameSummaryList.toList()
+            actionHistory += "${roundText[round]}: ${actionPlayer[player]} make call all-in with $allInAmount"
+
+//            bettingLog("--- AFTER CALL (all in) $playerName ---")
 
             updateStateFlowBets()
-            showdown.showdownCards()
+            gameRound.showdownCards()
         } else {
 
-            // player equals opponent bet
+//            bettingLog("--- BEFORE CALL $playerName ---")
+//            Log.d("MONEY DEBUG", "Amount to call: $amountToCall")
+
+            // Player has enough chips to call normally
+            pokerChips[player] -= amountToCall
             bet[player] = bet[opponent]
-            pokerChips[player] -= callValue
+
+            roundPot = bet[player] + bet[opponent]
+            actionText[player] = "Call $amountToCall"
+
+            actionHistory += "${roundText[round]}: ${actionPlayer[player]} call $amountToCall"
+
+            bettingLog("--- AFTER CALL $playerName ---")
+
+            updateStateFlowBets()
+
+            if (round == RIVER) {
+                gameRound.calculateWinner()
+            } else if(pokerChips[player] == 0 || pokerChips[opponent] == 0) {
+                gameRound.showdownCards()
+            } else {
+                switchPlayerTurn()
+                if (checkAvailable && round == PRE_FLOP)
+                    checkBet()
+                else
+                    nextRound()
+            }
+        }
+    }
+
+    fun bet(newBetAmount: Int) {
+        val playerName = uiStateFlow.value.name[player]
+        val previousBetAmount = bet[player]
+        val playerTotalStake = pokerChips[player] + previousBetAmount
+
+//        bettingLog("--- BEFORE BET $playerName ---")
+//        Log.d("MONEY DEBUG", "New bet amount: $newBetAmount")
+//        Log.d("MONEY DEBUG", "Previous bet amount: $previousBetAmount")
+//        Log.d("MONEY DEBUG", "Player total stake: $playerTotalStake")
+
+        checkAvailable = false
+        if (player == BOT)
+            botLastRaise = newBetAmount - bet[BOT]
+
+        if (newBetAmount > playerTotalStake) {
+//            Log.d("MONEY DEBUG", "All in: $playerTotalStake")
+            allIn()
+        } else {
+            val opponentTotalStake = pokerChips[opponent] + bet[opponent]
+//            Log.d("MONEY DEBUG", "Opponent total stake: $playerTotalStake")
+            if (newBetAmount >= opponentTotalStake) {
+                // Player bets more than or equal to opponent's total stack, opponent will be all-in if they call
+//                Log.d("MONEY DEBUG", "Bet equals opponent total stack: $playerTotalStake")
+                bet[player] = opponentTotalStake
+            } else {
+                bet[player] = newBetAmount
+            }
+
+            // Adjust player's chips: subtract the additional amount committed in this action
+            pokerChips[player] = playerTotalStake - bet[player]
 
             // calculate pot
-            pokerChips[POT] = bet[player] + bet[opponent]
+            roundPot = bet[player] + bet[opponent]
 
-            gameSummaryList += "${uiStateFlow.value.name[player]} calls $callValue €"
-            gameSummaryMap[gameNumber] = gameSummaryList.toList()
+            gameSummaryList += "$playerName bets ${bet[player]}"
+            actionText[player] = "Bet ${bet[player]}"
+
+            actionHistory += if (previousBetAmount == 0)
+                "${roundText[round]}: ${actionPlayer[player]} bet ${bet[player]}"
+            else
+                "${roundText[round]}: ${actionPlayer[player]} raise to $newBetAmount}"
+
+            bettingLog("--- AFTER BET $playerName ---")
 
             updateStateFlowBets()
             switchPlayerTurn()
 
-            if (pokerChips[player] == 0 || pokerChips[opponent] == 0) {
-                showdown.showdownCards()
+            if (pokerChips[player] + bet[player] <= bet[opponent]) {
+                foldCall()
             } else {
-                if (checkAvailable && round == PRE_FLOP) {
-                    checkBet()
-                } else {
-                    if (round == RIVER) {
-                        showdown.showdownCards()
-                    } else {
-                        nextRound()
-                    }
-                }
+                foldCallBet()
             }
         }
     }
 
-    fun bet(value: Int) {
+    fun allIn() {
+        val playerName = uiStateFlow.value.name[player]
+        val previousBetAmount = bet[player]
+        val playerTotalStake = pokerChips[player] + bet[player]
+        val opponentTotalStake = pokerChips[opponent] + bet[opponent]
 
         checkAvailable = false
 
-        if (value >= pokerChips[player]) {
-            allIn()
-            return
-        } else if (value > pokerChips[opponent]) {
-            bet[player] = pokerChips[opponent];
+//        bettingLog("--- BEFORE ALL IN $playerName ---")
+//        Log.d("MONEY DEBUG", "Previous bet amount: $previousBetAmount")
+
+        // bet all chips
+        bet[player] = if (playerTotalStake > opponentTotalStake) {
+//            Log.d("MONEY DEBUG", "ALL IN equals opponent total stack: $opponentTotalStake")
+            opponentTotalStake
         } else {
-            bet[player] = value
+//            Log.d("MONEY DEBUG", "ALL IN equals player total stack: $playerTotalStake")
+            playerTotalStake
         }
 
+        pokerChips[player] += previousBetAmount
         pokerChips[player] -= bet[player]
 
         // calculate pot
-        pokerChips[POT] = bet[player] + bet[opponent]
+        roundPot = bet[player] + bet[opponent]
 
-        gameSummaryList += "${uiStateFlow.value.name[player]} bets ${bet[player]} €"
-        gameSummaryMap[gameNumber] = gameSummaryList.toList()
+        gameSummaryList += "$playerName makes all in with ${bet[player]}"
+        actionText[player] = "All in ${bet[player]}"
 
-        updateStateFlowBets()
-        switchPlayerTurn()
+        actionHistory += "${roundText[round]}: ${actionPlayer[player]} make all-in with ${bet[player]}"
 
-        if (pokerChips[player] + bet[player] <= bet[opponent]) {
-           foldCall()
-        } else {
-            foldCallBet()
-        }
-    }
-
-    fun raise(value: Int) {
-
-        checkAvailable = false
-
-        // Add old bet to chips and subtract the new bet
-        pokerChips[player] += bet[player] - value
-        bet[player] = value
-        pokerChips[POT] = bet[player] + bet[opponent]
-
-        gameSummaryList += "${uiStateFlow.value.name[player]} raises to ${bet[player]} €"
-        gameSummaryMap[gameNumber] = gameSummaryList.toList()
-
-        updateStateFlowBets()
-        switchPlayerTurn()
-
-        if (pokerChips[player] + bet[player] <= bet[opponent]) {
-            foldCall()
-        } else {
-            foldCallBet()
-        }
-    }
-
-    fun allIn() {
-        checkAvailable = false
-
-        val previousBet = bet[player]
-
-        // bet all chips
-        bet[player] = if (pokerChips[player] + bet[player] > pokerChips[opponent] + bet[opponent]) {
-            pokerChips[opponent] + bet[opponent]
-        } else {
-            pokerChips[player] + bet[player]
-        }
-
-        pokerChips[player] += previousBet
-        pokerChips[player] -= bet[player]
-
-        pokerChips[POT] = bet[player] + bet[opponent]
-
-        gameSummaryList += "${uiStateFlow.value.name[player]} makes all in with ${bet[player]} €"
-        gameSummaryMap[gameNumber] = gameSummaryList.toList()
+        bettingLog("--- AFTER ALL IN $playerName ---")
 
         updateStateFlowBets()
         switchPlayerTurn()
@@ -500,7 +407,235 @@ class Betting {
         if (pokerChips[player] > 0) {
             foldCall()
         } else {
-            showdown.showdownCards()
+            gameRound.showdownCards()
         }
+    }
+
+    private fun nextRound() {
+
+        if (player == dealer) {
+            switchPlayerTurn()
+        }
+
+        action = NO_ACTION
+
+        mainPot += roundPot
+        roundPot = 0
+
+        bet[PLAYER] = 0
+        bet[BOT] = 0
+        checkAvailable = true
+
+        actionText[player] = ""
+
+        uiStateFlow.update { currentState ->
+            currentState.copy(
+                playerBet = bet[PLAYER],
+                botBet = bet[BOT],
+                playerMinRaise = getMinRaiseForPlayer(),
+                playerCurrentRaise = getMinRaiseForPlayer(),
+                mainPot = mainPot,
+                roundPot = roundPot,
+            )
+        }
+
+        when (round) {
+            PRE_FLOP -> {
+                round = FLOP
+                gameRound.flop()
+                checkBet()
+            }
+
+            FLOP -> {
+                round = TURN
+                gameRound.turn()
+                checkBet()
+            }
+
+            TURN -> {
+                round = RIVER
+                gameRound.river()
+                checkBet()
+            }
+
+            RIVER -> {
+                gameRound.calculateWinner()
+            }
+        }
+    }
+
+    private fun getMinRaiseForPlayer(): Int {
+        val botBet = bet[BOT]
+        val playerBet = bet[PLAYER]
+
+        // Pre-flop: if both bets are zero (new hand)
+        if (botBet == 0 && playerBet == 0) {
+            return BIG_BLIND
+        }
+
+        // No previous raise (bot just called BB)
+        if (botBet == BIG_BLIND) {
+            return BIG_BLIND * 2
+        }
+
+        // There was a previous raise — use lastRaiseAmount
+        return botBet + botLastRaise
+    }
+
+    private fun isBetAvailable(): Boolean {
+        val playerTotalStake = pokerChips[PLAYER] + bet[PLAYER]
+
+        if (playerTotalStake < bet[opponent]) {
+            return false
+        }
+
+        if (bet[opponent] == 0 && pokerChips[PLAYER] > 0) {
+            return true
+        }
+
+        return playerTotalStake >= bet[opponent]
+    }
+
+    private fun isMinBetAvailable(): Boolean {
+        return getMinRaiseForPlayer() < pokerChips[PLAYER]
+    }
+
+    private fun is3BBBetAvailable(): Boolean {
+        return getMinRaiseForPlayer() <= BIG_BLIND * 3 && pokerChips[PLAYER] >= BIG_BLIND * 3
+    }
+
+    private fun isPotBetAvailable(): Boolean {
+        return getMinRaiseForPlayer() <= roundPot + mainPot && roundPot + mainPot < pokerChips[PLAYER]
+    }
+
+    /**
+     * all in is available if:
+     *  - there is a previous bet:
+     *      - player chips and player bet is equal or small than 2 times opponent bet
+     *  - there is no previous bet:
+     *      - player chips are smaller or equal to big bling
+     */
+    private fun isAllInAvailable(): Boolean {
+        return if (bet[BOT] > 0 && pokerChips[PLAYER] <= bet[BOT] * 2) {
+            true
+        } else {
+            pokerChips[PLAYER] >= BIG_BLIND
+        }
+    }
+
+    private fun switchPlayerTurn() {
+        player = if (player == PLAYER) BOT else PLAYER
+        opponent = if (player == BOT) PLAYER else BOT
+        uiStateFlow.update { currentState -> currentState.copy(
+            isPlayerTurn = player == PLAYER
+        )}
+    }
+
+    private fun botAction() {
+        coroutineScope.launch {
+            val action = chatGptBot.calculateAction()
+            when (action) {
+                FOLD -> fold()
+                CHECK -> check()
+                CALL -> call()
+                BET -> {
+                    bet(chatGptBot.betValue)
+                }
+                ALLIN -> {
+                    allIn()
+                }
+                else -> null
+            }
+        }
+    }
+
+    private fun updateStateFlowBets() {
+        gameSummaryMap[gameNumber] = gameSummaryList.toList()
+        uiStateFlow.update { currentState ->
+            currentState.copy(
+                playerMoney = pokerChips[PLAYER],
+                botMoney = pokerChips[BOT],
+                playerBet = bet[PLAYER],
+                botBet = bet[BOT],
+                playerMinRaise = getMinRaiseForPlayer(),
+                playerCurrentRaise = getMinRaiseForPlayer(),
+                actions = actionText,
+                roundPot = roundPot,
+                mainPot = mainPot + roundPot,
+                gameSummary = gameSummaryMap
+            )
+        }
+    }
+
+    private fun foldCall() {
+        if (player == PLAYER) {
+            uiStateFlow.update { currentState -> currentState.copy(
+                isPlayerTurn = true,
+                playerCall = bet[BOT] - bet[PLAYER],
+                displayFoldButton = true,
+                displayCheckButton = false,
+                displayCallButton = true,
+                displayBetButton = false,
+                displayMinSmallButton = false,
+                display3BBSmallButton = false,
+                displayPotSmallButton = false,
+                displayAllInSmallButton = false
+            )}
+        } else {
+            validActions = listOf("Fold", "Call")
+            botAction()
+        }
+    }
+
+    private fun foldCallBet() {
+        if (player == PLAYER) {
+            uiStateFlow.update { currentState -> currentState.copy(
+                isPlayerTurn = true,
+                playerCall = bet[BOT] - bet[PLAYER],
+                playerMinRaise = getMinRaiseForPlayer(),
+                playerCurrentRaise = getMinRaiseForPlayer(),
+                displayFoldButton = true,
+                displayCheckButton = false,
+                displayCallButton = true,
+                displayBetButton = isBetAvailable(),
+                displayMinSmallButton = isMinBetAvailable(),
+                display3BBSmallButton = is3BBBetAvailable(),
+                displayPotSmallButton = isPotBetAvailable(),
+                displayAllInSmallButton = isAllInAvailable()
+            )}
+        } else {
+            validActions = listOf("Fold", "Call", "Bet")
+            botAction()
+        }
+    }
+
+    private fun checkBet() {
+        if (player == PLAYER) {
+            uiStateFlow.update { currentState ->
+                currentState.copy(
+                    isPlayerTurn = true,
+                    playerMinRaise = getMinRaiseForPlayer(),
+                    displayFoldButton = false,
+                    displayCheckButton = true,
+                    displayCallButton = false,
+                    displayBetButton = isBetAvailable(),
+                    displayMinSmallButton = isMinBetAvailable(),
+                    display3BBSmallButton = is3BBBetAvailable(),
+                    displayPotSmallButton = isPotBetAvailable(),
+                    displayAllInSmallButton = isAllInAvailable()
+                )
+            }
+        } else {
+            validActions = listOf("Check", "Bet")
+            botAction()
+        }
+    }
+
+    private fun bettingLog(title: String) {
+        Log.d("MONEY DEBUG", title)
+        Log.d("MONEY DEBUG", "PokerChips: ${pokerChips[PLAYER]} - ${pokerChips[BOT]}")
+        Log.d("MONEY DEBUG", "Bet: ${bet[PLAYER]} - ${bet[BOT]}")
+        Log.d("MONEY DEBUG", "RoundPot: $roundPot")
+        Log.d("MONEY DEBUG", "MainPot: $mainPot")
     }
 }

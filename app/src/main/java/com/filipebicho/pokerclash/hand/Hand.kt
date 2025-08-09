@@ -14,7 +14,6 @@ const val THREE_OF_A_KIND: Int = 4
 const val TWO_PAIR: Int = 3
 const val PAIR: Int = 2
 const val HIGH_CARD: Int = 1
-const val RESULT = 0
 
 class Hand(private var playerCards: List<Card>, private var tableCards: List<Card>) {
 
@@ -40,55 +39,55 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
 
         if (isStraightFlush()) {
             resultValue = STRAIGHT_FLUSH
-            resultText = "Straight Flush"
+            resultText = "Straight Flush from ${hand[4].cardRank()} to ${hand[0].cardRank()}"
             return
         }
 
         if (isFourOfAKind()) {
             resultValue = FOUR_OF_A_KIND
-            resultText = "Four of a Kind"
+            resultText = "Four of a Kind of {${hand[0].cardRank()}s"
             return
         }
 
         if (isFullHouse()) {
             resultValue = FULL_HOUSE
-            resultText = "Full House"
+            resultText = "Full House of ${hand[0].cardRank()}s with ${hand[3].cardRank()}s"
             return
         }
 
         if (isFlush()) {
             resultValue = FLUSH
-            resultText = "Flush"
+            resultText = "Flush of ${hand[0].cardSuit()}"
             return
         }
 
         if (isStraight()) {
             resultValue = STRAIGHT
-            resultText = "Straight"
+            resultText = "Straight from ${hand[4].cardRank()} to ${hand[0].cardRank()}"
             return
         }
 
         if (isThreeOfAKind()) {
             resultValue = THREE_OF_A_KIND
-            resultText = "Three of a Kind"
+            resultText = "Three of a Kind of ${hand[0].cardRank()}s"
             return
         }
 
         if (isTwoPair()) {
             resultValue = TWO_PAIR
-            resultText = "Two Pair"
+            resultText = "Two Pair of ${hand[0].cardRank()}s and ${hand[2].cardRank()}s"
             return
         }
 
         if (isPair()) {
             resultValue = PAIR
-            resultText = "Pair"
+            resultText = "Pair of ${hand[0].cardRank()}s"
             return
         }
 
         highCards()
         resultValue = HIGH_CARD
-        resultText = "High Card"
+        resultText = "High Card ${hand[0].cardRank()}"
     }
 
     private fun isRoyalStraightFlush(): Boolean {
@@ -136,15 +135,15 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
 
         // add highest three of a kind
         if (threeOfAKindList.any { it.key == 0 }) {
-            hand.addAll(threeOfAKindList.removeLast().value)
+            hand.addAll(threeOfAKindList.removeAt(threeOfAKindList.size -1).value)
 
         } else {
-            hand.addAll(threeOfAKindList.removeFirst().value)
+            hand.addAll(threeOfAKindList.removeAt(0).value)
         }
 
         // if there is a pair of Ace
         if (pairList.isNotEmpty() && pairList.any { it.key == 0 }) {
-            hand.addAll(pairList.removeLast().value)
+            hand.addAll(pairList.removeAt(pairList.size - 1).value)
             return true
         } else {
             // if there is another three of a kind
@@ -274,8 +273,8 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
                 hand.addAll(pairList.last().value)
                 hand.addAll(pairList[0].value)
             } else {
-                hand.addAll(pairList.removeFirst().value)
-                hand.addAll(pairList.removeFirst().value)
+                hand.addAll(pairList.removeAt(0).value)
+                hand.addAll(pairList.removeAt(0).value)
             }
             highCards()
             return true
@@ -310,9 +309,9 @@ class Hand(private var playerCards: List<Card>, private var tableCards: List<Car
 
         for (index: Int in hand.size..4) {
             if (otherCards.any { it.rank == ACE }) {
-                hand.add(otherCards.removeFirst())
+                hand.add(otherCards.removeAt(0))
             } else {
-                hand.add(otherCards.removeLast())
+                hand.add(otherCards.removeAt(otherCards.lastIndex))
             }
         }
     }

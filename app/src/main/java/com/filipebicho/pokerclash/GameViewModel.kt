@@ -1,29 +1,42 @@
 package com.filipebicho.pokerclash
 
-import androidx.lifecycle.ViewModel
-import com.filipebicho.pokerclash.bot.ALLIN
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.filipebicho.pokerclash.bot.BET
 import com.filipebicho.pokerclash.bot.CALL
 import com.filipebicho.pokerclash.bot.CHECK
 import com.filipebicho.pokerclash.bot.FOLD
-import com.filipebicho.pokerclash.bot.RAISE
 import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.data.Data.action
 import com.filipebicho.pokerclash.data.Data.betting
+import com.filipebicho.pokerclash.data.Data.botWins
+import com.filipebicho.pokerclash.data.Data.currentBot
 import com.filipebicho.pokerclash.data.Data.init
+import com.filipebicho.pokerclash.data.Data.playerWins
 import com.filipebicho.pokerclash.data.Data.pokerChips
+import com.filipebicho.pokerclash.data.Data.simulatedPlayer
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.filipebicho.pokerclash.data.PokerDataStore
+import com.filipebicho.pokerclash.data.pokerDataStore
+import com.filipebicho.pokerclash.game.Init
+import com.filipebicho.pokerclash.game.Stats
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-
-const val POT = 2
 const val SMALL_BLIND = 20
 const val BIG_BLIND = 40
 
-class GameViewModel : ViewModel() {
-    val uiState: StateFlow<GameUiState> = uiStateFlow.asStateFlow()
+class GameViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val appContext = application.applicationContext
+    val pokerDataStore = PokerDataStore(appContext)
+    val stats = Stats(appContext.pokerDataStore, viewModelScope)
+
+    init {
+        loadStats()
+        init = Init(viewModelScope, stats)
+    }
 
     fun setPlayerName(playerName: String) {
         uiStateFlow.update { currentState ->
@@ -34,14 +47,16 @@ class GameViewModel : ViewModel() {
         }
     }
 
-    fun setBot(bot: Pair<String, String>) {
+    fun setBot(bot: Pair<String, String>, index: Int) {
         uiStateFlow.update { currentState ->
             currentState.copy(
-                botName = bot.first,
-                botModel = bot.second,
+                simulatedPlayerName = bot.first,
                 name = listOf(uiStateFlow.value.playerName, bot.first)
             )
         }
+
+        simulatedPlayer = bot.second
+        currentBot = index
     }
 
     fun startGame() {
@@ -54,27 +69,27 @@ class GameViewModel : ViewModel() {
     fun updatePlayerBet(value: Int) {
         uiStateFlow.update { currentState ->
             currentState.copy(
-                playerBetValue = value,
+                playerCurrentRaise = value,
             )
         }
     }
 
-    fun foldAction() {
+    fun fold() {
         action = FOLD
         betting.fold()
     }
 
-    fun checkAction() {
+    fun check() {
         action = CHECK
         betting.check()
     }
 
-    fun callAction() {
+    fun call() {
         action = CALL
         betting.call()
     }
 
-    fun betAction(value: Int) {
+    fun bet(value: Int) {
         action = BET
         if (pokerChips[PLAYER] - value == 0) {
             betting.allIn()
@@ -83,21 +98,27 @@ class GameViewModel : ViewModel() {
         }
     }
 
-    fun raiseAction(value: Int) {
-        action = RAISE
-        if (pokerChips[PLAYER] - value == 0) {
-            betting.allIn()
-        } else {
-            betting.raise(value)
+    fun toggleGameSummary() {
+        uiStateFlow.update { currentState ->
+            currentState.copy(
+                displaySummary = !currentState.displaySummary,
+            )
         }
     }
 
-    fun allInAction() {
-        action = ALLIN
-        betting.allIn()
-    }
-
-    fun newGame() {
-        init.initGame()
+    private fun loadStats() {
+        viewModelScope.launch {
+            val loadedData = pokerDataStore.getAllStats()
+            stats.handsPlayed = loadedData.handsPlayed
+            stats.voluntarilyPutMoneyInPot = loadedData.voluntarilyPutMoneyInPot
+            stats.preFlopRaises = loadedData.preFlopRaises
+            stats.continuationBet = loadedData.continuationBet
+            stats.continuationBetFaced = loadedData.continuationBetFaced
+            stats.foldsToContinuationBet = loadedData.foldsToContinuationBet
+            stats.riverBets = loadedData.riverBets
+            stats.riverBluffsDetected = loadedData.riverBluffsDetected
+            playerWins = loadedData.playerWins
+            botWins = loadedData.botWins
+        }
     }
 }

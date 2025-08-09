@@ -1,15 +1,16 @@
 package com.filipebicho.pokerclash
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.filipebicho.pokerclash.data.Data.uiState
 import com.filipebicho.pokerclash.ui.BotSelectionScreen
 import com.filipebicho.pokerclash.ui.StartGameScreen
 import com.filipebicho.pokerclash.ui.GameBoardScreen
@@ -28,12 +29,13 @@ fun PokerApp(
     viewModel: GameViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
+    val gameUiState by uiState.collectAsState()
+
     NavHost(
         navController = navController,
-        startDestination = PokerScreen.Game.name,
+        startDestination = PokerScreen.Start.name,
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
     ) {
         composable(route = PokerScreen.Start.name) {
             StartGameScreen(
@@ -45,8 +47,8 @@ fun PokerApp(
         }
         composable(route = PokerScreen.BotSelection.name) {
             BotSelectionScreen(
-                onBotButtonClicked = {
-                    viewModel.setBot(it)
+                onBotSelected = { bot, index ->
+                    viewModel.setBot(bot = bot, index = index)
                     viewModel.startGame()
                     navController.navigate(PokerScreen.Game.name)
                 }
@@ -54,7 +56,7 @@ fun PokerApp(
         }
 
         composable(route = PokerScreen.Game.name) {
-            GameBoardScreen(viewModel)
+            GameBoardScreen(gameUiState, viewModel, navController)
         }
     }
 }

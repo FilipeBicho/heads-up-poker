@@ -35,5 +35,5 @@ class Deck {
     /**
      * Remove card from the top of the deck
      */
-    fun dealCard() = deck.removeLast()
+    fun dealCard() = deck.removeAt(deck.size -1)
 }

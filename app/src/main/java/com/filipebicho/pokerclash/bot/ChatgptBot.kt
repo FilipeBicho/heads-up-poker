@@ -2,20 +2,24 @@ package com.filipebicho.pokerclash.bot
 
 import android.util.Log
 import com.filipebicho.pokerclash.cards.BOT
+import com.filipebicho.pokerclash.cards.Card
 import com.filipebicho.pokerclash.cards.FLOP
 import com.filipebicho.pokerclash.cards.PLAYER
-import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.cards.RIVER
 import com.filipebicho.pokerclash.cards.TURN
-import com.filipebicho.pokerclash.data.Data.action
+import com.filipebicho.pokerclash.data.Data.actionHistory
 import com.filipebicho.pokerclash.data.Data.bet
 import com.filipebicho.pokerclash.data.Data.botCards
 import com.filipebicho.pokerclash.data.Data.dealer
+import com.filipebicho.pokerclash.data.Data.mainPot
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
+import com.filipebicho.pokerclash.data.Data.roundPot
+import com.filipebicho.pokerclash.data.Data.roundText
+import com.filipebicho.pokerclash.data.Data.simulatedPlayer
 import com.filipebicho.pokerclash.data.Data.tableCards
-import com.filipebicho.pokerclash.data.Data.totalPotValue
-import com.filipebicho.pokerclash.data.Data.uiState
+import com.filipebicho.pokerclash.data.Data.validActions
+import com.filipebicho.pokerclash.game.Stats
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONObject
 import retrofit2.Call
@@ -29,16 +33,15 @@ const val FOLD = 0
 const val CHECK = 1
 const val CALL = 2
 const val BET = 3
-const val RAISE = 4
 const val ALLIN = 5
 
-class ChatgptBot {
+class ChatgptBot(private val stats: Stats) {
 
     val retrofit = RetrofitClient.getOpenAiClient()
     var betValue: Int = 0
 
     suspend fun getAction(): Int = suspendCancellableCoroutine { continuation ->
-        val request = ChatRequest(model = uiState.value.botModel, messages = getRequestMessage(), response_format = ResponseFormat(type = "json_object"))
+        val request = ChatRequest(model = "gpt-4o", messages = getRequestMessage(), response_format = ResponseFormat(type = "json_object"))
         retrofit.getChatCompletion(request).enqueue(object : Callback<ChatResponse> {
             override fun onResponse(call: Call<ChatResponse>, response: Response<ChatResponse>) {
                 if (response.isSuccessful) {
@@ -66,21 +69,25 @@ class ChatgptBot {
     }
 
     fun getActionsFromResponse(response: Response<ChatResponse>): Int {
-        val content = response.body()?.choices?.first()?.message?.content
-        if (content != null) {
+        val content = response.body()?.choices?.first()?.message?.content.toString().lowercase()
+        if (content.isNotEmpty()) {
             val jsonContent = JSONObject(content)
-            val actionString = jsonContent.get("action").toString()
-            betValue = jsonContent.get("bet").toString().toInt()
 
-            Log.d("ChatgptBot", "Response: $jsonContent")
+            var actionString = ""
+            if (jsonContent.has("action")) {
+                actionString = jsonContent.get("action").toString()
+            }
+
+            if (jsonContent.has("bet")) {
+                betValue = jsonContent.get("bet").toString().toInt()
+            }
 
             return when (actionString) {
-                "Fold" -> FOLD
-                "Call" -> CALL
-                "Check" -> CHECK
-                "Bet" -> BET
-                "Raise" -> RAISE
-                "All in" -> ALLIN
+                "fold" -> FOLD
+                "call" -> CALL
+                "check" -> CHECK
+                "bet" -> BET
+                "all in" -> ALLIN
                 else -> -1
             }
         }
@@ -89,78 +96,64 @@ class ChatgptBot {
     }
 
     fun getRequestMessage(): List<Message> {
-        val botCard1 = botCards.first().toString()
-        val botCard2 = botCards.last().toString()
+        var currentTableCards = emptyList<Card>()
 
-        var tableCardsString = ""
-        when (round) {
-            FLOP -> tableCards.subList(0,3).forEach { tableCardsString += "$it, " }
-            TURN -> tableCards.subList(0,4).forEach { tableCardsString += "$it, " }
-            RIVER -> tableCards.forEach { tableCardsString += "$it, " }
-            else -> ""
+        currentTableCards = when (round) {
+            FLOP -> tableCards.subList(0,3)
+            TURN -> tableCards.subList(0,4)
+            RIVER -> tableCards
+            else -> emptyList()
         }
 
-        var playerAction = when (action) {
-            NO_ACTION -> "No action"
-            FOLD -> "Fold"
-            CHECK -> "Check"
-            CALL -> "Call"
-            BET -> "Bet ${bet[PLAYER]}"
-            RAISE -> "Raise ${bet[PLAYER]}"
-            ALLIN -> "All in"
-            else -> ""
-        }
+        val opponentStatsPayload = mapOf(
+            "handsPlayed" to stats.handsPlayed,
+            "voluntarilyPutMoneyInPot" to stats.safePercentage(stats.voluntarilyPutMoneyInPot, stats.handsPlayed),
+            "preFlopRaises" to stats.safePercentage(stats.preFlopRaises, stats.handsPlayed),
+            "continuationBet" to stats.safePercentage(stats.continuationBet, stats.preFlopRaises),
+            "continuationBetFaced" to stats.continuationBetFaced,
+            "foldsToContinuationBet" to stats.safePercentage(stats.foldsToContinuationBet, stats.continuationBetFaced),
+            "riverBets" to stats.riverBets,
+            "riverBluffsDetected" to stats.riverBluffsDetected
+        )
 
-        var roundString = when (round) {
-            PRE_FLOP -> "Pre flop"
-            FLOP -> "Flop"
-            TURN -> "Turn"
-            RIVER -> "River"
-            else -> ""
-        }
-
-        val currentPot = bet[PLAYER] + bet[BOT]
-        val totalPot = totalPotValue + currentPot
-
-        val dealer = if (dealer == BOT) "You" else "Opponent"
-
-        Log.d("ChatgptBot", "Request: \"Game type: Heads-up Texas hold'em\\n\" +\n" +
-                "                    \"Your hand: $botCard1, $botCard2\\n\" +\n" +
-                "                    \"Table cards: $tableCardsString\\n\" +\n" +
-                "                    \"Round: $roundString\\n\" +\n" +
-                "                    \"Dealer: $dealer\\n\" +\n" +
-                "                    \"Initial money: 1500\\n\" +\n" +
-                "                    \"Your money: ${pokerChips[BOT]}\\n\" +\n" +
-                "                    \"Opponent money: ${pokerChips[PLAYER]}\\n\" +\n" +
-                "                    \"Your previous bet: ${bet[BOT]}\\n\"+\n" +
-                "                    \"Opponent bet: ${bet[PLAYER]}\\n\"+\n" +
-                "                    \"Current pot round: $currentPot\\n\" +\n" +
-                "                    \"Total pot: $totalPot\\n\" +\n" +
-                "                    \"Opponent action: $playerAction \\n\" +\n" +
-                "                    \"Output: JSON containing only the action and bet\\n\" +\n" +
-                "                    \"Action types: Fold, Check, Call, Bet, Raise, All in\\n\" +\n" +
-                "                    \"Bet: value of the bet\\n\" +\n" +
-                "                    \"Question: What should be my action and Bet?\\n\"")
-
+        val prompt = buildChatPrompt(opponentStatsPayload, currentTableCards)
         return listOf(Message(
             role = "user",
-            content = "Game type: Heads-up Texas hold'em\n" +
-                    "Your hand: $botCard1, $botCard2\n" +
-                    "Table cards: $tableCardsString\n" +
-                    "Round: $roundString\n" +
-                    "Dealer: $dealer\n" +
-                    "Initial money: 1500\n" +
-                    "Your money: ${pokerChips[BOT]}\n" +
-                    "Opponent money: ${pokerChips[PLAYER]}\n" +
-                    "Your previous bet: ${bet[BOT]}\n"+
-                    "Opponent bet: ${bet[PLAYER]}\n"+
-                    "Current pot round: $currentPot\n" +
-                    "Total pot: $totalPot\n" +
-                    "Opponent action: $playerAction \n" +
-                    "Output: JSON containing only the action and bet\n" +
-                    "Action types: Fold, Check, Call, Bet, Raise, All in\n" +
-                    "Bet: value of the bet\n" +
-                    "Question: What should be my action and Bet?\n"
+            content = prompt
         ))
     }
+
+    fun buildChatPrompt(
+        opponentStatsPayload: Map<String, Int>,
+        tableCards: List<Card>,
+    ): String = buildString {
+        appendLine("You are playing Heads-up Texas Hold'em Poker.")
+        appendLine()
+        appendLine("Opponent Stats after ${opponentStatsPayload["handsPlayed"]} hands:")
+        appendLine("- VPIP (Voluntarily Put Money In Pot): ${opponentStatsPayload["voluntarilyPutMoneyInPot"]}%")
+        appendLine("- PFR (Pre-Flop Raise): ${opponentStatsPayload["preFlopRaises"]}%")
+        appendLine("- Continuation Bet Frequency: ${opponentStatsPayload["continuationBet"]}%")
+        appendLine("- Fold to C-Bet: ${opponentStatsPayload["foldsToContinuationBet"]}%")
+        appendLine("- River Bets: ${opponentStatsPayload["riverBets"]}")
+        appendLine("- River Bluffs Detected: ${opponentStatsPayload["riverBluffsDetected"]}")
+        appendLine()
+        appendLine("Current Hand State:")
+        appendLine("- Round: ${roundText[round]}")
+        appendLine("- Your Hand: ${botCards.joinToString(", ") { it.cardString() }}")
+        appendLine("- Board: ${if (tableCards.isEmpty()) "No board yet" else tableCards.joinToString(", ") { it.cardString() }}")
+        appendLine("- Dealer: ${if (dealer == BOT) "You" else "Opponent"}")
+        appendLine("- Pot: ${roundPot + mainPot}, Pot Before Round: ${mainPot}")
+        appendLine("- Your Stack: ${pokerChips[BOT]}, Opponent Stack: ${pokerChips[PLAYER]}")
+        appendLine("- Your Bet This Round: ${bet[BOT]}, Opponent Bet This Round: ${bet[PLAYER]}")
+        appendLine()
+        appendLine("Valid Actions: ${validActions.joinToString(", ")}")
+        appendLine()
+        appendLine("Action History:")
+        actionHistory.forEach { appendLine("- $it") }
+        appendLine()
+        appendLine("Play style: Play as $simulatedPlayer")
+        appendLine("Output: JSON with keys \"action\" and \"bet\"")
+        appendLine("Question: What should be my action and bet?")
+    }
+
 }
