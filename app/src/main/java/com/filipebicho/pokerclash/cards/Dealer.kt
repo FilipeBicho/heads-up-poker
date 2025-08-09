@@ -1,7 +1,6 @@
 package com.filipebicho.pokerclash.cards
 
 import android.annotation.SuppressLint
-import androidx.compose.material3.Card
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
 

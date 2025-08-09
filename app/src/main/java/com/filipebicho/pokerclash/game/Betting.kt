@@ -259,7 +259,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
 
             // Player is all-in by calling
             val allInAmount = pokerChips[player]
-            Log.d("MONEY DEBUG", "All in amount: $allInAmount")
+//            Log.d("MONEY DEBUG", "All in amount: $allInAmount")
 
             bet[player] += allInAmount
             pokerChips[player] = 0
@@ -277,14 +277,14 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
 
             actionHistory += "${roundText[round]}: ${actionPlayer[player]} make call all-in with $allInAmount"
 
-            bettingLog("--- AFTER CALL (all in) $playerName ---")
+//            bettingLog("--- AFTER CALL (all in) $playerName ---")
 
             updateStateFlowBets()
             gameRound.showdownCards()
         } else {
 
-            bettingLog("--- BEFORE CALL $playerName ---")
-            Log.d("MONEY DEBUG", "Amount to call: $amountToCall")
+//            bettingLog("--- BEFORE CALL $playerName ---")
+//            Log.d("MONEY DEBUG", "Amount to call: $amountToCall")
 
             // Player has enough chips to call normally
             pokerChips[player] -= amountToCall
@@ -318,24 +318,24 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
         val previousBetAmount = bet[player]
         val playerTotalStake = pokerChips[player] + previousBetAmount
 
-        bettingLog("--- BEFORE BET $playerName ---")
-        Log.d("MONEY DEBUG", "New bet amount: $newBetAmount")
-        Log.d("MONEY DEBUG", "Previous bet amount: $previousBetAmount")
-        Log.d("MONEY DEBUG", "Player total stake: $playerTotalStake")
+//        bettingLog("--- BEFORE BET $playerName ---")
+//        Log.d("MONEY DEBUG", "New bet amount: $newBetAmount")
+//        Log.d("MONEY DEBUG", "Previous bet amount: $previousBetAmount")
+//        Log.d("MONEY DEBUG", "Player total stake: $playerTotalStake")
 
         checkAvailable = false
         if (player == BOT)
             botLastRaise = newBetAmount - bet[BOT]
 
         if (newBetAmount > playerTotalStake) {
-            Log.d("MONEY DEBUG", "All in: $playerTotalStake")
+//            Log.d("MONEY DEBUG", "All in: $playerTotalStake")
             allIn()
         } else {
             val opponentTotalStake = pokerChips[opponent] + bet[opponent]
-            Log.d("MONEY DEBUG", "Opponent total stake: $playerTotalStake")
+//            Log.d("MONEY DEBUG", "Opponent total stake: $playerTotalStake")
             if (newBetAmount >= opponentTotalStake) {
                 // Player bets more than or equal to opponent's total stack, opponent will be all-in if they call
-                Log.d("MONEY DEBUG", "Bet equals opponent total stack: $playerTotalStake")
+//                Log.d("MONEY DEBUG", "Bet equals opponent total stack: $playerTotalStake")
                 bet[player] = opponentTotalStake
             } else {
                 bet[player] = newBetAmount
@@ -376,15 +376,15 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
 
         checkAvailable = false
 
-        bettingLog("--- BEFORE ALL IN $playerName ---")
-        Log.d("MONEY DEBUG", "Previous bet amount: $previousBetAmount")
+//        bettingLog("--- BEFORE ALL IN $playerName ---")
+//        Log.d("MONEY DEBUG", "Previous bet amount: $previousBetAmount")
 
         // bet all chips
         bet[player] = if (playerTotalStake > opponentTotalStake) {
-            Log.d("MONEY DEBUG", "ALL IN equals opponent total stack: $opponentTotalStake")
+//            Log.d("MONEY DEBUG", "ALL IN equals opponent total stack: $opponentTotalStake")
             opponentTotalStake
         } else {
-            Log.d("MONEY DEBUG", "ALL IN equals player total stack: $playerTotalStake")
+//            Log.d("MONEY DEBUG", "ALL IN equals player total stack: $playerTotalStake")
             playerTotalStake
         }
 

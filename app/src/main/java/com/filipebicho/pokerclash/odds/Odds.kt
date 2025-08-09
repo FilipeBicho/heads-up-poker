@@ -1,17 +1,12 @@
 package com.filipebicho.pokerclash.odds
 
-import android.util.Log
 import com.filipebicho.pokerclash.cards.BOT
 import com.filipebicho.pokerclash.cards.Card
 import com.filipebicho.pokerclash.cards.Deck
 import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.hand.Hand
 import com.filipebicho.pokerclash.hand.HandWinnerCalculator
-import com.filipebicho.pokerclash.hand.RESULT
 import kotlin.math.roundToInt
-import kotlin.random.Random
-
-const val MAX_COMBINATIONS = 1000
 
 class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
 
@@ -122,15 +117,19 @@ class Odds(private var allCombinations: MutableList<ArrayList<Card>>) {
         val botHand = Hand(opponentCards, tableCards)
         val winner = HandWinnerCalculator(player1Hand = playerHand, player2Hand = botHand).getWinner()
 
-        if (winner == PLAYER) {
-            showdownPlayerOdds = 100
-            showdownOpponentOdds = 0
-        } else if (winner == BOT) {
-            showdownPlayerOdds = 0
-            showdownOpponentOdds = 100
-        } else {
-            showdownPlayerOdds = 50
-            showdownOpponentOdds = 50
+        when (winner) {
+            PLAYER -> {
+                showdownPlayerOdds = 100
+                showdownOpponentOdds = 0
+            }
+            BOT -> {
+                showdownPlayerOdds = 0
+                showdownOpponentOdds = 100
+            }
+            else -> {
+                showdownPlayerOdds = 50
+                showdownOpponentOdds = 50
+            }
         }
     }
 

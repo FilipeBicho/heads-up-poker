@@ -10,7 +10,6 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.filipebicho.pokerclash.data.Data.botOptions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 
 val Context.pokerDataStore: DataStore<Preferences> by preferencesDataStore(name = "data_store_poker")

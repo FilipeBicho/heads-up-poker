@@ -1,18 +1,22 @@
 package com.filipebicho.pokerclash.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.filipebicho.pokerclash.Background
 import com.filipebicho.pokerclash.data.GameUiState
 import com.filipebicho.pokerclash.GameViewModel
+import com.filipebicho.pokerclash.R
 import com.filipebicho.pokerclash.ui.gamescreen.BotSection
 import com.filipebicho.pokerclash.ui.gamescreen.GameSection
 import com.filipebicho.pokerclash.ui.gamescreen.PlayerSection
+import com.filipebicho.pokerclash.ui.theme.PokerTheme
 
 @Composable
 fun GameBoardScreen(
@@ -73,4 +77,15 @@ fun BottomRow(
         gameViewModel = gameViewModel,
         modifier = modifier
     )
+}
+
+@Composable
+fun Background() {
+    PokerTheme {
+        Image(
+            painter = painterResource(id = R.drawable.background),
+            contentScale = ContentScale.FillBounds,
+            contentDescription = "Background",
+        )
+    }
 }
