@@ -162,19 +162,19 @@ class Round(var coroutineScope: CoroutineScope, private val stats: Stats) {
         when (winner) {
             PLAYER -> {
                 pokerChips[PLAYER] += mainPot
-                actionText[PLAYER] = "Wins $mainPot"
+                actionText[PLAYER] = "wins $mainPot"
                 gameSummaryList += "$playerName wins $mainPot"
             }
             BOT -> {
                 pokerChips[BOT] += mainPot
-                actionText[BOT] = "Wins $mainPot"
+                actionText[BOT] = "wins $mainPot"
                 gameSummaryList += "$botName wins $mainPot"
             }
             else -> {
                 pokerChips[PLAYER] += mainPot / 2
                 pokerChips[BOT] += mainPot / 2
-                actionText[PLAYER] = "Wins ${mainPot / 2}"
-                actionText[BOT] = "Wins ${mainPot / 2}"
+                actionText[PLAYER] = "wins ${mainPot / 2}"
+                actionText[BOT] = "wins ${mainPot / 2}"
                 gameSummaryList += "Split pot with value $mainPot"
             }
         }
