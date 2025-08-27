@@ -72,13 +72,13 @@ class ChatgptBot(private val stats: Stats) {
         val content = response.body()?.choices?.first()?.message?.content.toString().lowercase()
         if (content.isNotEmpty()) {
             val jsonContent = JSONObject(content)
-
+            Log.d("ChatgptBot", "Response: $jsonContent")
             var actionString = ""
             if (jsonContent.has("action")) {
                 actionString = jsonContent.get("action").toString()
             }
 
-            if (jsonContent.has("bet")) {
+            if (jsonContent.has("bet") && jsonContent.get("bet") != null) {
                 betValue = jsonContent.get("bet").toString().toInt()
             }
 

@@ -57,7 +57,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
          if (pokerChips[blind] <= BIG_BLIND) {
              if (pokerChips[blind] <= SMALL_BLIND) {
 
-                 bettingLog("--- BEFORE BLIND (small blind) All in ---")
+                 //bettingLog("--- BEFORE BLIND (small blind) All in ---")
 
                  // blind makes all in
                  bet[blind] = pokerChips[blind]
@@ -79,13 +79,13 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
                  actionHistory += "${roundText[round]}: ${actionPlayer[blind]} make all-in with ${bet[blind]}"
                  actionHistory += "${roundText[round]}: ${actionPlayer[dealer]} call all-in with ${bet[blind]}"
 
-                 bettingLog("--- AFTER BLIND (small blind) All in ---")
+                 //bettingLog("--- AFTER BLIND (small blind) All in ---")
 
                  updateStateFlowBets()
                  gameRound.showdownCards()
              } else {
 
-                 bettingLog("--- BEFORE BLIND (big blind) All in ---")
+                 //bettingLog("--- BEFORE BLIND (big blind) All in ---")
 
                  // blind makes all in
                  bet[blind] = pokerChips[blind]
@@ -107,7 +107,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
                  actionHistory += "${roundText[round]}: ${actionPlayer[blind]} make all-in with ${bet[blind]}"
                  actionHistory += "${roundText[round]}: ${actionPlayer[dealer]} call all-in with ${bet[blind]}"
 
-                 bettingLog("--- AFTER BLIND (big blind) All in ---")
+                 //bettingLog("--- AFTER BLIND (big blind) All in ---")
 
                  player = dealer
                  updateStateFlowBets()
@@ -115,7 +115,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
              }
          } else if (pokerChips[dealer] <= SMALL_BLIND) {
 
-             bettingLog("--- BEFORE DEALER (small blind) All in ---")
+             //bettingLog("--- BEFORE DEALER (small blind) All in ---")
 
              // dealer makes all in
              bet[dealer] = pokerChips[dealer]
@@ -137,13 +137,13 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
              actionHistory += "${roundText[round]}: ${actionPlayer[dealer]} make all-in with ${bet[dealer]}"
              actionHistory += "${roundText[round]}: ${actionPlayer[blind]} call all-in with ${bet[blind]}"
 
-             bettingLog("--- AFTER DEALER (small blind) All in ---")
+             //bettingLog("--- AFTER DEALER (small blind) All in ---")
 
              updateStateFlowBets()
              gameRound.showdownCards()
          } else {
 
-             bettingLog("--- BEFORE PRE FLOP ---")
+             //bettingLog("--- BEFORE PRE FLOP ---")
 
              // dealer pay small blind
              bet[dealer] = SMALL_BLIND
@@ -165,7 +165,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
              actionText[dealer] = "SB"
              actionText[blind] = "BB"
 
-             bettingLog("--- AFTER PRE FLOP ---")
+             //bettingLog("--- AFTER PRE FLOP ---")
 
              updateStateFlowBets()
              player = dealer
@@ -177,7 +177,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
         val playerName = uiStateFlow.value.name[player]
         val opponentName = uiStateFlow.value.name[opponent]
 
-        bettingLog("--- BEFORE FOLD $playerName ---")
+        //bettingLog("--- BEFORE FOLD $playerName ---")
 
         // opponent wins the pot
         val totalPotWonByOpponent = mainPot + roundPot
@@ -192,7 +192,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
         actionHistory += "${roundText[round]}: ${actionPlayer[player]} make fold"
         actionHistory += "${roundText[round]}: ${actionPlayer[opponent]} win $totalPotWonByOpponent"
 
-        bettingLog("--- AFTER FOLD $playerName ---")
+        //bettingLog("--- AFTER FOLD $playerName ---")
 
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
 
@@ -220,14 +220,14 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
     fun check() {
         val playerName = uiStateFlow.value.name[player]
 
-        bettingLog("--- BEFORE CHECK $playerName ---")
+        //bettingLog("--- BEFORE CHECK $playerName ---")
 
         gameSummaryList += "$playerName checks"
         actionText[player] = "Check"
 
         actionHistory += "${roundText[round]}: ${actionPlayer[player]} make check"
 
-        bettingLog("--- AFTER CHECK $playerName ---")
+        //bettingLog("--- AFTER CHECK $playerName ---")
 
         gameSummaryMap[gameNumber] = gameSummaryList.toList()
         uiStateFlow.update { currentState ->
@@ -254,7 +254,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
 
         if (pokerChips[player] <= amountToCall) {
 
-            bettingLog("--- BEFORE CALL (all in) $playerName ---")
+            //bettingLog("--- BEFORE CALL (all in) $playerName ---")
             Log.d("MONEY DEBUG", "Amount to call: $amountToCall")
 
             // Player is all-in by calling
@@ -295,7 +295,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
 
             actionHistory += "${roundText[round]}: ${actionPlayer[player]} call $amountToCall"
 
-            bettingLog("--- AFTER CALL $playerName ---")
+            //bettingLog("--- AFTER CALL $playerName ---")
 
             updateStateFlowBets()
 
@@ -355,7 +355,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
             else
                 "${roundText[round]}: ${actionPlayer[player]} raise to $newBetAmount}"
 
-            bettingLog("--- AFTER BET $playerName ---")
+            //bettingLog("--- AFTER BET $playerName ---")
 
             updateStateFlowBets()
             switchPlayerTurn()
@@ -399,7 +399,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
 
         actionHistory += "${roundText[round]}: ${actionPlayer[player]} make all-in with ${bet[player]}"
 
-        bettingLog("--- AFTER ALL IN $playerName ---")
+        //bettingLog("--- AFTER ALL IN $playerName ---")
 
         updateStateFlowBets()
         switchPlayerTurn()
@@ -544,7 +544,12 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
                 ALLIN -> {
                     allIn()
                 }
-                else -> null
+                else ->
+                    when(validActions[0]) {
+                        "Fold" -> fold()
+                        "Check" -> check()
+                        "Call" -> call()
+                    }
             }
         }
     }
