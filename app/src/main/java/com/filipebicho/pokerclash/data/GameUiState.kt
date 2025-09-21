@@ -56,6 +56,10 @@ data class GameUiState(
     val displayGameResult: Boolean = false,
     val winner: Int = -1,
     val displayFold: Boolean = false,
+    val level: Int = 1,
+    val levelTimer: String = "",
+    val displayLevelTimer: Boolean = false,
+    val levelUp: Boolean = false,
 
     // Display Bet Buttons
     val displayFoldButton: Boolean = false,

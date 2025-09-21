@@ -52,6 +52,7 @@ import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.hand.Hand
 import kotlinx.coroutines.delay
 import kotlin.collections.joinToString
+import kotlin.concurrent.timer
 
 @Composable
 fun GameSection(
@@ -92,6 +93,12 @@ private fun TopSection(gameUiState: GameUiState) {
         )
         Spacer(modifier = Modifier.height(40.dp))
         RoundPot(roundPot = gameUiState.roundPot, display = gameUiState.displayPot)
+        if (gameUiState.displayLevelTimer) {
+            LevelTimer(
+                level = gameUiState.level,
+                timer = gameUiState.levelTimer,
+                levelUp = gameUiState.levelUp)
+        }
     }
 }
 
@@ -103,7 +110,7 @@ private fun MiddleSection(
     modifier: Modifier) {
     Box(
         modifier = modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.TopCenter
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
@@ -143,7 +150,7 @@ private fun BottomSection(gameUiState: GameUiState, modifier: Modifier) {
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             if (!gameUiState.newGame) {
                 MainPot(pot = gameUiState.mainPot, display = gameUiState.displayPot)
@@ -287,6 +294,36 @@ private fun RoundPot(roundPot: Int, display: Boolean) {
             fontSize = 10.sp,
             text = "$roundPot"
         )
+    }
+}
+
+@Composable
+private fun LevelTimer(
+    level: Int,
+    timer: String,
+    levelUp: Boolean
+) {
+    Row {
+        if (levelUp) {
+            Text(
+                text = "Blinds will be increase next round",
+                color = Color.LightGray,
+                fontSize = 12.sp
+            )
+        } else {
+            Text(
+                text = "Level $level",
+                color = Color.White,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = timer,
+                color = Color.LightGray,
+                fontSize = 12.sp
+            )
+        }
     }
 }
 

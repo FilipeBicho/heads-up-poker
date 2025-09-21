@@ -10,9 +10,11 @@ import com.filipebicho.pokerclash.cards.TURN
 import com.filipebicho.pokerclash.data.Data.actionHistory
 import com.filipebicho.pokerclash.data.Data.actionPlayer
 import com.filipebicho.pokerclash.data.Data.actionText
+import com.filipebicho.pokerclash.data.Data.activeLevelTimer
 import com.filipebicho.pokerclash.data.Data.botCards
 import com.filipebicho.pokerclash.data.Data.botWins
 import com.filipebicho.pokerclash.data.Data.currentBot
+import com.filipebicho.pokerclash.data.Data.displayLevelTimerJob
 import com.filipebicho.pokerclash.data.Data.gameNumber
 import com.filipebicho.pokerclash.data.Data.gameSummaryList
 import com.filipebicho.pokerclash.data.Data.gameSummaryMap
@@ -25,7 +27,7 @@ import com.filipebicho.pokerclash.data.Data.playerCards
 import com.filipebicho.pokerclash.data.Data.playerWins
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
-import com.filipebicho.pokerclash.data.Data.roundPot
+                                                                                                                                                                                                                 import com.filipebicho.pokerclash.data.Data.roundPot
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.hand.Hand
@@ -214,6 +216,16 @@ class Round(var coroutineScope: CoroutineScope, private val stats: Stats) {
 
             coroutineScope.launch {
                 stats.updateStatsAfterHand()
+
+                // cancel level timer
+                activeLevelTimer = false
+                displayLevelTimerJob?.cancel()
+                displayLevelTimerJob = null
+
+                uiStateFlow.update { currentState -> currentState.copy(
+                    displayLevelTimer = false,
+                )}
+
                 delay(4000)
                 uiStateFlow.update { currentState -> currentState.copy(
                     newGame = true,

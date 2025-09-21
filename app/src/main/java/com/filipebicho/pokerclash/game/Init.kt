@@ -1,5 +1,6 @@
 package com.filipebicho.pokerclash.game
 
+import java.util.Locale
 import com.filipebicho.pokerclash.bot.ChatgptBot
 import com.filipebicho.pokerclash.bot.NO_ACTION
 import com.filipebicho.pokerclash.cards.BOT
@@ -8,6 +9,7 @@ import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.data.Data.action
 import com.filipebicho.pokerclash.data.Data.actionHistory
+import com.filipebicho.pokerclash.data.Data.activeLevelTimer
 import com.filipebicho.pokerclash.data.Data.bet
 import com.filipebicho.pokerclash.data.Data.betting
 import com.filipebicho.pokerclash.data.Data.blind
@@ -19,9 +21,12 @@ import com.filipebicho.pokerclash.data.Data.botWins
 import com.filipebicho.pokerclash.data.Data.chatGptBot
 import com.filipebicho.pokerclash.data.Data.currentBot
 import com.filipebicho.pokerclash.data.Data.dealer
+import com.filipebicho.pokerclash.data.Data.displayLevelTimerJob
 import com.filipebicho.pokerclash.data.Data.gameNumber
 import com.filipebicho.pokerclash.data.Data.gameSummaryList
 import com.filipebicho.pokerclash.data.Data.gameSummaryMap
+import com.filipebicho.pokerclash.data.Data.level
+import com.filipebicho.pokerclash.data.Data.levelUp
 import com.filipebicho.pokerclash.data.Data.mainPot
 import com.filipebicho.pokerclash.data.Data.odds
 import com.filipebicho.pokerclash.data.Data.opponent
@@ -37,13 +42,35 @@ import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.odds.Combinations
 import com.filipebicho.pokerclash.odds.Odds
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlin.text.format
+import kotlin.time.Duration.Companion.seconds
 
-class Init(coroutineScope: CoroutineScope, stats: Stats) {
+class Init(var coroutineScope: CoroutineScope, stats: Stats) {
 
     init {
         betting = Betting(coroutineScope, stats)
         chatGptBot = ChatgptBot(stats)
+    }
+
+    private fun blindTimer(roundSeconds: kotlin.time.Duration = 1.seconds): Flow<Int> = flow {
+        var count = 0
+        while (activeLevelTimer) {
+            emit(count)
+            delay(roundSeconds)
+            count++
+
+            if (count >= 5) {
+                levelUp = true
+                count = 0
+                uiStateFlow.update { currentState -> currentState.copy(
+                    levelUp = levelUp
+                )}
+            }
+        }
     }
 
     private fun dealCards() {
@@ -125,6 +152,8 @@ class Init(coroutineScope: CoroutineScope, stats: Stats) {
             newGame = false,
             dealer = dealer,
             displayGameResult = false,
+            displayLevelTimer = true,
+            level = level,
             winner = -1,
             winningHand = null,
             displayFold = false,
@@ -140,6 +169,21 @@ class Init(coroutineScope: CoroutineScope, stats: Stats) {
     fun initGame() {
         pokerChips[PLAYER] = playerMoney
         pokerChips[BOT] = botMoney
+
+        activeLevelTimer = true
+        displayLevelTimerJob?.cancel()
+        displayLevelTimerJob = coroutineScope.launch {
+            blindTimer().onEach { secondsPassed ->
+                val minutes = secondsPassed / 60
+                val seconds = secondsPassed % 60
+                val formattedTime = String.format(Locale.UK, "%02d:%02d", minutes, seconds)
+
+                uiStateFlow.update { currentState -> currentState.copy(
+                    levelTimer = formattedTime
+                )}
+            }.collect()
+        }
+
         newGame()
     }
 

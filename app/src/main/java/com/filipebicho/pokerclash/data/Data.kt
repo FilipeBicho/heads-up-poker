@@ -10,6 +10,7 @@ import com.filipebicho.pokerclash.game.Betting
 import com.filipebicho.pokerclash.game.Init
 import com.filipebicho.pokerclash.game.Round
 import com.filipebicho.pokerclash.odds.Odds
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -83,4 +84,10 @@ object Data {
     // Summary
     var gameSummaryMap: MutableList<List<String>> = ArrayList()
     var gameSummaryList: MutableList<String> = mutableListOf()
+
+    // Blinds
+    var level: Int = 1
+    var levelUp: Boolean = false
+    var activeLevelTimer: Boolean = false
+    var displayLevelTimerJob: Job? = null
 }
