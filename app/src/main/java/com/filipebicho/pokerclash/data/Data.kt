@@ -50,6 +50,8 @@ object Data {
     var actionText : MutableList<String> = mutableListOf("", "")
 
     // Money
+    var smallBlind = 20
+    var bigBlind = 40
     var playerMoney = 1500
     var botMoney = 1500
     var pokerChips: MutableList<Int> = mutableListOf(0,0)

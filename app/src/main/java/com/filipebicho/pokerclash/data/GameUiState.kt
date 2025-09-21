@@ -34,6 +34,7 @@ data class GameUiState(
     val mainPot: Int = 0,
     val roundPot: Int = 0,
     val displayPot: Boolean = true,
+    val bigBlind: Int = 0,
 
     // Cards
     val playerCards: List<Card> = ArrayList(),

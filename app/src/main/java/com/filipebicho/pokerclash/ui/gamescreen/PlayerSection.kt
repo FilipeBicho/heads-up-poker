@@ -159,7 +159,7 @@ private fun SmallBetButtonsSection(
         )
         SmallBetButton(
             text = "3 BB",
-            onClick = {gameViewModel.updatePlayerBet(3 * BIG_BLIND)},
+            onClick = {gameViewModel.updatePlayerBet(3 * gameUiState.bigBlind)},
             enabled = enabled && gameUiState.display3BBSmallButton,
             modifier = Modifier.weight(1f)
         )

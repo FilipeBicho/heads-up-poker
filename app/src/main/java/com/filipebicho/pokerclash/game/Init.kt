@@ -12,6 +12,7 @@ import com.filipebicho.pokerclash.data.Data.actionHistory
 import com.filipebicho.pokerclash.data.Data.activeLevelTimer
 import com.filipebicho.pokerclash.data.Data.bet
 import com.filipebicho.pokerclash.data.Data.betting
+import com.filipebicho.pokerclash.data.Data.bigBlind
 import com.filipebicho.pokerclash.data.Data.blind
 import com.filipebicho.pokerclash.data.Data.botMoney
 import com.filipebicho.pokerclash.data.Data.cardDealer
@@ -37,6 +38,7 @@ import com.filipebicho.pokerclash.data.Data.playerWins
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
+import com.filipebicho.pokerclash.data.Data.smallBlind
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.odds.Combinations
@@ -56,16 +58,19 @@ class Init(var coroutineScope: CoroutineScope, stats: Stats) {
         chatGptBot = ChatgptBot(stats)
     }
 
-    private fun blindTimer(roundSeconds: kotlin.time.Duration = 1.seconds): Flow<Int> = flow {
+    private fun blindTimer(): Flow<Int> = flow {
         var count = 0
         while (activeLevelTimer) {
             emit(count)
-            delay(roundSeconds)
+            delay(1.seconds)
             count++
 
-            if (count >= 5) {
-                levelUp = true
+            if (levelUp) {
                 count = 0
+            }
+
+            if (count >= 300) {
+                levelUp = true
                 uiStateFlow.update { currentState -> currentState.copy(
                     levelUp = levelUp
                 )}
@@ -116,6 +121,14 @@ class Init(var coroutineScope: CoroutineScope, stats: Stats) {
         roundPot = 0
         mainPot = 0
 
+        if (levelUp) {
+            level += 1
+            levelUp = false
+            activeLevelTimer = true
+            smallBlind *= 2
+            bigBlind *= 2
+        }
+
         checkAvailable = true
         gameSummaryList.clear()
 
@@ -144,6 +157,7 @@ class Init(var coroutineScope: CoroutineScope, stats: Stats) {
             playerMinRaise = 0,
             mainPot = 0,
             roundPot = 0,
+            bigBlind = bigBlind,
             gameSummary = gameSummaryMap,
             playerHandResult = "",
             playerOdds = -1,
@@ -154,6 +168,7 @@ class Init(var coroutineScope: CoroutineScope, stats: Stats) {
             displayGameResult = false,
             displayLevelTimer = true,
             level = level,
+            levelUp = levelUp,
             winner = -1,
             winningHand = null,
             displayFold = false,

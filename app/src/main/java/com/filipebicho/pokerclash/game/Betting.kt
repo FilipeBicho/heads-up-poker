@@ -1,8 +1,6 @@
 package com.filipebicho.pokerclash.game
 
 import android.util.Log
-import com.filipebicho.pokerclash.BIG_BLIND
-import com.filipebicho.pokerclash.SMALL_BLIND
 import com.filipebicho.pokerclash.bot.ALLIN
 import com.filipebicho.pokerclash.bot.BET
 import com.filipebicho.pokerclash.bot.CALL
@@ -20,6 +18,7 @@ import com.filipebicho.pokerclash.data.Data.actionHistory
 import com.filipebicho.pokerclash.data.Data.actionPlayer
 import com.filipebicho.pokerclash.data.Data.actionText
 import com.filipebicho.pokerclash.data.Data.bet
+import com.filipebicho.pokerclash.data.Data.bigBlind
 import com.filipebicho.pokerclash.data.Data.blind
 import com.filipebicho.pokerclash.data.Data.botLastRaise
 import com.filipebicho.pokerclash.data.Data.chatGptBot
@@ -37,6 +36,7 @@ import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
 import com.filipebicho.pokerclash.data.Data.roundText
+import com.filipebicho.pokerclash.data.Data.smallBlind
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.data.Data.validActions
 import kotlinx.coroutines.flow.update
@@ -54,8 +54,8 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
         val blindName = uiStateFlow.value.name[player]
         val dealerName = uiStateFlow.value.name[opponent]
 
-         if (pokerChips[blind] <= BIG_BLIND) {
-             if (pokerChips[blind] <= SMALL_BLIND) {
+         if (pokerChips[blind] <= bigBlind) {
+             if (pokerChips[blind] <= smallBlind) {
 
                  //bettingLog("--- BEFORE BLIND (small blind) All in ---")
 
@@ -92,7 +92,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
                  pokerChips[blind] = 0
 
                  // dealer pay small blind
-                 bet[dealer] = SMALL_BLIND
+                 bet[dealer] = smallBlind
                  pokerChips[dealer] -= bet[dealer]
 
                  // calculate pot
@@ -113,7 +113,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
                  updateStateFlowBets()
                  foldCall()
              }
-         } else if (pokerChips[dealer] <= SMALL_BLIND) {
+         } else if (pokerChips[dealer] <= smallBlind) {
 
              //bettingLog("--- BEFORE DEALER (small blind) All in ---")
 
@@ -146,11 +146,11 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
              //bettingLog("--- BEFORE PRE FLOP ---")
 
              // dealer pay small blind
-             bet[dealer] = SMALL_BLIND
+             bet[dealer] = smallBlind
              pokerChips[dealer] -= bet[dealer]
 
              // blind pay big blind
-             bet[blind] = BIG_BLIND
+             bet[blind] = bigBlind
              pokerChips[blind] -= bet[blind]
 
              // calculate pot
@@ -470,12 +470,12 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
 
         // Pre-flop: if both bets are zero (new hand)
         if (botBet == 0 && playerBet == 0) {
-            return BIG_BLIND
+            return bigBlind
         }
 
         // No previous raise (bot just called BB)
-        if (botBet == BIG_BLIND) {
-            return BIG_BLIND * 2
+        if (botBet == bigBlind) {
+            return bigBlind * 2
         }
 
         // There was a previous raise — use lastRaiseAmount
@@ -501,7 +501,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
     }
 
     private fun is3BBBetAvailable(): Boolean {
-        return getMinRaiseForPlayer() <= BIG_BLIND * 3 && pokerChips[PLAYER] >= BIG_BLIND * 3
+        return getMinRaiseForPlayer() <= bigBlind * 3 && pokerChips[PLAYER] >= bigBlind * 3
     }
 
     private fun isPotBetAvailable(): Boolean {
@@ -519,7 +519,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
         return if (bet[BOT] > 0 && pokerChips[PLAYER] <= bet[BOT] * 2) {
             true
         } else {
-            pokerChips[PLAYER] >= BIG_BLIND
+            pokerChips[PLAYER] >= bigBlind
         }
     }
 
