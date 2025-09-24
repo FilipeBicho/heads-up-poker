@@ -9,6 +9,7 @@ import com.filipebicho.pokerclash.cards.RIVER
 import com.filipebicho.pokerclash.cards.TURN
 import com.filipebicho.pokerclash.data.Data.actionHistory
 import com.filipebicho.pokerclash.data.Data.bet
+import com.filipebicho.pokerclash.data.Data.bigBlind
 import com.filipebicho.pokerclash.data.Data.botCards
 import com.filipebicho.pokerclash.data.Data.dealer
 import com.filipebicho.pokerclash.data.Data.mainPot
@@ -17,8 +18,10 @@ import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
 import com.filipebicho.pokerclash.data.Data.roundText
 import com.filipebicho.pokerclash.data.Data.simulatedPlayer
+import com.filipebicho.pokerclash.data.Data.smallBlind
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.validActions
+import com.filipebicho.pokerclash.data.LEVEL_TIMER
 import com.filipebicho.pokerclash.game.Stats
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONObject
@@ -117,6 +120,9 @@ class ChatgptBot(private val stats: Stats) {
         )
 
         val prompt = buildChatPrompt(opponentStatsPayload, currentTableCards)
+
+        Log.d("ChatgptBot", "Prompt: $prompt")
+
         return listOf(Message(
             role = "user",
             content = prompt
@@ -138,6 +144,10 @@ class ChatgptBot(private val stats: Stats) {
         appendLine("- River Bluffs Detected: ${opponentStatsPayload["riverBluffsDetected"]}")
         appendLine()
         appendLine("Current Hand State:")
+        appendLine("- Small Blind: $smallBlind")
+        appendLine("- Big Blind: $bigBlind")
+        appendLine("- Blind level time: $LEVEL_TIMER seconds")
+        appendLine("- Round: ${roundText[round]}")
         appendLine("- Round: ${roundText[round]}")
         appendLine("- Your Hand: ${botCards.joinToString(", ") { it.cardString() }}")
         appendLine("- Board: ${if (tableCards.isEmpty()) "No board yet" else tableCards.joinToString(", ") { it.cardString() }}")

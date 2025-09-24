@@ -311,18 +311,27 @@ private fun LevelTimer(
                 fontSize = 12.sp
             )
         } else {
-            Text(
-                text = "Level $level",
-                color = Color.White,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = timer,
-                color = Color.LightGray,
-                fontSize = 12.sp
-            )
+            if (level == 10) {
+                Text(
+                    text = "Level Max",
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            } else {
+                Text(
+                    text = "Level $level",
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = timer,
+                    color = Color.LightGray,
+                    fontSize = 12.sp
+                )
+            }
         }
     }
 }

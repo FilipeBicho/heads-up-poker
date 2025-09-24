@@ -9,11 +9,11 @@ import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.cards.PRE_FLOP
 import com.filipebicho.pokerclash.data.Data.action
 import com.filipebicho.pokerclash.data.Data.actionHistory
-import com.filipebicho.pokerclash.data.Data.activeLevelTimer
 import com.filipebicho.pokerclash.data.Data.bet
 import com.filipebicho.pokerclash.data.Data.betting
 import com.filipebicho.pokerclash.data.Data.bigBlind
 import com.filipebicho.pokerclash.data.Data.blind
+import com.filipebicho.pokerclash.data.Data.blindLevels
 import com.filipebicho.pokerclash.data.Data.botMoney
 import com.filipebicho.pokerclash.data.Data.cardDealer
 import com.filipebicho.pokerclash.data.Data.checkAvailable
@@ -41,6 +41,8 @@ import com.filipebicho.pokerclash.data.Data.roundPot
 import com.filipebicho.pokerclash.data.Data.smallBlind
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
+import com.filipebicho.pokerclash.data.INITIAL_MONEY
+import com.filipebicho.pokerclash.data.LEVEL_TIMER
 import com.filipebicho.pokerclash.odds.Combinations
 import com.filipebicho.pokerclash.odds.Odds
 import kotlinx.coroutines.CoroutineScope
@@ -60,16 +62,12 @@ class Init(var coroutineScope: CoroutineScope, stats: Stats) {
 
     private fun blindTimer(): Flow<Int> = flow {
         var count = 0
-        while (activeLevelTimer) {
+        while (!levelUp) {
             emit(count)
             delay(1.seconds)
             count++
 
-            if (levelUp) {
-                count = 0
-            }
-
-            if (count >= 300) {
+            if (count >= LEVEL_TIMER) {
                 levelUp = true
                 uiStateFlow.update { currentState -> currentState.copy(
                     levelUp = levelUp
@@ -121,12 +119,11 @@ class Init(var coroutineScope: CoroutineScope, stats: Stats) {
         roundPot = 0
         mainPot = 0
 
-        if (levelUp) {
+        if (levelUp && level < 10) {
             level += 1
             levelUp = false
-            activeLevelTimer = true
-            smallBlind *= 2
-            bigBlind *= 2
+            smallBlind = blindLevels[level]?.smallBlind ?: 40
+            bigBlind = blindLevels[level]?.bigBlind ?: 20
         }
 
         checkAvailable = true
@@ -178,15 +175,18 @@ class Init(var coroutineScope: CoroutineScope, stats: Stats) {
         )}
     }
 
-    /**
-     * Called at the begin of a new game
-     */
-    fun initGame() {
-        pokerChips[PLAYER] = playerMoney
-        pokerChips[BOT] = botMoney
+    fun initLevelTimer() {
 
-        activeLevelTimer = true
-        displayLevelTimerJob?.cancel()
+        // max level
+        if (bigBlind >= INITIAL_MONEY) {
+            return
+        }
+
+        if (displayLevelTimerJob != null && displayLevelTimerJob!!.isActive) {
+            return
+        }
+
+        levelUp = false
         displayLevelTimerJob = coroutineScope.launch {
             blindTimer().onEach { secondsPassed ->
                 val minutes = secondsPassed / 60
@@ -198,13 +198,25 @@ class Init(var coroutineScope: CoroutineScope, stats: Stats) {
                 )}
             }.collect()
         }
+    }
 
+    /**
+     * Called at the begin of a new game
+     */
+    fun initGame() {
+        pokerChips[PLAYER] = playerMoney
+        pokerChips[BOT] = botMoney
+        levelUp = false
         newGame()
     }
 
     fun newGame() {
         initValues()
         dealCards()
+        if (displayLevelTimerJob == null || !displayLevelTimerJob!!.isActive) {
+            initLevelTimer()
+        }
+
         betting.preFlop()
     }
 }

@@ -16,6 +16,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.ArrayList
 
+const val INITIAL_MONEY = 1500
+const val LEVEL_TIMER = 10 // 5 min
+
 object Data {
 
     val uiStateFlow = MutableStateFlow(GameUiState())
@@ -50,10 +53,8 @@ object Data {
     var actionText : MutableList<String> = mutableListOf("", "")
 
     // Money
-    var smallBlind = 20
-    var bigBlind = 40
-    var playerMoney = 1500
-    var botMoney = 1500
+    var playerMoney = INITIAL_MONEY
+    var botMoney = INITIAL_MONEY
     var pokerChips: MutableList<Int> = mutableListOf(0,0)
     var bet: MutableList<Int> = mutableListOf(0,0)
     var botLastRaise: Int = 0
@@ -90,6 +91,20 @@ object Data {
     // Blinds
     var level: Int = 1
     var levelUp: Boolean = false
-    var activeLevelTimer: Boolean = false
     var displayLevelTimerJob: Job? = null
+    data class BlindLevel(val smallBlind: Int, val bigBlind: Int)
+    val blindLevels = mapOf(
+        1 to BlindLevel(20, 40),
+        2 to BlindLevel(30, 60),
+        3 to BlindLevel(50, 100),
+        4 to BlindLevel(75, 150),
+        5 to BlindLevel(100, 200),
+        6 to BlindLevel(150, 300),
+        7 to BlindLevel(200, 400),
+        8 to BlindLevel(300, 600),
+        9 to BlindLevel(400, 800),
+        10 to BlindLevel(500, 1000),
+    )
+    var smallBlind = blindLevels.getValue(level).smallBlind
+    var bigBlind = blindLevels.getValue(level).bigBlind
 }
