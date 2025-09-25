@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.util.ArrayList
 
 const val INITIAL_MONEY = 1500
-const val LEVEL_TIMER = 10 // 5 min
+const val LEVEL_TIMER = 300 // 5 min
 
 object Data {
 

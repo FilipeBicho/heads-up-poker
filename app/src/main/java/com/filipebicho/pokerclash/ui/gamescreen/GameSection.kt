@@ -1,7 +1,15 @@
 package com.filipebicho.pokerclash.ui.gamescreen
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,6 +29,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -97,7 +106,9 @@ private fun TopSection(gameUiState: GameUiState) {
             LevelTimer(
                 level = gameUiState.level,
                 timer = gameUiState.levelTimer,
-                levelUp = gameUiState.levelUp)
+                levelUp = gameUiState.levelUp,
+                modifier = Modifier
+            )
         }
     }
 }
@@ -297,40 +308,64 @@ private fun RoundPot(roundPot: Int, display: Boolean) {
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun LevelTimer(
     level: Int,
     timer: String,
-    levelUp: Boolean
+    levelUp: Boolean,
+    modifier: Modifier = Modifier
 ) {
-    Row {
-        if (levelUp) {
-            Text(
-                text = "Blinds will be increase next round",
-                color = Color.LightGray,
-                fontSize = 12.sp
-            )
-        } else {
-            if (level == 10) {
+    Row(
+        modifier = modifier.padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        AnimatedContent(
+            targetState = levelUp,
+            transitionSpec = {
+                // Defines how the content animates when levelUp state changes
+                if (targetState) {
+                    slideInVertically { height -> height } + fadeIn() with
+                            slideOutVertically { height -> -height } + fadeOut()
+                } else {
+                    slideInVertically { height -> -height } + fadeIn() with
+                            slideOutVertically { height -> height } + fadeOut()
+                } using SizeTransform(clip = false)
+            },
+            label = "LevelUpAnimation"
+        ) { isLevelingUp ->
+            if (isLevelingUp) {
                 Text(
-                    text = "Level Max",
-                    color = Color.White,
-                    fontSize = 12.sp,
+                    text = "Level Up! Blinds Increased!",
+                    color = Color.LightGray,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
             } else {
-                Text(
-                    text = "Level $level",
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = timer,
-                    color = Color.LightGray,
-                    fontSize = 12.sp
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (level >= 10) {
+                        Text(
+                            text = "Max Level",
+                            color = Color.White,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    } else {
+                        Text(
+                            text = "Level $level",
+                            color = Color.LightGray,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = timer,
+                            color = Color.LightGray,
+                            fontSize = 13.sp
+                        )
+                    }
+                }
             }
         }
     }
