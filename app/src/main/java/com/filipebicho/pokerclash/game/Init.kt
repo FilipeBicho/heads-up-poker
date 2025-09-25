@@ -207,6 +207,9 @@ class Init(var coroutineScope: CoroutineScope, stats: Stats) {
         pokerChips[PLAYER] = playerMoney
         pokerChips[BOT] = botMoney
         levelUp = false
+        level = 1
+        displayLevelTimerJob?.cancel()
+        displayLevelTimerJob = null
         newGame()
     }
 
