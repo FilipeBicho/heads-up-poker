@@ -317,7 +317,7 @@ private fun LevelTimer(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.padding(vertical = 4.dp),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
