@@ -42,6 +42,7 @@ class ChatgptBot(private val stats: Stats) {
 
     val retrofit = RetrofitClient.getOpenAiClient()
     var betValue: Int = 0
+    var minBet: Int = 0
 
     suspend fun getAction(): Int = suspendCancellableCoroutine { continuation ->
         val request = ChatRequest(model = "gpt-4o", messages = getRequestMessage(), response_format = ResponseFormat(type = "json_object"))
@@ -52,7 +53,8 @@ class ChatgptBot(private val stats: Stats) {
                     continuation.resume(getActionsFromResponse(response))
                 } else {
                     // Resume with exception if response is unsuccessful
-                    continuation.resumeWithException(Exception("API error: ${response.errorBody()}"))
+                    Log.e("ChatgptBot", "Error: ${response.errorBody()?.string()}")
+                    continuation.resume(NO_ACTION)
                 }
             }
 
@@ -63,7 +65,8 @@ class ChatgptBot(private val stats: Stats) {
         })
     }
 
-    suspend fun calculateAction(): Int {
+    suspend fun calculateAction(minBet: Int): Int {
+        this.minBet = minBet
         try {
            return getAction()
         } catch (e: Exception) {
@@ -120,6 +123,9 @@ class ChatgptBot(private val stats: Stats) {
         )
 
         val prompt = buildChatPrompt(opponentStatsPayload, currentTableCards)
+
+        Log.d("ChatgptBot", "Prompt: $prompt")
+
         return listOf(Message(
             role = "user",
             content = prompt
@@ -143,6 +149,7 @@ class ChatgptBot(private val stats: Stats) {
         appendLine("Current Hand State:")
         appendLine("- Small Blind: $smallBlind")
         appendLine("- Big Blind: $bigBlind")
+        appendLine("- Min bet: $minBet")
         appendLine("- Blind level time: $LEVEL_TIMER seconds")
         appendLine("- Round: ${roundText[round]}")
         appendLine("- Round: ${roundText[round]}")

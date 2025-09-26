@@ -42,7 +42,6 @@ import com.filipebicho.pokerclash.data.Data.smallBlind
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.data.INITIAL_BIG_BLIND
-import com.filipebicho.pokerclash.data.INITIAL_MONEY
 import com.filipebicho.pokerclash.data.INITIAL_SMALL_BLIND
 import com.filipebicho.pokerclash.data.LEVEL_TIMER
 import com.filipebicho.pokerclash.odds.Combinations
@@ -208,7 +207,7 @@ class Init(var coroutineScope: CoroutineScope, stats: Stats) {
         pokerChips[PLAYER] = playerMoney
         pokerChips[BOT] = botMoney
         levelUp = false
-        level = 1
+        level = 4
         smallBlind = blindLevels[level]?.smallBlind ?: INITIAL_SMALL_BLIND
         bigBlind = blindLevels[level]?.bigBlind ?: INITIAL_BIG_BLIND
         displayLevelTimerJob?.cancel()

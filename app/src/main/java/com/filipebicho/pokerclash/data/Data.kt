@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.util.ArrayList
 
 const val INITIAL_MONEY = 1500
-const val LEVEL_TIMER = 300 // 5 min
+const val LEVEL_TIMER = 60 // 5 min
 const val INITIAL_SMALL_BLIND = 20
 const val INITIAL_BIG_BLIND = 40
 
@@ -59,6 +59,7 @@ object Data {
     var botMoney = INITIAL_MONEY
     var pokerChips: MutableList<Int> = mutableListOf(0,0)
     var bet: MutableList<Int> = mutableListOf(0,0)
+    var playerLastRaise: Int = 0
     var botLastRaise: Int = 0
     var roundPot: Int = 0
     var mainPot: Int = 0
@@ -68,6 +69,7 @@ object Data {
     var checkAvailable: Boolean = true
     var round: Int = PRE_FLOP
     var validActions = listOf("")
+    var botMinBet: Int = 0
 
     // Count variables
     var currentBot = -1

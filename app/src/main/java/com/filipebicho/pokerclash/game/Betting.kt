@@ -32,6 +32,7 @@ import com.filipebicho.pokerclash.data.Data.init
 import com.filipebicho.pokerclash.data.Data.mainPot
 import com.filipebicho.pokerclash.data.Data.opponent
 import com.filipebicho.pokerclash.data.Data.player
+import com.filipebicho.pokerclash.data.Data.playerLastRaise
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
@@ -324,8 +325,11 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
 //        Log.d("MONEY DEBUG", "Player total stake: $playerTotalStake")
 
         checkAvailable = false
-        if (player == BOT)
+        if (player == BOT) {
             botLastRaise = newBetAmount - bet[BOT]
+        } else if (player == PLAYER) {
+            playerLastRaise = newBetAmount - bet[PLAYER]
+        }
 
         if (newBetAmount > playerTotalStake) {
 //            Log.d("MONEY DEBUG", "All in: $playerTotalStake")
@@ -432,8 +436,8 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
             currentState.copy(
                 playerBet = bet[PLAYER],
                 botBet = bet[BOT],
-                playerMinRaise = getMinRaiseForPlayer(),
-                playerCurrentRaise = getMinRaiseForPlayer(),
+                playerMinRaise = getMinRaise(PLAYER),
+                playerCurrentRaise = getMinRaise(PLAYER),
                 mainPot = mainPot,
                 roundPot = roundPot,
             )
@@ -464,22 +468,26 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
         }
     }
 
-    private fun getMinRaiseForPlayer(): Int {
-        val botBet = bet[BOT]
-        val playerBet = bet[PLAYER]
+    private fun getMinRaise(player: Int): Int {
+
+        val opponent = if (player == PLAYER) BOT else PLAYER
+        val opponentLastRaise = if (player == PLAYER) botLastRaise else playerLastRaise
+
+        val opponentBet = bet[opponent]
+        val playerBet = bet[player]
 
         // Pre-flop: if both bets are zero (new hand)
-        if (botBet == 0 && playerBet == 0) {
+        if (opponentBet == 0 && playerBet == 0) {
             return bigBlind
         }
 
         // No previous raise (bot just called BB)
-        if (botBet == bigBlind) {
+        if (opponentBet == bigBlind) {
             return bigBlind * 2
         }
 
         // There was a previous raise — use lastRaiseAmount
-        return botBet + botLastRaise
+        return opponentBet + opponentLastRaise
     }
 
     private fun isBetAvailable(): Boolean {
@@ -497,15 +505,15 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
     }
 
     private fun isMinBetAvailable(): Boolean {
-        return getMinRaiseForPlayer() < pokerChips[PLAYER]
+        return getMinRaise(PLAYER) < pokerChips[PLAYER]
     }
 
     private fun is3BBBetAvailable(): Boolean {
-        return getMinRaiseForPlayer() <= bigBlind * 3 && pokerChips[PLAYER] >= bigBlind * 3
+        return getMinRaise(PLAYER) <= bigBlind * 3 && pokerChips[PLAYER] >= bigBlind * 3
     }
 
     private fun isPotBetAvailable(): Boolean {
-        return getMinRaiseForPlayer() <= roundPot + mainPot && roundPot + mainPot < pokerChips[PLAYER]
+        return getMinRaise(PLAYER) <= roundPot + mainPot && roundPot + mainPot < pokerChips[PLAYER]
     }
 
     /**
@@ -533,13 +541,18 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
 
     private fun botAction() {
         coroutineScope.launch {
-            val action = chatGptBot.calculateAction()
+            val action = chatGptBot.calculateAction(getMinRaise(BOT))
             when (action) {
                 FOLD -> fold()
                 CHECK -> check()
                 CALL -> call()
                 BET -> {
-                    bet(chatGptBot.betValue)
+                    val botBetValue = if (chatGptBot.betValue < getMinRaise(BOT)) {
+                        getMinRaise(BOT)
+                    } else {
+                        chatGptBot.betValue
+                    }
+                    bet(botBetValue)
                 }
                 ALLIN -> {
                     allIn()
@@ -562,8 +575,8 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
                 botMoney = pokerChips[BOT],
                 playerBet = bet[PLAYER],
                 botBet = bet[BOT],
-                playerMinRaise = getMinRaiseForPlayer(),
-                playerCurrentRaise = getMinRaiseForPlayer(),
+                playerMinRaise = getMinRaise(PLAYER),
+                playerCurrentRaise = getMinRaise(PLAYER),
                 actions = actionText,
                 roundPot = roundPot,
                 mainPot = mainPot + roundPot,
@@ -597,8 +610,8 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
             uiStateFlow.update { currentState -> currentState.copy(
                 isPlayerTurn = true,
                 playerCall = bet[BOT] - bet[PLAYER],
-                playerMinRaise = getMinRaiseForPlayer(),
-                playerCurrentRaise = getMinRaiseForPlayer(),
+                playerMinRaise = getMinRaise(PLAYER),
+                playerCurrentRaise = getMinRaise(PLAYER),
                 displayFoldButton = true,
                 displayCheckButton = false,
                 displayCallButton = true,
@@ -619,7 +632,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
             uiStateFlow.update { currentState ->
                 currentState.copy(
                     isPlayerTurn = true,
-                    playerMinRaise = getMinRaiseForPlayer(),
+                    playerMinRaise = getMinRaise(PLAYER),
                     displayFoldButton = false,
                     displayCheckButton = true,
                     displayCallButton = false,
