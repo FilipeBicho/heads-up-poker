@@ -120,9 +120,6 @@ class ChatgptBot(private val stats: Stats) {
         )
 
         val prompt = buildChatPrompt(opponentStatsPayload, currentTableCards)
-
-        Log.d("ChatgptBot", "Prompt: $prompt")
-
         return listOf(Message(
             role = "user",
             content = prompt

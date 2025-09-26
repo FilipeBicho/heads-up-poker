@@ -18,6 +18,8 @@ import java.util.ArrayList
 
 const val INITIAL_MONEY = 1500
 const val LEVEL_TIMER = 300 // 5 min
+const val INITIAL_SMALL_BLIND = 20
+const val INITIAL_BIG_BLIND = 40
 
 object Data {
 
@@ -94,7 +96,7 @@ object Data {
     var displayLevelTimerJob: Job? = null
     data class BlindLevel(val smallBlind: Int, val bigBlind: Int)
     val blindLevels = mapOf(
-        1 to BlindLevel(20, 40),
+        1 to BlindLevel(INITIAL_SMALL_BLIND, INITIAL_BIG_BLIND),
         2 to BlindLevel(30, 60),
         3 to BlindLevel(50, 100),
         4 to BlindLevel(75, 150),
@@ -105,6 +107,6 @@ object Data {
         9 to BlindLevel(400, 800),
         10 to BlindLevel(500, 1000),
     )
-    var smallBlind = blindLevels.getValue(level).smallBlind
-    var bigBlind = blindLevels.getValue(level).bigBlind
+    var smallBlind = INITIAL_SMALL_BLIND
+    var bigBlind = INITIAL_BIG_BLIND
 }

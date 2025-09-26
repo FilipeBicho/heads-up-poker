@@ -61,7 +61,6 @@ import com.filipebicho.pokerclash.cards.PLAYER
 import com.filipebicho.pokerclash.hand.Hand
 import kotlinx.coroutines.delay
 import kotlin.collections.joinToString
-import kotlin.concurrent.timer
 
 @Composable
 fun GameSection(

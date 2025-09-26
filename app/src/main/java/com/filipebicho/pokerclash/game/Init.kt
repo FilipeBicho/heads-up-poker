@@ -41,7 +41,9 @@ import com.filipebicho.pokerclash.data.Data.roundPot
 import com.filipebicho.pokerclash.data.Data.smallBlind
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
+import com.filipebicho.pokerclash.data.INITIAL_BIG_BLIND
 import com.filipebicho.pokerclash.data.INITIAL_MONEY
+import com.filipebicho.pokerclash.data.INITIAL_SMALL_BLIND
 import com.filipebicho.pokerclash.data.LEVEL_TIMER
 import com.filipebicho.pokerclash.odds.Combinations
 import com.filipebicho.pokerclash.odds.Odds
@@ -122,8 +124,8 @@ class Init(var coroutineScope: CoroutineScope, stats: Stats) {
         if (levelUp && level < 10) {
             level += 1
             levelUp = false
-            smallBlind = blindLevels[level]?.smallBlind ?: 40
-            bigBlind = blindLevels[level]?.bigBlind ?: 20
+            smallBlind = blindLevels[level]?.smallBlind ?: INITIAL_SMALL_BLIND
+            bigBlind = blindLevels[level]?.bigBlind ?: INITIAL_BIG_BLIND
         }
 
         checkAvailable = true
@@ -176,9 +178,8 @@ class Init(var coroutineScope: CoroutineScope, stats: Stats) {
     }
 
     fun initLevelTimer() {
-
         // max level
-        if (bigBlind >= INITIAL_MONEY) {
+        if (level >= 10) {
             return
         }
 
@@ -208,6 +209,8 @@ class Init(var coroutineScope: CoroutineScope, stats: Stats) {
         pokerChips[BOT] = botMoney
         levelUp = false
         level = 1
+        smallBlind = blindLevels[level]?.smallBlind ?: INITIAL_SMALL_BLIND
+        bigBlind = blindLevels[level]?.bigBlind ?: INITIAL_BIG_BLIND
         displayLevelTimerJob?.cancel()
         displayLevelTimerJob = null
         newGame()
@@ -216,6 +219,7 @@ class Init(var coroutineScope: CoroutineScope, stats: Stats) {
     fun newGame() {
         initValues()
         dealCards()
+
         if (displayLevelTimerJob == null || !displayLevelTimerJob!!.isActive) {
             initLevelTimer()
         }
