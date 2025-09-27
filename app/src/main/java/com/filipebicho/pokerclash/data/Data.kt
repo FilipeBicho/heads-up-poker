@@ -10,10 +10,16 @@ import com.filipebicho.pokerclash.game.Betting
 import com.filipebicho.pokerclash.game.Init
 import com.filipebicho.pokerclash.game.Round
 import com.filipebicho.pokerclash.odds.Odds
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.ArrayList
+
+const val INITIAL_MONEY = 1500
+const val LEVEL_TIMER = 60 // 5 min
+const val INITIAL_SMALL_BLIND = 20
+const val INITIAL_BIG_BLIND = 40
 
 object Data {
 
@@ -49,10 +55,9 @@ object Data {
     var actionText : MutableList<String> = mutableListOf("", "")
 
     // Money
-    var playerMoney = 1500
-    var botMoney = 1500
     var pokerChips: MutableList<Int> = mutableListOf(0,0)
     var bet: MutableList<Int> = mutableListOf(0,0)
+    var playerLastRaise: Int = 0
     var botLastRaise: Int = 0
     var roundPot: Int = 0
     var mainPot: Int = 0
@@ -62,6 +67,7 @@ object Data {
     var checkAvailable: Boolean = true
     var round: Int = PRE_FLOP
     var validActions = listOf("")
+    var botMinBet: Int = 0
 
     // Count variables
     var currentBot = -1
@@ -83,4 +89,24 @@ object Data {
     // Summary
     var gameSummaryMap: MutableList<List<String>> = ArrayList()
     var gameSummaryList: MutableList<String> = mutableListOf()
+
+    // Blinds
+    var level: Int = 1
+    var levelUp: Boolean = false
+    var displayLevelTimerJob: Job? = null
+    data class BlindLevel(val smallBlind: Int, val bigBlind: Int)
+    val blindLevels = mapOf(
+        1 to BlindLevel(INITIAL_SMALL_BLIND, INITIAL_BIG_BLIND),
+        2 to BlindLevel(30, 60),
+        3 to BlindLevel(50, 100),
+        4 to BlindLevel(75, 150),
+        5 to BlindLevel(100, 200),
+        6 to BlindLevel(150, 300),
+        7 to BlindLevel(200, 400),
+        8 to BlindLevel(300, 600),
+        9 to BlindLevel(400, 800),
+        10 to BlindLevel(500, 1000),
+    )
+    var smallBlind = INITIAL_SMALL_BLIND
+    var bigBlind = INITIAL_BIG_BLIND
 }

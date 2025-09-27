@@ -1,8 +1,6 @@
 package com.filipebicho.pokerclash.game
 
 import android.util.Log
-import com.filipebicho.pokerclash.BIG_BLIND
-import com.filipebicho.pokerclash.SMALL_BLIND
 import com.filipebicho.pokerclash.bot.ALLIN
 import com.filipebicho.pokerclash.bot.BET
 import com.filipebicho.pokerclash.bot.CALL
@@ -20,6 +18,7 @@ import com.filipebicho.pokerclash.data.Data.actionHistory
 import com.filipebicho.pokerclash.data.Data.actionPlayer
 import com.filipebicho.pokerclash.data.Data.actionText
 import com.filipebicho.pokerclash.data.Data.bet
+import com.filipebicho.pokerclash.data.Data.bigBlind
 import com.filipebicho.pokerclash.data.Data.blind
 import com.filipebicho.pokerclash.data.Data.botLastRaise
 import com.filipebicho.pokerclash.data.Data.chatGptBot
@@ -33,10 +32,12 @@ import com.filipebicho.pokerclash.data.Data.init
 import com.filipebicho.pokerclash.data.Data.mainPot
 import com.filipebicho.pokerclash.data.Data.opponent
 import com.filipebicho.pokerclash.data.Data.player
+import com.filipebicho.pokerclash.data.Data.playerLastRaise
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
 import com.filipebicho.pokerclash.data.Data.roundText
+import com.filipebicho.pokerclash.data.Data.smallBlind
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.data.Data.validActions
 import kotlinx.coroutines.flow.update
@@ -54,8 +55,8 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
         val blindName = uiStateFlow.value.name[player]
         val dealerName = uiStateFlow.value.name[opponent]
 
-         if (pokerChips[blind] <= BIG_BLIND) {
-             if (pokerChips[blind] <= SMALL_BLIND) {
+         if (pokerChips[blind] <= bigBlind) {
+             if (pokerChips[blind] <= smallBlind) {
 
                  //bettingLog("--- BEFORE BLIND (small blind) All in ---")
 
@@ -92,7 +93,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
                  pokerChips[blind] = 0
 
                  // dealer pay small blind
-                 bet[dealer] = SMALL_BLIND
+                 bet[dealer] = smallBlind
                  pokerChips[dealer] -= bet[dealer]
 
                  // calculate pot
@@ -113,7 +114,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
                  updateStateFlowBets()
                  foldCall()
              }
-         } else if (pokerChips[dealer] <= SMALL_BLIND) {
+         } else if (pokerChips[dealer] <= smallBlind) {
 
              //bettingLog("--- BEFORE DEALER (small blind) All in ---")
 
@@ -146,11 +147,11 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
              //bettingLog("--- BEFORE PRE FLOP ---")
 
              // dealer pay small blind
-             bet[dealer] = SMALL_BLIND
+             bet[dealer] = smallBlind
              pokerChips[dealer] -= bet[dealer]
 
              // blind pay big blind
-             bet[blind] = BIG_BLIND
+             bet[blind] = bigBlind
              pokerChips[blind] -= bet[blind]
 
              // calculate pot
@@ -255,7 +256,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
         if (pokerChips[player] <= amountToCall) {
 
             //bettingLog("--- BEFORE CALL (all in) $playerName ---")
-            Log.d("MONEY DEBUG", "Amount to call: $amountToCall")
+          //  Log.d("MONEY DEBUG", "Amount to call: $amountToCall")
 
             // Player is all-in by calling
             val allInAmount = pokerChips[player]
@@ -267,7 +268,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
             // Opponent's bet might need to be adjusted if player's all-in is less than opponent's bet
             if (bet[opponent] > bet[player]) {
                 val excessBet = bet[opponent] - bet[player]
-                Log.d("MONEY DEBUG", "Excess bet: $excessBet")
+               // Log.d("MONEY DEBUG", "Excess bet: $excessBet")
                 pokerChips[opponent] += excessBet // Return excess to opponent's chips
                 bet[opponent] = bet[player]     // Opponent's bet now matches player's all-in bet
             }
@@ -324,10 +325,13 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
 //        Log.d("MONEY DEBUG", "Player total stake: $playerTotalStake")
 
         checkAvailable = false
-        if (player == BOT)
+        if (player == BOT) {
             botLastRaise = newBetAmount - bet[BOT]
+        } else if (player == PLAYER) {
+            playerLastRaise = newBetAmount - bet[PLAYER]
+        }
 
-        if (newBetAmount > playerTotalStake) {
+        if (newBetAmount >= playerTotalStake) {
 //            Log.d("MONEY DEBUG", "All in: $playerTotalStake")
             allIn()
         } else {
@@ -432,8 +436,8 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
             currentState.copy(
                 playerBet = bet[PLAYER],
                 botBet = bet[BOT],
-                playerMinRaise = getMinRaiseForPlayer(),
-                playerCurrentRaise = getMinRaiseForPlayer(),
+                playerMinRaise = getMinRaise(PLAYER),
+                playerCurrentRaise = getMinRaise(PLAYER),
                 mainPot = mainPot,
                 roundPot = roundPot,
             )
@@ -464,22 +468,26 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
         }
     }
 
-    private fun getMinRaiseForPlayer(): Int {
-        val botBet = bet[BOT]
-        val playerBet = bet[PLAYER]
+    private fun getMinRaise(player: Int): Int {
+
+        val opponent = if (player == PLAYER) BOT else PLAYER
+        val opponentLastRaise = if (player == PLAYER) botLastRaise else playerLastRaise
+
+        val opponentBet = bet[opponent]
+        val playerBet = bet[player]
 
         // Pre-flop: if both bets are zero (new hand)
-        if (botBet == 0 && playerBet == 0) {
-            return BIG_BLIND
+        if (opponentBet == 0 && playerBet == 0) {
+            return bigBlind
         }
 
         // No previous raise (bot just called BB)
-        if (botBet == BIG_BLIND) {
-            return BIG_BLIND * 2
+        if (opponentBet == bigBlind) {
+            return bigBlind * 2
         }
 
         // There was a previous raise — use lastRaiseAmount
-        return botBet + botLastRaise
+        return opponentBet + opponentLastRaise
     }
 
     private fun isBetAvailable(): Boolean {
@@ -497,15 +505,15 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
     }
 
     private fun isMinBetAvailable(): Boolean {
-        return getMinRaiseForPlayer() < pokerChips[PLAYER]
+        return getMinRaise(PLAYER) < pokerChips[PLAYER]
     }
 
     private fun is3BBBetAvailable(): Boolean {
-        return getMinRaiseForPlayer() <= BIG_BLIND * 3 && pokerChips[PLAYER] >= BIG_BLIND * 3
+        return getMinRaise(PLAYER) <= bigBlind * 3 && pokerChips[PLAYER] >= bigBlind * 3
     }
 
     private fun isPotBetAvailable(): Boolean {
-        return getMinRaiseForPlayer() <= roundPot + mainPot && roundPot + mainPot < pokerChips[PLAYER]
+        return getMinRaise(PLAYER) <= roundPot + mainPot && roundPot + mainPot < pokerChips[PLAYER]
     }
 
     /**
@@ -519,7 +527,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
         return if (bet[BOT] > 0 && pokerChips[PLAYER] <= bet[BOT] * 2) {
             true
         } else {
-            pokerChips[PLAYER] >= BIG_BLIND
+            pokerChips[PLAYER] >= bigBlind
         }
     }
 
@@ -533,13 +541,18 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
 
     private fun botAction() {
         coroutineScope.launch {
-            val action = chatGptBot.calculateAction()
+            val action = chatGptBot.calculateAction(getMinRaise(BOT))
             when (action) {
                 FOLD -> fold()
                 CHECK -> check()
                 CALL -> call()
                 BET -> {
-                    bet(chatGptBot.betValue)
+                    val botBetValue = if (chatGptBot.betValue < getMinRaise(BOT)) {
+                        getMinRaise(BOT)
+                    } else {
+                        chatGptBot.betValue
+                    }
+                    bet(botBetValue)
                 }
                 ALLIN -> {
                     allIn()
@@ -562,8 +575,8 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
                 botMoney = pokerChips[BOT],
                 playerBet = bet[PLAYER],
                 botBet = bet[BOT],
-                playerMinRaise = getMinRaiseForPlayer(),
-                playerCurrentRaise = getMinRaiseForPlayer(),
+                playerMinRaise = getMinRaise(PLAYER),
+                playerCurrentRaise = getMinRaise(PLAYER),
                 actions = actionText,
                 roundPot = roundPot,
                 mainPot = mainPot + roundPot,
@@ -597,8 +610,8 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
             uiStateFlow.update { currentState -> currentState.copy(
                 isPlayerTurn = true,
                 playerCall = bet[BOT] - bet[PLAYER],
-                playerMinRaise = getMinRaiseForPlayer(),
-                playerCurrentRaise = getMinRaiseForPlayer(),
+                playerMinRaise = getMinRaise(PLAYER),
+                playerCurrentRaise = getMinRaise(PLAYER),
                 displayFoldButton = true,
                 displayCheckButton = false,
                 displayCallButton = true,
@@ -619,7 +632,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
             uiStateFlow.update { currentState ->
                 currentState.copy(
                     isPlayerTurn = true,
-                    playerMinRaise = getMinRaiseForPlayer(),
+                    playerMinRaise = getMinRaise(PLAYER),
                     displayFoldButton = false,
                     displayCheckButton = true,
                     displayCallButton = false,

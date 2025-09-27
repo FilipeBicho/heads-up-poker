@@ -13,6 +13,7 @@ import com.filipebicho.pokerclash.data.Data.actionText
 import com.filipebicho.pokerclash.data.Data.botCards
 import com.filipebicho.pokerclash.data.Data.botWins
 import com.filipebicho.pokerclash.data.Data.currentBot
+import com.filipebicho.pokerclash.data.Data.displayLevelTimerJob
 import com.filipebicho.pokerclash.data.Data.gameNumber
 import com.filipebicho.pokerclash.data.Data.gameSummaryList
 import com.filipebicho.pokerclash.data.Data.gameSummaryMap
@@ -214,6 +215,15 @@ class Round(var coroutineScope: CoroutineScope, private val stats: Stats) {
 
             coroutineScope.launch {
                 stats.updateStatsAfterHand()
+
+                // cancel level timer
+                displayLevelTimerJob?.cancel()
+                displayLevelTimerJob = null
+
+                uiStateFlow.update { currentState -> currentState.copy(
+                    displayLevelTimer = false,
+                )}
+
                 delay(4000)
                 uiStateFlow.update { currentState -> currentState.copy(
                     newGame = true,

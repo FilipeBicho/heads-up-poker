@@ -34,6 +34,7 @@ data class GameUiState(
     val mainPot: Int = 0,
     val roundPot: Int = 0,
     val displayPot: Boolean = true,
+    val bigBlind: Int = 0,
 
     // Cards
     val playerCards: List<Card> = ArrayList(),
@@ -56,6 +57,10 @@ data class GameUiState(
     val displayGameResult: Boolean = false,
     val winner: Int = -1,
     val displayFold: Boolean = false,
+    val level: Int = 1,
+    val levelTimer: String = "",
+    val displayLevelTimer: Boolean = false,
+    val levelUp: Boolean = false,
 
     // Display Bet Buttons
     val displayFoldButton: Boolean = false,

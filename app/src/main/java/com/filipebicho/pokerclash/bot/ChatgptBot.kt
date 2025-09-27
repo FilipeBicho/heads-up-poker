@@ -9,6 +9,7 @@ import com.filipebicho.pokerclash.cards.RIVER
 import com.filipebicho.pokerclash.cards.TURN
 import com.filipebicho.pokerclash.data.Data.actionHistory
 import com.filipebicho.pokerclash.data.Data.bet
+import com.filipebicho.pokerclash.data.Data.bigBlind
 import com.filipebicho.pokerclash.data.Data.botCards
 import com.filipebicho.pokerclash.data.Data.dealer
 import com.filipebicho.pokerclash.data.Data.mainPot
@@ -17,8 +18,10 @@ import com.filipebicho.pokerclash.data.Data.round
 import com.filipebicho.pokerclash.data.Data.roundPot
 import com.filipebicho.pokerclash.data.Data.roundText
 import com.filipebicho.pokerclash.data.Data.simulatedPlayer
+import com.filipebicho.pokerclash.data.Data.smallBlind
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.validActions
+import com.filipebicho.pokerclash.data.LEVEL_TIMER
 import com.filipebicho.pokerclash.game.Stats
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONObject
@@ -39,6 +42,7 @@ class ChatgptBot(private val stats: Stats) {
 
     val retrofit = RetrofitClient.getOpenAiClient()
     var betValue: Int = 0
+    var minBet: Int = 0
 
     suspend fun getAction(): Int = suspendCancellableCoroutine { continuation ->
         val request = ChatRequest(model = "gpt-4o", messages = getRequestMessage(), response_format = ResponseFormat(type = "json_object"))
@@ -49,7 +53,8 @@ class ChatgptBot(private val stats: Stats) {
                     continuation.resume(getActionsFromResponse(response))
                 } else {
                     // Resume with exception if response is unsuccessful
-                    continuation.resumeWithException(Exception("API error: ${response.errorBody()}"))
+                    Log.e("ChatgptBot", "Error: ${response.errorBody()?.string()}")
+                    continuation.resume(NO_ACTION)
                 }
             }
 
@@ -60,7 +65,8 @@ class ChatgptBot(private val stats: Stats) {
         })
     }
 
-    suspend fun calculateAction(): Int {
+    suspend fun calculateAction(minBet: Int): Int {
+        this.minBet = minBet
         try {
            return getAction()
         } catch (e: Exception) {
@@ -72,7 +78,7 @@ class ChatgptBot(private val stats: Stats) {
         val content = response.body()?.choices?.first()?.message?.content.toString().lowercase()
         if (content.isNotEmpty()) {
             val jsonContent = JSONObject(content)
-            Log.d("ChatgptBot", "Response: $jsonContent")
+           // Log.d("ChatgptBot", "Response: $jsonContent")
             var actionString = ""
             if (jsonContent.has("action")) {
                 actionString = jsonContent.get("action").toString()
@@ -117,6 +123,9 @@ class ChatgptBot(private val stats: Stats) {
         )
 
         val prompt = buildChatPrompt(opponentStatsPayload, currentTableCards)
+
+       // Log.d("ChatgptBot", "Prompt: $prompt")
+
         return listOf(Message(
             role = "user",
             content = prompt
@@ -138,6 +147,11 @@ class ChatgptBot(private val stats: Stats) {
         appendLine("- River Bluffs Detected: ${opponentStatsPayload["riverBluffsDetected"]}")
         appendLine()
         appendLine("Current Hand State:")
+        appendLine("- Small Blind: $smallBlind")
+        appendLine("- Big Blind: $bigBlind")
+        appendLine("- Min bet: $minBet")
+        appendLine("- Blind level time: $LEVEL_TIMER seconds")
+        appendLine("- Round: ${roundText[round]}")
         appendLine("- Round: ${roundText[round]}")
         appendLine("- Your Hand: ${botCards.joinToString(", ") { it.cardString() }}")
         appendLine("- Board: ${if (tableCards.isEmpty()) "No board yet" else tableCards.joinToString(", ") { it.cardString() }}")

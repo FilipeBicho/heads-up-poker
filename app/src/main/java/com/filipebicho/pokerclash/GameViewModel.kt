@@ -24,9 +24,6 @@ import com.filipebicho.pokerclash.game.Stats
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-const val SMALL_BLIND = 20
-const val BIG_BLIND = 40
-
 class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     private val appContext = application.applicationContext
@@ -63,9 +60,6 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         init.initGame()
     }
 
-    /**
-     * Update player bet via button interaction
-     */
     fun updatePlayerBet(value: Int) {
         uiStateFlow.update { currentState ->
             currentState.copy(
