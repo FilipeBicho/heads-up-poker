@@ -60,9 +60,6 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         init.initGame()
     }
 
-    /**
-     * Update player bet via button interaction
-     */
     fun updatePlayerBet(value: Int) {
         uiStateFlow.update { currentState ->
             currentState.copy(

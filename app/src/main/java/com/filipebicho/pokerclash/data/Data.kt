@@ -55,8 +55,6 @@ object Data {
     var actionText : MutableList<String> = mutableListOf("", "")
 
     // Money
-    var playerMoney = INITIAL_MONEY
-    var botMoney = INITIAL_MONEY
     var pokerChips: MutableList<Int> = mutableListOf(0,0)
     var bet: MutableList<Int> = mutableListOf(0,0)
     var playerLastRaise: Int = 0

@@ -256,7 +256,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
         if (pokerChips[player] <= amountToCall) {
 
             //bettingLog("--- BEFORE CALL (all in) $playerName ---")
-            Log.d("MONEY DEBUG", "Amount to call: $amountToCall")
+          //  Log.d("MONEY DEBUG", "Amount to call: $amountToCall")
 
             // Player is all-in by calling
             val allInAmount = pokerChips[player]
@@ -268,7 +268,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
             // Opponent's bet might need to be adjusted if player's all-in is less than opponent's bet
             if (bet[opponent] > bet[player]) {
                 val excessBet = bet[opponent] - bet[player]
-                Log.d("MONEY DEBUG", "Excess bet: $excessBet")
+               // Log.d("MONEY DEBUG", "Excess bet: $excessBet")
                 pokerChips[opponent] += excessBet // Return excess to opponent's chips
                 bet[opponent] = bet[player]     // Opponent's bet now matches player's all-in bet
             }
@@ -331,7 +331,7 @@ class Betting(var coroutineScope: CoroutineScope, private val stats: Stats) {
             playerLastRaise = newBetAmount - bet[PLAYER]
         }
 
-        if (newBetAmount > playerTotalStake) {
+        if (newBetAmount >= playerTotalStake) {
 //            Log.d("MONEY DEBUG", "All in: $playerTotalStake")
             allIn()
         } else {

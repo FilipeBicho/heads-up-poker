@@ -14,7 +14,6 @@ import com.filipebicho.pokerclash.data.Data.betting
 import com.filipebicho.pokerclash.data.Data.bigBlind
 import com.filipebicho.pokerclash.data.Data.blind
 import com.filipebicho.pokerclash.data.Data.blindLevels
-import com.filipebicho.pokerclash.data.Data.botMoney
 import com.filipebicho.pokerclash.data.Data.cardDealer
 import com.filipebicho.pokerclash.data.Data.checkAvailable
 import com.filipebicho.pokerclash.data.Data.botCards
@@ -33,7 +32,6 @@ import com.filipebicho.pokerclash.data.Data.odds
 import com.filipebicho.pokerclash.data.Data.opponent
 import com.filipebicho.pokerclash.data.Data.player
 import com.filipebicho.pokerclash.data.Data.playerCards
-import com.filipebicho.pokerclash.data.Data.playerMoney
 import com.filipebicho.pokerclash.data.Data.playerWins
 import com.filipebicho.pokerclash.data.Data.pokerChips
 import com.filipebicho.pokerclash.data.Data.round
@@ -42,6 +40,7 @@ import com.filipebicho.pokerclash.data.Data.smallBlind
 import com.filipebicho.pokerclash.data.Data.tableCards
 import com.filipebicho.pokerclash.data.Data.uiStateFlow
 import com.filipebicho.pokerclash.data.INITIAL_BIG_BLIND
+import com.filipebicho.pokerclash.data.INITIAL_MONEY
 import com.filipebicho.pokerclash.data.INITIAL_SMALL_BLIND
 import com.filipebicho.pokerclash.data.LEVEL_TIMER
 import com.filipebicho.pokerclash.odds.Combinations
@@ -204,14 +203,24 @@ class Init(var coroutineScope: CoroutineScope, stats: Stats) {
      * Called at the begin of a new game
      */
     fun initGame() {
-        pokerChips[PLAYER] = playerMoney
-        pokerChips[BOT] = botMoney
+
+        // reset money
+        pokerChips[PLAYER] = INITIAL_MONEY
+        pokerChips[BOT] = INITIAL_MONEY
+        smallBlind = INITIAL_SMALL_BLIND
+        bigBlind = INITIAL_BIG_BLIND
+
+        // reset blind level
         levelUp = false
-        level = 4
-        smallBlind = blindLevels[level]?.smallBlind ?: INITIAL_SMALL_BLIND
-        bigBlind = blindLevels[level]?.bigBlind ?: INITIAL_BIG_BLIND
+        level = 1
         displayLevelTimerJob?.cancel()
         displayLevelTimerJob = null
+
+        // reset summary
+        gameNumber = 0
+        gameSummaryList.clear()
+        gameSummaryMap.clear()
+
         newGame()
     }
 

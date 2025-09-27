@@ -78,7 +78,7 @@ class ChatgptBot(private val stats: Stats) {
         val content = response.body()?.choices?.first()?.message?.content.toString().lowercase()
         if (content.isNotEmpty()) {
             val jsonContent = JSONObject(content)
-            Log.d("ChatgptBot", "Response: $jsonContent")
+           // Log.d("ChatgptBot", "Response: $jsonContent")
             var actionString = ""
             if (jsonContent.has("action")) {
                 actionString = jsonContent.get("action").toString()
@@ -124,7 +124,7 @@ class ChatgptBot(private val stats: Stats) {
 
         val prompt = buildChatPrompt(opponentStatsPayload, currentTableCards)
 
-        Log.d("ChatgptBot", "Prompt: $prompt")
+       // Log.d("ChatgptBot", "Prompt: $prompt")
 
         return listOf(Message(
             role = "user",
